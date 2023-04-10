@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+require "verse/core"
+require "verse/cli"
+
+Verse::Cli::App.start
