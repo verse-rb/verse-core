@@ -8,7 +8,8 @@ module Verse
 
     include Verse::Util
 
-    PluginNotFoundError = Class.new(RuntimeError)
+    NotFoundError = Class.new(RuntimeError)
+    DependencyError = Class.new(RuntimeError)
 
     @plugins = {}
 
@@ -66,7 +67,7 @@ module Verse
     # @return [Verse::Plugin::Base+] the plugin
     def [](name)
       @plugins.fetch(name.to_sym) do
-        raise PluginNotFoundError, "Plugin not found: `#{name}`"
+        raise NotFoundError, "Plugin not found: `#{name}`"
       end
     end
 
@@ -81,13 +82,8 @@ module Verse
     end
 
     def start(mode)
-      case mode
-      when :server
-        @plugins.values.each(&:on_start)
-      when :spec
-        @plugins.values.each(&:on_spec_helper_load)
-      when :rake
-        @plugins.values.each(&:on_rake)
+      @plugins.values.each do |x|
+        x.on_start(mode)
       end
     rescue => e
       Verse.logger.fatal(e)
@@ -120,17 +116,11 @@ module Verse
       name = plugin.fetch(:name, type)
       config = plugin.fetch(:config, {})
 
-      dependencies = plugin.fetch(:map, {})
+      dependencies = plugin.fetch(:dep, {})
 
       logger.debug{ "Plugin `#{name}`: Initializing plugin" }
 
-      if type =~ /[A-Z]/
-        plugin_class_str = type
-      else
-        plugin_class_str = "Verse::Plugin::#{StringUtil.camelize(type)}::Plugin"
-      end
-
-      plugin_class = Reflection.get(plugin_class_str)
+      plugin_class = Reflection.get(type)
       plugin = plugin_class.new(name.to_s, config, dependencies, logger)
 
       register_plugin(plugin)

@@ -26,11 +26,11 @@ module Verse
       def check_dependencies!
         dependencies.each do |x|
           self.send(x)
-        rescue PluginNotFoundError => e
+        rescue NotFoundError => e
           if dep = dep_config[x]
-            raise PluginNotFoundError, "Plugin `#{name}` depends on `#{dep}` (via #{x}) but it is not found."
+            raise DependencyError, "Plugin `#{name}` depends on `#{dep}` (via #{x}) but it is not found."
           else
-            raise PluginNotFoundError, "Plugin `#{name}` depends on `#{x}` but it is not found."
+            raise DependencyError, "Plugin `#{name}` depends on `#{x}` but it is not found."
           end
         end
       end
@@ -47,7 +47,8 @@ module Verse
 
       # This is called once all `on_init` of each plugins has been called.
       # This is where you should hook a server or any other long-lived object.
-      def on_start
+      # @param mode [Symbol] the mode of the server (:server, :spec, :rake, :console)
+      def on_start(mode)
       end
 
       # This is called when the server is shutting down.
@@ -56,14 +57,6 @@ module Verse
 
       # This is the last step of the shutdown process.
       def on_finalize
-      end
-
-      # This is called when the specs are run
-      def on_spec_helper_load
-      end
-
-      # This is called to add external rake tasks.
-      def on_rake
       end
 
     end

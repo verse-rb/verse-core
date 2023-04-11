@@ -2,6 +2,8 @@ module Verse
   module Plugin
     module Test
       class Plugin < Verse::Plugin::Base
+        attr_reader :actions
+
         def initialize(*args)
           super(*args)
           @actions = []
@@ -33,7 +35,7 @@ module Verse
           %i<dependent_plugin>
         end
 
-        def on_start
+        def on_start(mode)
           @action = dependent_plugin.do_something
         end
       end

@@ -5,11 +5,7 @@ plugins:
     config:
       a: true
       foo: "bar"
-  - name: plugin_with_dependencies
-    # dep:
-      # dependent_plugin: dependent_plugin
   - name: another_plugin_with_dependencies <plugin_with_dependencies>
     dep:
       dependent_plugin: dependent_plugin_2
-  - name: dependent_plugin
-  - name: dependent_plugin_2
+  - name: dependent_plugin # Bad linking.
