@@ -1,6 +1,10 @@
+require_relative "util/hash_util"
+
 module Verse
   module Config
     module_function
+
+    include Verse::Util
 
     def config
       @config
@@ -30,11 +34,10 @@ module Verse
       end
     end
 
-    protected
-
     # :nodoc:
     def inject_to_config(file)
-      yaml_content = ERB.new(File.read(file_path)).result
+      yaml_content = ERB.new(File.read(file)).result
+
       @config.merge!(
         HashUtil.deep_symbolize_keys(
           YAML.load(yaml_content)

@@ -26,8 +26,6 @@ require_relative "version"
 require_relative "env"
 
 Dir["#{__dir__}/**/*.rb"].each do |file|
-  puts "load #{file}"
-
   next if file[__dir__.size .. -1] =~ /^\/verse\/cli/ # do not load CLI files unless told otherwise.
 
   require_relative file

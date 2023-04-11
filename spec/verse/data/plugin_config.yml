@@ -1,15 +1,15 @@
 service_name: verse-spec
 description: used to test the plugin system.
 plugins:
-  - plugin: test
+  - name: test
     config:
-      sample: true
-    mapping:
-      dep: another_dependency
-  - plugin: test2
-    name: another_dependency
-    config:
-      sample2: true
-  - plugin: Spec::Test::Plugin # constantized plugin
-    name: test_spec
-    # no config
+      a: true
+      foo: "bar"
+  - name: plugin_with_dependencies
+    dep:
+      dependent_plugin: dependent_plugin
+  - name: another_plugin_with_dependencies <plugin_with_dependencies>
+    dep:
+      dependent_plugin: dependent_plugin_2
+  - name: dependent_plugin
+  - name: dependent_plugin_2

@@ -4,7 +4,7 @@ module Verse
       module_function
 
       def assert(test, message = nil, klass = RuntimeError)
-        return unless test
+        return if test
 
         if block_given?
           raise klass.new(yield)

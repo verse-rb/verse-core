@@ -4,17 +4,33 @@ module Verse
     class Base
       NO_DEPS = [].freeze
 
+      attr_reader :name, :config, :dep_config, :logger
+
       def initialize(name, config, dep_config, logger)
         @name       = name
         @config     = config
         @dep_config = dep_config
         @logger     = logger
+
+        init_dependencies
       end
 
-      def init_dependencies
+      protected def init_dependencies
         dependencies.each do |dep|
           define_singleton_method(dep) do
             Verse::Plugin[@dep_config.fetch(dep, dep)]
+          end
+        end
+      end
+
+      def check_dependencies!
+        dependencies.each do |x|
+          self.send(x)
+        rescue PluginNotFoundError => e
+          if dep = dep_config[x]
+            raise PluginNotFoundError, "Plugin `#{name}` depends on `#{dep}` (via #{x}) but it is not found."
+          else
+            raise PluginNotFoundError, "Plugin `#{name}` depends on `#{x}` but it is not found."
           end
         end
       end
