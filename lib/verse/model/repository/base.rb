@@ -122,7 +122,7 @@ module Verse
 
             next unless encoder
 
-            if field.is_a?(Array) && Filtering.expect_array?(field)
+            if field.is_a?(Array) && filtering.expect_array?(field)
               dup[key] = value.map{ |x| encoder.encode(x) }
             else
               dup[key] = encoder.encode(value)
@@ -172,8 +172,8 @@ module Verse
           end
         end
 
-        def prepare_included(included_list, collection, serializer: self.class.model_class)
-          set = Serializer::IncludeSet.new(included_list)
+        def prepare_included(included_list, collection, record: self.class.model_class)
+          set = IncludeSet.new(included_list)
           tree = tree_from_include_list included_list
 
           tree.each do |key, value|
@@ -183,7 +183,7 @@ module Verse
                 .map{ |x| x.gsub(/^#{key}($|\.)/, "") }
                 .reject(&:empty?)
 
-            relation = serializer.relations.fetch(key.to_sym){ raise "Relation not found: #{key}"}
+            relation = record.relations.fetch(key.to_sym){ raise "Relation not found: #{key}"}
 
             # include_list,                                     # the list we store
             # ->(included) { included[primary_key.to_s] },      # The index where to store in the set
@@ -192,10 +192,10 @@ module Verse
               collection, auth_context, sub_included
             )
 
-            set.set_lookup_method([serializer, key], &record_callback)
+            set.set_lookup_method([record, key], &record_callback)
 
             list.each do |element|
-              set.add([serializer, key], index_callback.call(element), element)
+              set.add([record, key], index_callback.call(element), element)
             end
           end
 

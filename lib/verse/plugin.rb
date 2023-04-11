@@ -8,8 +8,9 @@ module Verse
 
     include Verse::Util
 
-    NotFoundError = Class.new(RuntimeError)
-    DependencyError = Class.new(RuntimeError)
+    Error = Class.new(StandardError)
+    NotFoundError = Class.new(Error)
+    DependencyError = Class.new(Error)
 
     @plugins = {}
 

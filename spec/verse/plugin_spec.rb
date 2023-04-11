@@ -14,6 +14,12 @@ RSpec.describe Verse::Plugin do
       Verse.stop
     end
 
+    it "can list all plugins" do
+      start
+
+      expect(Verse::Plugin.all.size).to eq(5)
+    end
+
     it "can retrieve a plugin and config is loaded" do
       start
 
