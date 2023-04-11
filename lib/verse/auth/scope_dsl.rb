@@ -2,23 +2,23 @@
 module Verse
   module Auth
     class ScopeDSL
-      def initialize(context, action, resource, scopes, &block)
+      def initialize(context, action, resource, &block)
+        @action = action.to_sym
+        @resource = resource.to_sym
+
         @context = context
 
-        @scope = @context.can?(@action, @resource, &block)
+        @scope = @context.can?(action.to_sym, resource.to_sym).to_sym
 
-        context.reject! unless scope
+        context.reject! unless @scope
 
-        scopes.each do |x|
-          x = x.to_s
+        @scopes = @context.list_scopes(@action, @resource)
 
-          next if x == "custom"
-          method = "#{x}?"
+        @scopes.lazy.map(&:to_sym).select{ |x| x != :custom }.each do |scope|
+          define_singleton_method("#{scope}?") do |&block|
+            return unless @scope == scope
 
-          define_singleton_method(method) do |&block|
-            next unless x == scope
-
-            @result = block.call(scope)
+            @result = block.call
           end
         end
 
@@ -28,9 +28,11 @@ module Verse
       # Is used with custom scopes.
       # @param scope [String] the scope to check
       def custom?(&block)
-        next unless @scope == "custom"
+        return unless @scope == :custom
 
-        context.custom_scope
+        @result = block.call(
+          @context.custom_scope(@resource)
+        )
       end
 
       def else?(&block)

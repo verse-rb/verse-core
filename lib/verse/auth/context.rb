@@ -1,4 +1,7 @@
 # frozen_string_literal: true
+
+require_relative "./scope_dsl.rb"
+
 module Verse
   module Auth
     # object describing authorizations
@@ -30,34 +33,39 @@ module Verse
       # @param block [Proc] the block used to define the scope.
       #
       # @return [Object] the result of the selected block
+      #
       def can!(action, resource, &block)
         scopes = list_scopes(action, resource)
 
         mark_as_checked!
-        result = ScopeDsl.new(scopes, &block).result
+        result = ScopeDSL.new(self, action, resource,  &block).result
 
-        if result.nil?
-          raise UnauthorizedError, "unauthorized"
-        end
+        reject! if result.nil?
+
+        result
       end
 
       def can?(caction, resource)
         raise UnimplementedError, "can? must be implemented"
       end
 
-      alias_method :mark_as_checked!, :no_authorization!
-
-      # said that the security context has been checked.
+      # Confirm that the security context has been checked
       def mark_as_checked!
         @checked = true
       end
+
+      alias_method :no_authorization!, :mark_as_checked!
 
       def checked?
         !!@checked
       end
 
+      def reject!
+        raise UnauthorizedError, "unauthorized"
+      end
+
       def custom_scope(resource)
-        @custom_scopes[resource.to_s]
+        @custom_scopes[resource.to_sym]
       end
 
       protected

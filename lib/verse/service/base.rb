@@ -3,6 +3,7 @@ require_relative "./class_methods"
 module Verse
   module Service
     # Base class for your application services
+    # @abstract
     class Base
       extend ClassMethods
 
