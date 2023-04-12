@@ -1,5 +1,7 @@
 class MockAuthContext < Verse::Auth::Context
   def initialize(authorization)
+    super()
+
     @authorization = authorization
 
     @scopes = {
