@@ -25,8 +25,48 @@ module Verse
           raise NotImplementedError
         end
 
-        def find_by!(parameters, scope: scoped(:read), included: [])
-          record = find_by(parameters, included: included, scope: scope)
+        def update(id, attributes, scope = scoped(:update))
+          raise NotImplementedError, "please implement update"
+        end
+
+        def create(attributes, scope = scoped(:create))
+          raise NotImplementedError, "please implement create"
+        end
+
+        def delete(id, scope = scoped(:delete))
+          raise NotImplementedError, "please implement delete"
+        end
+
+        def find_by(
+          filter,
+          scope: scoped(:read),
+          included: [],
+          record: self.class.model_class
+        )
+          raise NotImplementedError, "please implement find_by"
+        end
+
+        def index(
+          filters: {},
+          scope: scoped(:read),
+          included: [],
+          page: 1,
+          items_per_page: 50,
+          sort: nil,
+          record: self.class.model_class,
+          query_count: true
+        )
+          raise NotImplementedError, "please implement index"
+        end
+
+
+        def find_by!(parameters, scope: scoped(:read), included: [], record: self.class.model_class)
+          record = find_by(
+            parameters,
+            included: included,
+            scope: scope,
+            record: record
+          )
 
           raise Verse::Error::RecordNotFound, parameters unless record
 

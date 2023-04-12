@@ -28,6 +28,7 @@ RSpec.describe Verse::Util::Inflector do
     expect(subject.inflect_past("bite")).to eq("bitten")
 
     # y => ied
+    expect(subject.inflect_past("buy")).to eq("bought")
     expect(subject.inflect_past("play")).to eq("played")
     expect(subject.inflect_past("curry")).to eq("curried")
 
