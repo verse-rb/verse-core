@@ -1,0 +1,3 @@
+class PostRepository < InMemoryRepository
+
+end

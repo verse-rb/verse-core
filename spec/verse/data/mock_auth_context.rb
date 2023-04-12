@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MockAuthContext < Verse::Auth::Context
   def initialize(authorization)
     super()

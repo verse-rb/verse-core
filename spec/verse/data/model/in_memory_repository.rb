@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class InMemoryRepository < Verse::Model::Repository::Base
   def filtering
     InMemoryFiltering
