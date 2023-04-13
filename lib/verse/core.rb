@@ -19,6 +19,10 @@ module Verse
   module_function
 
   GEM_PATH = File.expand_path("..", __dir__)
+
+  def service_name
+    Config.config.fetch(:service_name)
+  end
 end
 
 require_relative "init"
@@ -26,7 +30,7 @@ require_relative "version"
 require_relative "env"
 
 Dir["#{__dir__}/**/*.rb"].each do |file|
-  next if file[__dir__.size .. -1] =~ /^\/verse\/cli/ # do not load CLI files unless told otherwise.
+  next if file[__dir__.size .. -1] =~ /^\/verse\/(?:cli|spec)/ # do not load CLI files unless told otherwise.
 
   require_relative file
 end

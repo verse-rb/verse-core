@@ -1,5 +1,5 @@
 require "spec_helper"
-require_relative "../data/mock_auth_context"
+require "spec/mock_auth_context"
 
 RSpec.describe Verse::Auth::Context do
 

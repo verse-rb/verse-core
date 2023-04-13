@@ -7,7 +7,8 @@ class MockAuthContext < Verse::Auth::Context
     @authorization = authorization
 
     @scopes = {
-      users: %i<all any myself reject>
+      users: %i<all any myself reject>,
+      posts: %i<all any>
     }
 
     @custom_scopes = {
@@ -20,8 +21,6 @@ class MockAuthContext < Verse::Auth::Context
   end
 
   def can?(action, resource)
-    return false unless action == :read && resource == :users
-
     return @authorization
   end
 

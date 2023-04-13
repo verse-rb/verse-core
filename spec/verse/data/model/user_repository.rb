@@ -1,6 +1,6 @@
 require_relative "in_memory_repository"
 
-class PostRepository < InMemoryRepository
+class UserRepository < InMemoryRepository
   def self.clear
     @data.clear
     @id = 0
