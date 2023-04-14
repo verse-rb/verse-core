@@ -96,6 +96,31 @@ RSpec.describe Verse::Model::Repository::Base do
     end
   end
 
+  describe "#delete" do
+    it "can delete user" do
+      out = @users.delete(1)
+
+      expect(out).to be true
+
+      user = @users.find_by({ id: 1 })
+
+      expect(user).to be_nil
+    end
+
+    it "returns false if not found" do
+      out = @users.delete(999)
+      expect(out).to be false
+    end
+  end
+
+  describe "#delete!" do
+    it "throws error if not found" do
+      expect do
+        @users.delete!(999)
+      end.to raise_error(Verse::Error::RecordNotFound)
+    end
+  end
+
   describe "#index" do
     it "can index users" do
       users = @users.index({})

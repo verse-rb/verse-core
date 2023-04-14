@@ -74,6 +74,11 @@ module Verse
           raise Verse::Error::RecordNotFound, id unless output
         end
 
+        def delete!(id, scope = scoped(:delete))
+          output = delete(id, scope)
+          raise Verse::Error::RecordNotFound, id unless output
+        end
+
         def with_metadata(metadata)
           old_metadata = @metadata
           @metadata = @metadata.merge(metadata)
