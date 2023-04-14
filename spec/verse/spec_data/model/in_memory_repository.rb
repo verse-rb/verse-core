@@ -106,7 +106,13 @@ class InMemoryRepository < Verse::Model::Repository::Base
   end
 
   def after_commit(&block)
-    @after_commit_blocks << block
+    raise ArgumentError, "block required" unless block_given?
+
+    if @in_transaction
+      @after_commit_blocks << block
+    else
+      yield
+    end
   end
 
   protected
