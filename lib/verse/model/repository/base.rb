@@ -61,15 +61,10 @@ module Verse
           raise NotImplementedError, "please implement index"
         end
 
-        def find_by!(parameters, scope: scoped(:read), included: [], record: self.class.model_class)
-          record = find_by(
-            parameters,
-            included: included,
-            scope: scope,
-            record: record
-          )
+        def find_by!(filters, **opts)
+          record = find_by(filters, **opts)
 
-          raise Verse::Error::RecordNotFound, parameters unless record
+          raise Verse::Error::RecordNotFound, filters.inspect unless record
 
           record
         end

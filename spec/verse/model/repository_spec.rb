@@ -72,7 +72,7 @@ RSpec.describe Verse::Model::Repository::Base do
 
   describe "#index" do
     it "can index users" do
-      users = @users.index
+      users = @users.index({})
 
       expect(users).to be_a(Verse::Util::ArrayWithMetadata)
       expect(users.size).to eq(2)
@@ -86,21 +86,21 @@ RSpec.describe Verse::Model::Repository::Base do
     end
 
     it "can index using pagination" do
-      users = @users.index(page: 1, items_per_page: 1)
+      users = @users.index({}, page: 1, items_per_page: 1)
 
       expect(users.size).to eq(1)
       expect(users.first.id).to eq(1)
     end
 
     it "can index using sort" do
-      users = @users.index(sort: { name: :asc })
+      users = @users.index({}, sort: { name: :asc })
 
       expect(users.length).to eq(2)
       expect(users.first.id).to eq(2)
     end
 
     it "can index using include" do
-      users = @users.index(included: ["account"])
+      users = @users.index({}, included: ["account"])
 
       expect(users.length).to eq(2)
       expect(users.first.account).to be_a(AccountRecord)

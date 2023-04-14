@@ -46,7 +46,7 @@ class InMemoryRepository < Verse::Model::Repository::Base
   end
 
   def update(id, attributes, scope = scoped(:update))
-    target = scope.find_by{ |record| record[pkey] == id }
+    target = scope.find{ |record| record[pkey] == id }
 
     return false unless target
 
@@ -69,7 +69,7 @@ class InMemoryRepository < Verse::Model::Repository::Base
   end
 
   def delete(id, scope = scoped(:delete))
-    target = scope.find_by{ |record| record[pkey] == id }
+    target = scope.find{ |record| record[pkey] == id }
 
     return false unless target
 
@@ -97,7 +97,7 @@ class InMemoryRepository < Verse::Model::Repository::Base
   end
 
   def index(
-    filters = {},
+    filters,
     scope: scoped(:read),
     included: [],
     page: 1, items_per_page: 1000,
