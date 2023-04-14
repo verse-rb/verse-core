@@ -1,10 +1,13 @@
 # frozen_string_literal: true
 
 require_relative "util/hash_util"
+require_relative "error/base"
 
 module Verse
   module Config
     extend self
+
+    SchemaError = Class.new(Verse::Error::Base)
 
     include Verse::Util
 
@@ -34,6 +37,16 @@ module Verse
       end.each do |file|
         inject_to_config(file)
       end
+
+      result = Verse::Config::Schema.new.call(
+        @config
+      )
+
+      if result.errors.any?
+        raise Verse::Config::SchemaError, "Config errors: #{result.errors.to_h}"
+        exit(-1)
+      end
+
     end
 
     # :nodoc:

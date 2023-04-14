@@ -2,7 +2,7 @@
 
 module Verse
   module Error
-    class Base < RuntimeError
+    class Base < StandardError
       attr_reader :meta, :source, :details
 
       def initialize(msg = nil, details: {}, meta: {})

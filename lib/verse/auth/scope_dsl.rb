@@ -9,21 +9,19 @@ module Verse
 
         @context = context
 
-        @scope = @context.can?(action.to_sym, resource.to_sym).to_sym
+        @scope = @context.can?(action.to_sym, resource.to_sym)
 
         context.reject! unless @scope
 
-        @scopes = @context.list_scopes(@action, @resource)
-
-        @scopes.lazy.map(&:to_sym).reject{ |x| x == :custom }.each do |scope|
-          define_singleton_method("#{scope}?") do |&scope_code|
-            return unless @scope == scope
-
-            @result = scope_code.call
-          end
-        end
+        @scope = @scope.to_sym
 
         block.call(self)
+      end
+
+      def method_missing(method_name, *args, &block)
+        return false unless "#{@scope}?".to_sym == method_name
+
+        @result = block.call(self)
       end
 
       # Is used with custom scopes.
@@ -32,7 +30,7 @@ module Verse
         return unless @scope == :custom
 
         @result = block.call(
-          @context.custom_scope(@resource)
+          @context[@resource]
         )
       end
 

@@ -1,34 +1,36 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require "verse/spec/mock_auth_context"
+require "verse/spec/auth/mock_context"
 
 RSpec.describe Verse::Auth::Context do
-  it "scopes correctly" do
-    can_method = proc do |context|
-      context.can!(:read, :users) do |scope|
-        scope.all?{
-          [1, 2, 3, 4]
-        }
-        scope.custom?{ |users| users }
-        scope.myself?{ [context.user_id] }
 
-        scope.else?(&:reject!)
+  {
+    ["*.*.*"] => [1, 2, 3, 4],
+    ["users.read.?"] => ["1234"],
+    ["users.read.myself"] => [1]
+  }.each do |right, value|
+    it "scopes correctly for #{right}" do
+      can_method = proc do |context|
+        context.can!(:read, :users) do |scope|
+          scope.all?{
+            [1, 2, 3, 4]
+          }
+          scope.custom?{ |users| users }
+          scope.myself?{ [context.user_id] }
+
+          scope.else?(&:reject!)
+        end
       end
-    end
 
-    {
-      all: [1, 2, 3, 4],
-      custom: ["1234"],
-      myself: [1]
-    }.each do |scope, value|
-      context = MockAuthContext.new(scope)
+      context = Spec::Auth::MockContext.new(right, data: { users: ["1234"] })
       expect(can_method.call(context)).to eq(value)
     end
   end
 
   it "rejects correctly" do
-    @context = MockAuthContext.new(:reject)
+    # Zero rights.
+    @context = Spec::Auth::MockContext.new([])
 
     can_method = proc do |context|
       context.can!(:read, :users) do |scope|

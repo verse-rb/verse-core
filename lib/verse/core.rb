@@ -10,6 +10,8 @@ require "dry/validation"
 require "json"
 
 require "dry-schema"
+require "dry/schema/messages/i18n"
+
 require "dry-types"
 require "dry-validation"
 

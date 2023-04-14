@@ -9,10 +9,10 @@ module Verse
       AuthError = Class.new(StandardError)
       UnauthorizedError = Class.new(AuthError)
 
-      attr_reader :custom_scopes
+      attr_reader :data
 
       def initialize
-        @custom_scopes = {}
+        @data = {}
       end
 
       # Check whether we can perform an action on a resource.
@@ -63,8 +63,8 @@ module Verse
         raise UnauthorizedError, "unauthorized"
       end
 
-      def custom_scope(resource)
-        @custom_scopes[resource.to_sym]
+      def [](resource)
+        @data[resource.to_sym]
       end
 
       protected
