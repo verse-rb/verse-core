@@ -4,11 +4,16 @@ module Verse
   module Model
     module Record
       # Record acts as a model mapper (read-only) object.
+      # @example
+      #   class User < Verse::Model::Record::Base
+      #     field :id, type: Integer, primary: true
+      #     field :name, type: String
+      #     field :email, type: String
+      #   end
       # @abstract
       class Base
         @record_root_path       = "App::Model"
         @repositories_root_path = "App::Model"
-        @primary_key            = :id
 
         attr_reader :relations, :fields, :included
 

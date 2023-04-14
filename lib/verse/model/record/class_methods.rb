@@ -10,24 +10,24 @@ module Verse
 
         include Verse::Util
 
-        # get or set the type of the record
-        # if not set, it will be infered from the class name
-        # e.g. UserRecord => users
+        # get or set the `type` of the record. Useful for some renderers.
+        # If not set, it will be infered from the class name
+        #
+        # @example
+        #   class UserRecord < Verse::Model::Record::Base
+        #     type "individual_users" # if not declared, it will be infered as "users" from the class name
+        #   end
         #
         def type(value = nil)
           if value
             @type = value
           else
-            @type ||= infer_record_type_by_class_name
+            @type ||= `infer_record_type_by_class_name`
           end
         end
 
-        def primary_key(value = nil)
-          if value
-            @primary_key = value
-          else
-            @primary_key ||= :id
-          end
+        def primary_key
+          raise "primary_key is not set" if @primary_key.nil?
         end
 
         def relation(name, array: false, &block)
@@ -50,7 +50,7 @@ module Verse
         # this is a good example of creating a custom relation
         # relation name, arity: :one|:many do |collection, auth_context, sub_included|
         #
-        # - collection => current collectio of object having the relationship included
+        # - collection => current collection of object having the relationship included
         # - auth_context
         # - sub_included => the case we have a tree of inclusion, this give the sub-included elements
         # (e.g. if we call contract and include 'property.units',
@@ -114,6 +114,23 @@ module Verse
           end
         end
 
+        # Define a relation has-many between two records.
+        #
+        # @param relation_name [Symbol] the name of the relation
+        # @param primary_key [Symbol] the primary key of the relation,
+        #        which is by default inferred from the foreign record primary key definition.
+        # @param foreign_key [Symbol] the foreign key of the relation,
+        #      which is by default the name of the actual record + `_id`, e.g. user_id.
+        # @param repository [String] the repository of the foreign relation.
+        # @param record [String] the record class of the foreign relation.
+        # @param opts [Hash] the options of the relation
+        # @option opts [Proc] :if a proc called at aggregation to discard some relations.
+        #
+        # @example
+        #   class UserRecord < Verse::Model::Record::Base
+        #     has_many :published_posts, foreign_key: :author_id, if: ->(x) { x[:status] == "published" }
+        #   end
+        #
         def has_many(relation_name, primary_key: nil, foreign_key: nil, repository: nil, record: nil, **opts) # rubocop:disable Naming/PredicateName
           foreign_key ||= "#{Verse.inflector.singularize(type)}_id"
 
@@ -215,9 +232,9 @@ module Verse
           define_method(name, &block)
         end
 
-        def enum(name, values, prefix: nil)
+        def enum(name, values, prefix: nil, suffix: nil)
           values.each do |value|
-            method_name = prefix ? "#{prefix}_#{value}" : value
+            method_name = [prefix, value, suffix].compact.join("_")
 
             raise "enum: redefinition of method #{method_name}?" if respond_to?(:"#{method_name}?")
 

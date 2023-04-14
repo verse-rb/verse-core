@@ -2,6 +2,19 @@
 
 module Spec
   module Auth
+    # Use this class to mock an auth context for testing purposes.
+    # Actions follow the format `["resource.action.scope"]`.
+    #
+    # Special wildcard `*` can be used for all resources, actions or scopes.
+    # Special wildcard `?` can be used for custom scopes.
+    #
+    # @example
+    #
+    #   MockAuthContext.new(["users.read.*", "users.write.?"])
+    #   # means that the user can read all users and write custom users
+    #   # with custom value found in `context[:users]` key.
+    #
+    # @see Verse::Auth::Context
     class MockContext < Verse::Auth::Context
       @roles = {}
 
