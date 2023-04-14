@@ -49,7 +49,7 @@ module Verse
         end
 
         def index(
-          filters: {},
+          filters = {},
           scope: scoped(:read),
           included: [],
           page: 1,

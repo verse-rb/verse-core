@@ -70,7 +70,9 @@ module Verse
         #                     Used for example to include a relation only if a condition is met (polymorphism).
         def belongs_to(relation_name, primary_key: nil, foreign_key: nil, repository: nil, record: nil, **opts)
           foreign_key ||= "#{relation_name}_id"
-          repository ||= "App::Model::#{StringUtil.camelize(relation_name.to_s)}Repository"
+
+          root = self.name.split(/::[^:]+$/).first
+          repository ||= "#{root}::#{StringUtil.camelize(relation_name.to_s)}Repository"
 
           relation relation_name, array: false do |collection, auth_context, sub_included|
             repository = Reflection.constantize(repository) if repository.is_a?(String)
@@ -81,7 +83,7 @@ module Verse
             included = repository.new(
               auth_context
             ).index(
-              filters: {
+              {
                 "#{primary_key}__in" => collection.map{ |x|
                   condition = opts[:if]
                   next if condition && !condition.call(x)
@@ -89,7 +91,7 @@ module Verse
                   # check key_type using model structure
                   pkey_info = record.fields.fetch(primary_key){ raise "primary key name not found: `#{primary_key}`" }
 
-                  Verse::Model::record::Converter.convert(x[foreign_key.to_sym], pkey_info[:type])
+                  Verse::Model::Record::Converter.convert(x[foreign_key.to_sym], pkey_info[:type])
                 }.compact
               },
               included: sub_included,
@@ -115,7 +117,8 @@ module Verse
         def has_many(relation_name, primary_key: nil, foreign_key: nil, repository: nil, record: nil, **opts) # rubocop:disable Naming/PredicateName
           foreign_key ||= "#{Verse.inflector.singularize(type)}_id"
 
-          repository ||= "App::Model::#{StringUtil.camelize(relation_name.to_s)}Repository"
+          root = self.name.split(/::[^:]+$/).first
+          repository ||= "#{root}::#{StringUtil.camelize(relation_name.to_s)}Repository"
 
           relation relation_name, array: true do |collection, auth_context, sub_included|
             repository = Reflection.constantize(repository) if repository.is_a?(String)
@@ -126,7 +129,7 @@ module Verse
             included = repository.new(
               auth_context
             ).index(
-              filters: {
+              {
                 "#{foreign_key}__in" => collection.map{ |x|
                   condition = opts[:if]
                   next if condition && !condition.call(x)
@@ -134,7 +137,7 @@ module Verse
                   # check key_type using model structure
                   pkey_info = record.fields[primary_key]
 
-                  Verse::Model::record::Converter.convert(x[primary_key.to_sym], pkey_info[:type])
+                  Verse::Model::Record::Converter.convert(x[primary_key.to_sym], pkey_info[:type])
                 }.compact
               },
               included: sub_included,
@@ -158,9 +161,11 @@ module Verse
         end
 
         def has_one(relation_name, primary_key: nil, foreign_key: nil, repository: nil, **opts) # rubocop:disable Naming/PredicateName
-          foreign_key ||= "#{type.singularize}_id"
+          foreign_key ||= "#{Verse.inflector.singularize(type)}_id"
 
-          repository ||= "App::Model::#{relation_name.to_s.classify}Repository"
+          root = self.name.split(/::[^:]+$/).first
+
+          repository ||= "#{root}::#{StringUtil.camelize(relation_name.to_s)}Repository"
 
           relation relation_name, array: false do |collection, auth_context, sub_included|
             repository = Reflection.constantize(repository) if repository.is_a?(String)
@@ -169,7 +174,7 @@ module Verse
             included = repository.new(
               auth_context
             ).index(
-              filters: {
+              {
                 "#{foreign_key}__in" => collection.map{ |x|
                   condition = opts[:if]
                   next if condition && !condition.call(x)
@@ -177,7 +182,7 @@ module Verse
                   # check key_type using model structure
                   pkey_info = repository.model_class.fields[primary_key]
 
-                  Verse::Model::record::Converter.convert(x[primary_key.to_sym], pkey_info[:type])
+                  Verse::Model::Record::Converter.convert(x[primary_key.to_sym], pkey_info[:type])
                 }.compact
               },
               included: sub_included

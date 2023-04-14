@@ -2,6 +2,8 @@
 
 require_relative "in_memory_filtering"
 
+# Very simple repository storing models in memory.
+# Used for the specs and testing the whole system.
 class InMemoryRepository < Verse::Model::Repository::Base
   class << self
     attr_accessor :data, :id
@@ -11,6 +13,11 @@ class InMemoryRepository < Verse::Model::Repository::Base
       subclass.instance_variable_set(:@id, 0)
 
       super
+    end
+
+    def clear
+      @data.clear
+      @id = 0
     end
   end
 
@@ -52,9 +59,13 @@ class InMemoryRepository < Verse::Model::Repository::Base
   def create(attributes)
     self.class.id += 1
 
-    row = attributes.merge(id: self.class.id)
+    id = self.class.id
+
+    row = attributes.merge(id: id)
 
     self.class.data << row
+
+    id
   end
 
   def delete(id, scope = scoped(:delete))
@@ -86,11 +97,11 @@ class InMemoryRepository < Verse::Model::Repository::Base
   end
 
   def index(
-    filters: {},
+    filters = {},
     scope: scoped(:read),
     included: [],
     page: 1, items_per_page: 1000,
-    sort: nil, # rubocop:disable Lint/UnusedMethodArgument
+    sort: nil,
     record: self.class.model_class,
     query_count: true # rubocop:disable Lint/UnusedMethodArgument
   )
@@ -101,11 +112,44 @@ class InMemoryRepository < Verse::Model::Repository::Base
 
     set = prepare_included(included, query, record: record)
 
+    if sort
+      count = sort.size
+
+      query = query.sort do |a, b|
+        x = 0
+        sort.reduce(0) do |sum, (field, direction)|
+          field = field.to_sym
+
+          a = a[field.to_sym]
+          b = b[field.to_sym]
+
+          result = \
+            case
+            when a.nil?
+              1
+            when b.nil?
+              -1
+            else
+              a <=> b
+            end
+
+          result = result * (1 << (count-x))
+          result = -result if direction == :desc
+
+          x + 1
+
+          sum + result
+        end
+      end
+    end
+
+    metadata = {}
+    count = query_count ? query.size : nil
+    metadata[:count] = count if count
+
     Verse::Util::ArrayWithMetadata.new(
-      result.map{ |elm| record.new(elm, include_set: set) },
-      metadata: {
-        count: count
-      }
+      query.map{ |elm| record.new(elm, include_set: set) },
+      metadata: metadata
     )
   end
 
