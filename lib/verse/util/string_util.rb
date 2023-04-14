@@ -5,7 +5,7 @@ module Verse
     module StringUtil
       extend self
 
-      def camelize(string, uppercase_first_letter = true)
+      def camelize(string, uppercase_first_letter: true)
         string = if uppercase_first_letter
                    string.sub(/^[a-z\d]*/, &:capitalize)
                  else

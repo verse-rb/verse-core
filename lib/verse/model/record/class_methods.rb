@@ -102,7 +102,7 @@ module Verse
           end
         end
 
-        def has_many(relation_name, primary_key: nil, foreign_key: nil, repository: nil, serializer: nil, **opts)
+        def has_many(relation_name, primary_key: nil, foreign_key: nil, repository: nil, serializer: nil, **opts) # rubocop:disable Naming/PredicateName
           foreign_key ||= "#{type.singularize}_id"
 
           repository ||= "App::Model::#{relation_name.to_s.classify}Repository"
@@ -147,7 +147,7 @@ module Verse
           end
         end
 
-        def has_one(relation_name, primary_key: nil, foreign_key: nil, repository: nil, **opts)
+        def has_one(relation_name, primary_key: nil, foreign_key: nil, repository: nil, **opts) # rubocop:disable Naming/PredicateName
           foreign_key ||= "#{type.singularize}_id"
 
           repository ||= "App::Model::#{relation_name.to_s.classify}Repository"

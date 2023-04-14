@@ -19,7 +19,7 @@ module Verse
       def check_dependencies!
         dependencies.each do |dep|
           send(dep)
-        rescue NotFoundError => e
+        rescue NotFoundError
           dep_map = dep_config[dep]
 
           if dep_map

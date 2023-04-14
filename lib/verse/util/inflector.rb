@@ -136,17 +136,17 @@ module Verse
         @singular_exceptions = plural_exceptions.lazy.map(&:reverse).to_h.freeze
       end
 
-      def pluralize(x, count = 2)
-        return x if count <= 1
+      def pluralize(word, count = 2)
+        return word if count <= 1
 
-        @plural_exceptions.fetch(x) {
-          "#{x}s"
+        @plural_exceptions.fetch(word) {
+          "#{word}s"
         }
       end
 
-      def singularize(x)
-        @singular_exceptions.fetch(x) {
-          x.gsub(/s$/, "")
+      def singularize(word)
+        @singular_exceptions.fetch(word) {
+          word.gsub(/s$/, "")
         }
       end
 

@@ -35,9 +35,8 @@ module Verse
       # @return [Object] the result of the selected block
       #
       def can!(action, resource, &block)
-        scopes = list_scopes(action, resource)
-
         mark_as_checked!
+
         result = ScopeDSL.new(self, action, resource, &block).result
 
         reject! if result.nil?

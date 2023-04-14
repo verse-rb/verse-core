@@ -9,7 +9,6 @@ RSpec.describe Verse::Util::Iterator do
 
   (1..2).each do |size|
     context "with chunk_size #{size}" do
-
       it "iterates over every item from the data array" do
         iterator = subject.chunk_iterator do |chunk|
           data.slice(chunk * size, size)
@@ -35,7 +34,7 @@ RSpec.describe Verse::Util::Iterator do
         end
 
         result = iterator.each_with_index.map do |_, n|
-          { n_each_called: n + 1, block_call_count: }
+          { n_each_called: n + 1, block_call_count: block_call_count }
         end
 
         expect(result).to eq(expectation)

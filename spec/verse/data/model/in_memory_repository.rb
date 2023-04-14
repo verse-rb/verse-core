@@ -9,6 +9,7 @@ class InMemoryRepository < Verse::Model::Repository::Base
     def inherited(subclass)
       subclass.instance_variable_set(:@data, [])
       subclass.instance_variable_set(:@id, 0)
+      super
     end
   end
 
@@ -37,14 +38,14 @@ class InMemoryRepository < Verse::Model::Repository::Base
   end
 
   def update(id, attributes, scope = scoped(:update))
-    x = scope.find_by{ |x| x[pkey] == id }
+    target = scope.find_by{ |record| record[pkey] == id }
 
-    return false unless x
+    return false unless target
 
-    x.clear
-    x.merge!(attributes)
+    target.clear
+    target.merge!(attributes)
 
-    x
+    target
   end
 
   def create(attributes)
@@ -56,11 +57,11 @@ class InMemoryRepository < Verse::Model::Repository::Base
   end
 
   def delete(id, scope = scoped(:delete))
-    x = scope.find_by{ |x| x[pkey] == id }
+    target = scope.find_by{ |record| record[pkey] == id }
 
-    return false unless x
+    return false unless target
 
-    self.class.data.delete(x)
+    self.class.data.delete(target)
 
     true
   end
@@ -79,9 +80,9 @@ class InMemoryRepository < Verse::Model::Repository::Base
     scope: scoped(:read),
     included: [],
     page: 1, items_per_page: 1000,
-    sort: nil,
+    sort: nil, # rubocop:disable Lint/UnusedMethodArgument
     record: self.class.model_class,
-    query_count: true
+    query_count: true # rubocop:disable Lint/UnusedMethodArgument
   )
     filters = encode_filters(filters)
     query = filtering.filter_by(scope, filters, self.class.custom_filters)
