@@ -42,11 +42,9 @@ module Verse
         @config
       )
 
-      if result.errors.any?
-        raise Verse::Config::SchemaError, "Config errors: #{result.errors.to_h}"
-        exit(-1)
-      end
+      return unless result.errors.any?
 
+      raise Verse::Config::SchemaError, "Config errors: #{result.errors.to_h}"
     end
 
     # :nodoc:

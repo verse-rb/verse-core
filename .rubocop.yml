@@ -12,5 +12,8 @@ Style/StringLiteralsInInterpolation:
   Enabled: true
   EnforcedStyle: double_quotes
 
+Style/AccessModifierDeclarations:
+  Enabled: false
+
 Layout/LineLength:
   Max: 120

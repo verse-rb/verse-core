@@ -5,7 +5,6 @@ module Spec
     class MockContext < Verse::Auth::Context
       @roles = {}
 
-
       attr_accessor :user_id, :user_role
 
       # Use this class to mock an auth context for testing purposes.
@@ -47,15 +46,13 @@ module Spec
           scope = scope.gsub("*", "all").gsub(/^\?$/, "custom")
 
           if scope == "custom"
-            if resource == "*"
-              raise "custom scope `?` not allowed for wildcard resources"
-            else
-              unless self[resource.to_sym]
-                raise "custom scope `?` found for resource `#{resource}` but no custom data was given"
-              end
-            end
-          end
+            raise "custom scope `?` not allowed for wildcard resources" if resource == "*"
 
+            unless self[resource.to_sym]
+              raise "custom scope `?` found for resource `#{resource}` but no custom data was given"
+            end
+
+          end
 
           [resource_regexp, action_regexp, scope.to_sym]
         }
@@ -70,7 +67,6 @@ module Spec
 
         (scope && scope[2]) || false
       end
-
     end
   end
 end

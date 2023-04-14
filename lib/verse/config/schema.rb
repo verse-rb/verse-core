@@ -6,7 +6,7 @@ module Verse
   module Config
     class Schema < Verse::Validation::Contract
       SERVICE_NAME = /[a-z0-9_-]+/.freeze
-      PLUGIN_NAME = /[a-z0-9_]+( \<[a-zA-Z0-9\:]+\>)?/.freeze
+      PLUGIN_NAME = /[a-z0-9_]+( <[a-zA-Z0-9:]+>)?/.freeze
 
       params do
         required(:service_name).filled(:string)
@@ -32,7 +32,6 @@ module Verse
           key([:plugin, :name, index]).failure(:bad_format)
         end
       end
-
     end
   end
 end

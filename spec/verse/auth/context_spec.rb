@@ -4,7 +4,6 @@ require "spec_helper"
 require "verse/spec/auth/mock_context"
 
 RSpec.describe Verse::Auth::Context do
-
   {
     ["*.*.*"] => [1, 2, 3, 4],
     ["users.read.?"] => ["1234"],
