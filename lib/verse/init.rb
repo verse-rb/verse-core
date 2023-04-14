@@ -49,5 +49,4 @@ module Verse
 
     Verse::Plugin.start(mode)
   end
-
 end

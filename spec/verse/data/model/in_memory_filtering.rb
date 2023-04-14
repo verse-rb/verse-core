@@ -1,14 +1,12 @@
 # frozen_string_literal: true
 
 module InMemoryFiltering
-  module_function
-
   OPERATIONS = {
-    lt:     ->(col, column, value) { col.select{ |x| x[column] < value } },
-    lte:    ->(col, column, value) { col.select{ |x| x[column] <= value } },
-    gt:     ->(col, column, value) { col.select{ |x| x[column] > value } },
-    gte:    ->(col, column, value) { col.select{ |x| x[column] >= value } },
-    eq:     ->(col, column, value) {
+    lt: ->(col, column, value) { col.select{ |x| x[column] < value } },
+    lte: ->(col, column, value) { col.select{ |x| x[column] <= value } },
+    gt: ->(col, column, value) { col.select{ |x| x[column] > value } },
+    gte: ->(col, column, value) { col.select{ |x| x[column] >= value } },
+    eq: ->(col, column, value) {
       case value
       when Array
         if value.size == 0
@@ -20,11 +18,11 @@ module InMemoryFiltering
         col.select{ |x| x[column] == value }
       end
     },
-    neq:    ->(col, column, value) { col.select{ |x| x[column] != value } },
+    neq: ->(col, column, value) { col.select{ |x| x[column] != value } },
     prefix: ->(col, column, value) { col.select{ |x| x[column].to_s.start_with?(value) } },
-    in:     ->(col, column, value) { col.select{ |x| value.include?(x[column]) } },
-    match:  ->(col, column, value) { col.select{ |x| x[column].to_s =~ regexp(value) } },
-    contains:  ->(col, column, value) {
+    in: ->(col, column, value) { col.select{ |x| value.include?(x[column]) } },
+    match: ->(col, column, value) { col.select{ |x| x[column].to_s =~ regexp(value) } },
+    contains: ->(col, column, value) {
       case value
       when Array
         if value.empty?
@@ -50,7 +48,6 @@ module InMemoryFiltering
     collection = collection.lazy
 
     filtering_parameters.each do |key, value|
-
       custom_filter = custom_filters && custom_filters[key.to_s]
 
       if custom_filter

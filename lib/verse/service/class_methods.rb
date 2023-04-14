@@ -3,7 +3,6 @@ require_relative "./class_methods"
 module Verse
   module Service
     module ClassMethods
-
       # Define quickly repositories used by the service.
       #
       # This will automatically add metadata and propagate the
@@ -32,9 +31,9 @@ module Verse
             return repo if repo
 
             repo = klass.new(auth_context)
-            repo.metadata.merge!(self.metadata.merge(
-              service: self.class.name
-            ))
+            repo.metadata.merge!(metadata.merge(
+                                   service: self.class.name
+                                 ))
 
             instance_variable_set("@#{method}", repo)
 
@@ -42,7 +41,6 @@ module Verse
           end
         end
       end
-
     end
   end
 end

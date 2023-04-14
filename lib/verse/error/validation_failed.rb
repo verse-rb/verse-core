@@ -34,7 +34,6 @@ module Verse
                      else
                        { model: model, parameter: k, key: value }
                      end
-
             end
           else # Hash
             dry_errors_flattener(v, [model, k].compact.join("."), out)
@@ -43,7 +42,6 @@ module Verse
 
         out
       end
-
     end
   end
 end

@@ -3,8 +3,6 @@
 module Verse
   module Util
     module Iterator
-      module_function
-
       # This method returns an Enumerator that iterates over chunks of data retrieved on each call.
       # It takes an optional parameter, chunk, and a block.
       # The Enumerator yields values from the block while the loop continues,

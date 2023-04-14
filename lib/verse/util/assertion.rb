@@ -6,11 +6,9 @@ module Verse
       def assert(test, message = nil, klass = RuntimeError)
         return if test
 
-        if block_given?
-          raise klass.new(yield)
-        else
-          raise klass.new(message || "Assertion failed")
-        end
+        raise klass, yield if block_given?
+
+        raise klass, message || "Assertion failed"
       end
     end
   end

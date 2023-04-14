@@ -15,5 +15,4 @@ RSpec.describe Verse::Util::StringUtil do
     expect(subject.camelize("test/test_test_test")).to eq("Test::TestTestTest")
     expect(subject.camelize("test/test_test_test", false)).to eq("test::TestTestTest")
   end
-
 end

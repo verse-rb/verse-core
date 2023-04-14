@@ -10,7 +10,7 @@ module Verse
         # if not set, it will be infered from the class name
         # e.g. UserRecord => users
         #
-        def type(value=nil)
+        def type(value = nil)
           if value
             @type = value
           else
@@ -75,7 +75,7 @@ module Verse
                   next if condition && !condition.call(x)
 
                   # check key_type using model structure
-                  pkey_info = serializer.fields.fetch(primary_key){ raise "primary key name not found: `#{primary_key}`"}
+                  pkey_info = serializer.fields.fetch(primary_key){ raise "primary key name not found: `#{primary_key}`" }
 
                   Verse::Model::Serializer::Converter.convert(x[foreign_key.to_sym], pkey_info[:type])
                 }.compact
@@ -85,12 +85,12 @@ module Verse
             )
 
             [
-              included,                                              # the list we store
+              included, # the list we store
               lambda do |inc_record|
                 inc_record.fetch(primary_key.to_s) do
                   raise "[belongs_to #{name}:#{relation_name}] primary key not found: #{primary_key}"
                 end.to_s
-              end,  # Create index key
+              end, # Create index key
               lambda do |record| # Acces index key
                 record.fetch(foreign_key.to_s) do
                   raise "[belongs_to #{name}:#{relation_name}] foreign key not found: #{foreign_key}"
@@ -101,7 +101,7 @@ module Verse
         end
 
         def has_many(relation_name, primary_key: nil, foreign_key: nil, repository: nil, serializer: nil, **opts)
-          foreign_key ||= "#{self.type.singularize}_id"
+          foreign_key ||= "#{type.singularize}_id"
 
           repository ||= "App::Model::#{relation_name.to_s.classify}Repository"
 
@@ -135,7 +135,7 @@ module Verse
                 inc_record.fetch(foreign_key.to_s) do
                   raise "[belongs_to #{name}:#{relation_name}] primary key not found: #{foreign_key}"
                 end.to_s
-              end,  # Create index key
+              end, # Create index key
               lambda do |record| # Acces index key
                 record.fetch(primary_key.to_s) do
                   raise "[belongs_to #{name}:#{relation_name}] foreign key not found: #{primary_key}"
@@ -143,11 +143,10 @@ module Verse
               end
             ]
           end
-
         end
 
         def has_one(relation_name, primary_key: nil, foreign_key: nil, repository: nil, **opts)
-          foreign_key ||= "#{self.type.singularize}_id"
+          foreign_key ||= "#{type.singularize}_id"
 
           repository ||= "App::Model::#{relation_name.to_s.classify}Repository"
 
@@ -178,7 +177,7 @@ module Verse
                 inc_record.fetch(foreign_key.to_s) do
                   raise "[belongs_to #{name}:#{relation_name}] primary key not found: #{foreign_key}"
                 end.to_s
-              end,  # Create index key
+              end, # Create index key
               lambda do |record| # Acces index key
                 record.fetch(primary_key.to_s) do
                   raise "[belongs_to #{name}:#{relation_name}] foreign key not found: #{primary_key}"
@@ -186,7 +185,6 @@ module Verse
               end
             ]
           end
-
         end
 
         def field(name, type = :any, key: nil, primary: false, &block)
@@ -204,10 +202,10 @@ module Verse
           values.each do |value|
             method_name = prefix ? "#{prefix}_#{value}" : value
 
-            raise "enum: redefinition of method #{method_name}?" if self.respond_to?(:"#{method_name}?")
+            raise "enum: redefinition of method #{method_name}?" if respond_to?(:"#{method_name}?")
 
             define_method(:"#{method_name}?") do
-              self.send(name.to_sym) == value
+              send(name.to_sym) == value
             end
           end
         end

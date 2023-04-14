@@ -15,7 +15,7 @@ RSpec.describe Verse::Util::Inflector do
     expect(subject.singularize("users")).to eq("user")
     expect(subject.singularize("user")).to eq("user")
 
-    #exceptions:
+    # exceptions:
     expect(subject.singularize("people")).to eq("person")
     expect(subject.singularize("person")).to eq("person")
   end
@@ -45,5 +45,4 @@ RSpec.describe Verse::Util::Inflector do
     expect(subject.inflect_past("update_user")).to eq("user_updated")
     expect(subject.inflect_past("eat_picnic")).to eq("picnic_eaten")
   end
-
 end

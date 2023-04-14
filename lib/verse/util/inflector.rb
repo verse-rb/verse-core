@@ -166,9 +166,9 @@ module Verse
           when /[^oa]y$/
             verb[0..-2] + "ied"
           when /[^aeiou][aeiou][glmpt]$/
-            verb + verb[-1] + 'ed'
+            verb + verb[-1] + "ed"
           when /c$/
-            verb + 'ked' # picnic / picnicked
+            verb + "ked" # picnic / picnicked
           else
             verb + "ed"
           end
@@ -176,7 +176,6 @@ module Verse
 
         [*words[1..-1], paste_tense_verb].join("_")
       end
-
     end
   end
 end

@@ -8,7 +8,6 @@ module Verse
       # @param object_space [Object] the object space to search in
       # @return [Object] the constant
       def get(string, object_space = ObjectSpace)
-
         if string[0..1] == "::"
           string = string[2..-1]
         end
@@ -26,7 +25,6 @@ module Verse
 
         get_path(path[1..-1], constant)
       end
-
     end
   end
 end

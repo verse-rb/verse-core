@@ -59,7 +59,6 @@ module Verse
           raise NotImplementedError, "please implement index"
         end
 
-
         def find_by!(parameters, scope: scoped(:read), included: [], record: self.class.model_class)
           record = find_by(
             parameters,
@@ -109,7 +108,7 @@ module Verse
         #  end
         # ```
         #
-        def no_event(&block)
+        def no_event
           @disable_event = true
           yield
         ensure
@@ -162,24 +161,25 @@ module Verse
 
             next unless encoder
 
-            if field.is_a?(Array) && filtering.expect_array?(field)
-              dup[key] = value.map{ |x| encoder.encode(x) }
-            else
-              dup[key] = encoder.encode(value)
-            end
+            dup[key] = if field.is_a?(Array) && filtering.expect_array?(field)
+                         value.map{ |x| encoder.encode(x) }
+                       else
+                         encoder.encode(value)
+                       end
           end
 
           dup
-
         end
 
         def encode_array(array)
           return array unless self.class.encoders
+
           array.map{ |h| encode(h) }
         end
 
         def decode_array(array)
           return array unless self.class.encoders
+
           array.map{ |h| decode(h) }
         end
 
@@ -202,13 +202,12 @@ module Verse
         # return a hash tree from the include list:
         # ["a.b.c", "c.d"] => { a: {b: {c: {}}}, c: {d: {}} }
         def tree_from_include_list(include, root = {})
-          include.filter{ |x| x.is_a?(String) }.inject(root) do |root, inc| # rubocop:disable Lint/ShadowingOuterLocalVariable
+          include.filter{ |x| x.is_a?(String) }.each_with_object(root) do |inc, root| # rubocop:disable Lint/ShadowingOuterLocalVariable
             first_part, remainer = inc.split "."
             root[first_part] = tree_from_include_list(
               [remainer].compact,
               root.fetch(first_part, {})
             )
-            root
           end
         end
 
@@ -216,14 +215,14 @@ module Verse
           set = IncludeSet.new(included_list)
           tree = tree_from_include_list included_list
 
-          tree.each do |key, value|
+          tree.each do |key, _value|
             sub_included = \
               included_list \
-                .filter{ |x| x =~ /^#{key}($|\.)/ } \
-                .map{ |x| x.gsub(/^#{key}($|\.)/, "") }
-                .reject(&:empty?)
+              .filter{ |x| x =~ /^#{key}($|\.)/ } \
+              .map{ |x| x.gsub(/^#{key}($|\.)/, "") }
+              .reject(&:empty?)
 
-            relation = record.relations.fetch(key.to_sym){ raise "Relation not found: #{key}"}
+            relation = record.relations.fetch(key.to_sym){ raise "Relation not found: #{key}" }
 
             # include_list,                                     # the list we store
             # ->(included) { included[primary_key.to_s] },      # The index where to store in the set
@@ -241,7 +240,6 @@ module Verse
 
           set
         end
-
       end
     end
   end

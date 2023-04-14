@@ -53,7 +53,7 @@ module Verse
 
     private def infer_name_and_class(str)
       name         = str.scan(/([^<][\w:]+)/).first&.first
-      klass_name   = str.scan(/<([\w\:]+)>/).first&.first
+      klass_name   = str.scan(/<([\w:]+)>/).first&.first
       klass_name ||= name
 
       if klass_name !~ /[A-Z]/
@@ -86,7 +86,7 @@ module Verse
       @plugins.values.each do |x|
         x.on_start(mode)
       end
-    rescue => e
+    rescue StandardError => e
       Verse.logger.fatal(e)
       exit(-1)
     end
@@ -94,7 +94,7 @@ module Verse
     def stop
       @plugins.values.each do |p|
         p.on_stop
-      rescue => e
+      rescue StandardError => e
         Verse.logger.error(e)
       end
     end
@@ -102,7 +102,7 @@ module Verse
     def finalize
       @plugins.values.each do |p|
         p.on_finalize
-      rescue => e
+      rescue StandardError => e
         Verse.logger.error(e)
       end
 
@@ -127,7 +127,7 @@ module Verse
       register_plugin(plugin)
 
       logger.debug{ "Plugin `#{name}`: Initializing done" }
-    rescue => e
+    rescue StandardError => e
       logger.fatal(e)
       exit(-1)
     end
@@ -141,6 +141,5 @@ module Verse
 
       @plugins[name] = plugin
     end
-
   end
 end

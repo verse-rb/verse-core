@@ -20,11 +20,11 @@ class MockAuthContext < Verse::Auth::Context
     1
   end
 
-  def can?(action, resource)
-    return @authorization
+  def can?(_action, _resource)
+    @authorization
   end
 
-  def list_scopes(action, resource)
+  def list_scopes(_action, resource)
     @scopes[resource]
   end
 end

@@ -1,4 +1,3 @@
-
 module Verse
   module Model
     module Record
@@ -25,7 +24,7 @@ module Verse
 
           return unless include_set
 
-          self.class.relations.each do |name, relation|
+          self.class.relations.each do |name, _relation|
             lookup_method = include_set.get_lookup_method([self.class, name.to_s])
 
             next unless lookup_method

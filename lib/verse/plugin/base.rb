@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Verse
   module Plugin
     class Base
@@ -25,13 +26,11 @@ module Verse
 
       def check_dependencies!
         dependencies.each do |x|
-          self.send(x)
+          send(x)
         rescue NotFoundError => e
-          if dep = dep_config[x]
-            raise DependencyError, "Plugin `#{name}` depends on `#{dep}` (via #{x}) but it is not found."
-          else
-            raise DependencyError, "Plugin `#{name}` depends on `#{x}` but it is not found."
-          end
+          raise DependencyError, "Plugin `#{name}` depends on `#{dep}` (via #{x}) but it is not found." if dep = dep_config[x]
+
+          raise DependencyError, "Plugin `#{name}` depends on `#{x}` but it is not found."
         end
       end
 
@@ -42,23 +41,18 @@ module Verse
 
       # This is called after all plugins has been initialized
       # but the server is still not started.
-      def on_init
-      end
+      def on_init; end
 
       # This is called once all `on_init` of each plugins has been called.
       # This is where you should hook a server or any other long-lived object.
       # @param mode [Symbol] the mode of the server (:server, :spec, :rake, :console)
-      def on_start(mode)
-      end
+      def on_start(mode); end
 
       # This is called when the server is shutting down.
-      def on_stop
-      end
+      def on_stop; end
 
       # This is the last step of the shutdown process.
-      def on_finalize
-      end
-
+      def on_finalize; end
     end
   end
 end

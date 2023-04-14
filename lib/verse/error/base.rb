@@ -34,6 +34,5 @@ module Verse
         end
       end
     end
-
   end
 end

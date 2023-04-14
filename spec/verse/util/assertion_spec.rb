@@ -24,5 +24,4 @@ RSpec.describe Verse::Util::Assertion do
       Verse::Util::Assertion.assert(false, "This should raise", StandardError)
     end.to raise_error(StandardError, /This should raise/)
   end
-
 end

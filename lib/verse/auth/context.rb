@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "./scope_dsl.rb"
+require_relative "./scope_dsl"
 
 module Verse
   module Auth
@@ -38,14 +38,14 @@ module Verse
         scopes = list_scopes(action, resource)
 
         mark_as_checked!
-        result = ScopeDSL.new(self, action, resource,  &block).result
+        result = ScopeDSL.new(self, action, resource, &block).result
 
         reject! if result.nil?
 
         result
       end
 
-      def can?(caction, resource)
+      def can?(_caction, _resource)
         raise UnimplementedError, "can? must be implemented"
       end
 
@@ -70,10 +70,9 @@ module Verse
 
       protected
 
-      def list_scopes(action, resource)
+      def list_scopes(_action, _resource)
         raise UnimplementedError, "list_scopes must be implemented"
       end
-
     end
   end
 end

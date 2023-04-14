@@ -28,7 +28,7 @@ module Verse
         File.join(config_path, "config.#{Verse.environment}.yml"),
         File.join(config_path),
       ].select do |file|
-        File.exists?(file) && !File.directory?(file)
+        File.exist?(file) && !File.directory?(file)
       end.each do |file|
         inject_to_config(file)
       end
@@ -44,6 +44,5 @@ module Verse
         )
       )
     end
-
   end
 end

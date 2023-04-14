@@ -37,7 +37,7 @@ module Verse
           %i<dependent_plugin>
         end
 
-        def on_start(mode)
+        def on_start(_mode)
           @action = dependent_plugin.do_something
         end
       end
@@ -58,7 +58,5 @@ module Verse
         end
       end
     end
-
-
   end
 end

@@ -3,7 +3,6 @@
 require_relative "in_memory_filtering"
 
 class InMemoryRepository < Verse::Model::Repository::Base
-
   class << self
     attr_accessor :data, :id
 
@@ -12,7 +11,6 @@ class InMemoryRepository < Verse::Model::Repository::Base
       subclass.instance_variable_set(:@id, 0)
     end
   end
-
 
   def filtering
     InMemoryFiltering
@@ -24,7 +22,7 @@ class InMemoryRepository < Verse::Model::Repository::Base
     @after_commit_blocks = []
   end
 
-  def transaction(&block)
+  def transaction
     if @in_transaction
       yield
     else
@@ -100,7 +98,6 @@ class InMemoryRepository < Verse::Model::Repository::Base
     )
   end
 
-
   def after_commit(&block)
     @after_commit_blocks << block
   end
@@ -123,5 +120,4 @@ class InMemoryRepository < Verse::Model::Repository::Base
       scope.custom? { |id| @@data.select{ |h| h[pkey] == id } }
     end
   end
-
 end

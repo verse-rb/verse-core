@@ -3,7 +3,6 @@ require_relative "../data/model/user_repository"
 require_relative "../data/mock_auth_context"
 
 RSpec.describe Verse::Model::Repository::Base do
-
   before do
     Verse.start(:server)
     PostRepository.clear
@@ -24,7 +23,7 @@ RSpec.describe Verse::Model::Repository::Base do
 
   describe "find_by" do
     it "can find user" do
-      user = @users.find_by({name: "John"})
+      user = @users.find_by({ name: "John" })
 
       expect(user).to be_a(User)
       expect(user.name).to eq("John")
@@ -32,7 +31,7 @@ RSpec.describe Verse::Model::Repository::Base do
     end
 
     it "returns nil if not found" do
-      user = @users.find_by({name: "Not Found"})
+      user = @users.find_by({ name: "Not Found" })
 
       expect(user).to be_nil
     end
@@ -41,9 +40,8 @@ RSpec.describe Verse::Model::Repository::Base do
   describe "find_by!" do
     it "throws error if not found" do
       expect do
-        @users.find_by!({name: "Not Found"})
+        @users.find_by!({ name: "Not Found" })
       end.to raise_error(Verse::Error::RecordNotFound)
     end
   end
-
 end

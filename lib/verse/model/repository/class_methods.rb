@@ -10,7 +10,7 @@ module Verse
         end
 
         def __default_record_name__
-          self.name.gsub(/Repository$/, "Record")
+          name.gsub(/Repository$/, "Record")
         end
 
         # The record class used by this repository.
@@ -47,7 +47,7 @@ module Verse
         end
 
         # Flag the next defined method as an event method.
-        def event(name=nil, **opts)
+        def event(name = nil, **opts)
           @next_method_mode = [:w, name, opts]
         end
 
@@ -73,11 +73,11 @@ module Verse
 
         def define_query_method(method, method_name)
           define_method(method_name) do |*args|
-            self.with_db_mode(:r){ method.bind(self).call(*args) }
+            with_db_mode(:r){ method.bind(self).call(*args) }
           end
         end
 
-        def define_event_method(method, method_name, options = {})
+        def define_event_method(method, method_name, _options = {})
           _, name, opts = @next_method_mode
 
           if opts[:creation]
@@ -123,13 +123,13 @@ module Verse
                   unless @disable_event
                     after_commit do
                       Verse.event_manager&.publish(event_path, {
-                        resource_model: self.class.event_resource,
-                        resource_id: result.to_s,
-                        event: event_path,
-                        args: args,
-                        metadata: metadata,
-                        created_at: Time.current
-                      })
+                                                     resource_model: self.class.event_resource,
+                                                     resource_id: result.to_s,
+                                                     event: event_path,
+                                                     args: args,
+                                                     metadata: metadata,
+                                                     created_at: Time.current
+                                                   })
                     end
                   end
 
@@ -143,13 +143,13 @@ module Verse
                   unless @disable_event
                     after_commit do
                       Verse.event_manager&.publish(event_path, {
-                        resource_model: self.class.event_resource,
-                        resource_id: id.to_s,
-                        event: event_path,
-                        args: arg2,
-                        metadata: metadata,
-                        created_at: Time.current
-                      })
+                                                     resource_model: self.class.event_resource,
+                                                     resource_id: id.to_s,
+                                                     event: event_path,
+                                                     args: arg2,
+                                                     metadata: metadata,
+                                                     created_at: Time.current
+                                                   })
                     end
                   end
 
@@ -160,9 +160,7 @@ module Verse
 
               result
             end
-
           end
-
         end
 
         def method_added(method_name)
@@ -189,7 +187,6 @@ module Verse
         def pkeyify(pkey)
           pkey
         end
-
       end
     end
   end

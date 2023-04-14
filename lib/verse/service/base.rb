@@ -27,7 +27,6 @@ module Verse
       ensure
         @metadata = old_metadata
       end
-
     end
   end
 end

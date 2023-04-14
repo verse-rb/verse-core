@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
 class MockAuthContext < Verse::Auth::Context
-
-  attr_accessor :user_id
-  attr_accessor :user_role
+  attr_accessor :user_id, :user_role
 
   # Use this class to mock an auth context for testing purposes.
   #
@@ -37,11 +35,12 @@ class MockAuthContext < Verse::Auth::Context
   # :nodoc:
   def can?(action, resource)
     return :all if @authorization == :all
-    return @authorization.fetch(resource, false).fetch(action, false)
+
+    @authorization.fetch(resource, false).fetch(action, false)
   end
 
   # :nodoc:
-  def list_scopes(action, resource)
+  def list_scopes(_action, resource)
     @scopes[resource]
   end
 end
