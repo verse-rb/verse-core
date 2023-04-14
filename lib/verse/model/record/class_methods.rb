@@ -50,11 +50,6 @@ module Verse
         # this is a good example of creating a custom relation
         # relation name, arity: :one|:many do |collection, auth_context, sub_included|
         #
-        # - collection => current collection of object having the relationship included
-        # - auth_context
-        # - sub_included => the case we have a tree of inclusion, this give the sub-included elements
-        # (e.g. if we call contract and include 'property.units',
-        #       the code is called on 'property' with sub_included 'units' )
         # returns:
         # an array with the collection of item fetched, and the indexing lambda method
         # used to detect and rebind the elements.
@@ -67,7 +62,17 @@ module Verse
         # @param opts [Hash] the options of the relation
         #
         # @option opts [Proc] :if a proc to check if the relation should be included.
-        #                     Used for example to include a relation only if a condition is met (polymorphism).
+        #                     Used for example to include a relation only if a condition is met.
+        #
+        # @example
+        #
+        #  class Post < Verse::Model::Record::Base
+        #     field :id, type: Integer, primary: true
+        #     field :content
+        #
+        #     belongs_to :author, repository: "UserRepository", if: ->(author) { author[:type] != "bot" }
+        #   end
+        #
         def belongs_to(relation_name, primary_key: nil, foreign_key: nil, repository: nil, record: nil, **opts)
           foreign_key ||= "#{relation_name}_id"
 
@@ -221,17 +226,56 @@ module Verse
           end
         end
 
-        def field(name, type: :any, key: nil, primary: false, &block)
+        # define a field of the record
+        #
+        # @param name [Symbol] the name (method) of the field
+        # @param type [Symbol] the type of the field (optional, any by default)
+        # @param key [Symbol] the key of the field. key map to a column name (optional, name by default)
+        # @param primary [Boolean] if the field is the primary key
+        # @param visible [Boolean] if the field is visible in the record
+        #
+        # @param block [Proc] optional block to call as getter for the field.
+        # @example
+        #
+        #  class UserRecord < Verse::Model::Record::Base
+        #     field :id, type: :integer, primary: true
+        #     field :first_name, type: :string
+        #     field :last_name, type: :string
+        #
+        #     field :password_digest, visible: false # tell renderer not to export it.
+        #
+        #     field :full_name do
+        #       "#{first_name} #{last_name}"
+        #     end
+        #  end
+        def field(name, type: :any, key: nil, primary: false, visible: true, &block)
           key ||= name.to_sym
-          @fields[key] = { name: name, type: type }
+          @fields[key] = { name: name, type: type, visible: visible }
 
-          @primary_key = key if primary
+          if primary
+            raise "field: primary key already defined: #{@primary_key}" if @primary_key
+            @primary_key = key
+          end
 
           block ||= -> { @fields[key] }
 
           define_method(name, &block)
         end
 
+        # define a enum field of the record
+        # @param name [Symbol] the name (method) of the field
+        # @param values [Array] the values of the enum
+        # @param prefix [String] the prefix of the enum methods
+        # @param suffix [String] the suffix of the enum methods
+        #
+        # @example
+        #
+        # class UserRecord < Verse::Model::Record::Base
+        #   enum :status, [:active, :inactive], prefix: "is"
+        # end
+        # user = UserRecord.new(status: :active)
+        # user.is_active? # => true
+        # user.is_inactive? # => false
         def enum(name, values, prefix: nil, suffix: nil)
           values.each do |value|
             method_name = [prefix, value, suffix].compact.join("_")
