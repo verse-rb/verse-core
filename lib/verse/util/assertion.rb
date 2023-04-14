@@ -3,7 +3,7 @@
 module Verse
   module Util
     module Assertion
-      module_function
+      extend self
 
       def assert(test, message = nil, klass = RuntimeError)
         return if test

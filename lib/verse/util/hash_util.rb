@@ -3,7 +3,7 @@
 module Verse
   module Util
     module HashUtil
-      module_function
+      extend self
 
       def deep_symbolize_keys(hash)
         hash.map do |k, v|

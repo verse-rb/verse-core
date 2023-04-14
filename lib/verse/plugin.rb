@@ -4,7 +4,7 @@ require_relative "util/assertion"
 
 module Verse
   module Plugin
-    module_function
+    extend self
 
     include Verse::Util
 
@@ -100,8 +100,6 @@ module Verse
 
       @plugins.clear
     end
-
-    protected
 
     # Load a specific plugin
     # @param plugin [Hash] the plugin configuration

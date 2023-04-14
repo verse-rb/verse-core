@@ -4,7 +4,7 @@ require "i18n"
 
 module Verse
   module I18n
-    module_function
+    extend self
 
     def init
       config = Verse::Config.config[:i18n] || {}

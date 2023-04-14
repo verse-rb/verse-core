@@ -14,7 +14,7 @@ require "dry-types"
 require "dry-validation"
 
 module Verse
-  module_function
+  extend self
 
   GEM_PATH = File.expand_path("..", __dir__)
 

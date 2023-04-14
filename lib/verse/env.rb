@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Verse
-  module_function
+  extend self
 
   def logger
     @logger

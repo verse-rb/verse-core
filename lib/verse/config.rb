@@ -4,7 +4,7 @@ require_relative "util/hash_util"
 
 module Verse
   module Config
-    module_function
+    extend self
 
     include Verse::Util
 
