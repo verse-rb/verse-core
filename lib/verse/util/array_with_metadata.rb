@@ -19,8 +19,8 @@ module Verse
         @delegated.send(method, *args, &block)
       end
 
-      def ==(x)
-        @delegated == x || super
+      def ==(other)
+        @delegated == other || super
       end
     end
   end
