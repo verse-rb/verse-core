@@ -5,8 +5,6 @@ require_relative "../spec_data/model/user_repository"
 require_relative "../spec_data/model/comment_repository"
 require_relative "../spec_data/model/account_repository"
 
-require_relative "../spec_data/mock_auth_context"
-
 RSpec.describe Verse::Model::Repository::Base do
   before do
     Verse.start(:server, config_path: File.join(__dir__, "../spec_data/config.yml"))
@@ -16,7 +14,7 @@ RSpec.describe Verse::Model::Repository::Base do
     CommentRepository.clear
     AccountRepository.clear
 
-    @auth_context = MockAuthContext.new(:all)
+    @auth_context = Spec::Auth::MockContext.new(["*.*.*"])
 
     # create data
     @users = UserRepository.new(@auth_context)

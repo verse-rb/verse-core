@@ -18,6 +18,10 @@ module Verse
         # delegate to sub array any methods.
         @delegated.send(method, *args, &block)
       end
+
+      def ==(x)
+        @delegated == x || super
+      end
     end
   end
 end

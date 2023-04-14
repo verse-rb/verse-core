@@ -25,7 +25,7 @@ module Verse
       # ```
       #
       # @param list_of_repositories [Hash] list of repositories to use
-      def use_repo(list_of_repositories)
+      def use_repo(**list_of_repositories)
         list_of_repositories.each do |method, klass|
           define_method(method) do
             repo = instance_variable_get("@#{method}")
