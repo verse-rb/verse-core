@@ -16,8 +16,9 @@ module Verse
       # @param message [String] the message to use if the test fails
       # @param klass [Class] the exception class to raise
       # @yieldreturn [String] the message to use if the test fails
+      #
       # @return [void]
-      def assert(test, message = nil, klass = RuntimeError, &block)
+      def assert(test, message = nil, klass = RuntimeError)
         return if test
 
         raise klass, yield if block_given?

@@ -22,12 +22,14 @@ module Verse
           if value
             @type = value
           else
-            @type ||= `infer_record_type_by_class_name`
+            @type ||= infer_record_type_by_class_name
           end
         end
 
         def primary_key
-          raise "primary_key is not set" if @primary_key.nil?
+          raise "primary_key in #{self} is not set" if @primary_key.nil?
+
+          @primary_key
         end
 
         def relation(name, array: false, &block)

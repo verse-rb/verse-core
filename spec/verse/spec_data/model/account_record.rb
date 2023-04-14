@@ -4,10 +4,10 @@ class AccountRecord < Verse::Model::Record::Base
   self.record_root_path       = ""
   self.repositories_root_path = ""
 
-  belongs_to :user
+  field :id, primary: true
+  field :email, type: String
 
   field :user_id
 
-  field :id, primary: true
-  field :email, type: String
+  belongs_to :user
 end
