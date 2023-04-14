@@ -7,6 +7,10 @@ module Verse
     @logger
   end
 
+  def inflector
+    @inflector ||= Verse::Util::Inflector.new
+  end
+
   def environment
     @environment
   end

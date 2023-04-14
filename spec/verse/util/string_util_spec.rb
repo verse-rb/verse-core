@@ -17,4 +17,13 @@ RSpec.describe Verse::Util::StringUtil do
     expect(subject.camelize("test/test_test_test")).to eq("Test::TestTestTest")
     expect(subject.camelize("test/test_test_test", uppercase_first_letter: false)).to eq("test::TestTestTest")
   end
+
+  it "can convert string to snake case" do
+    expect(subject.underscore("Test")).to eq("test")
+    expect(subject.underscore("TestTest")).to eq("test_test")
+    expect(subject.underscore("TestTestTest")).to eq("test_test_test")
+    expect(subject.underscore("Test::Test")).to eq("test/test")
+    expect(subject.underscore("Test::TestTest")).to eq("test/test_test")
+    expect(subject.underscore("Test::TestTestTest")).to eq("test/test_test_test")
+  end
 end

@@ -7,10 +7,11 @@ module Verse
   module Config
     extend self
 
-    SchemaError = Class.new(Verse::Error::Base)
-
     include Verse::Util
 
+    SchemaError = Class.new(Verse::Error::Base)
+
+    # @return [Hash] The current configuration hash.
     def config
       @config
     end

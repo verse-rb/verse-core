@@ -7,6 +7,8 @@ module Verse
         attr_writer :model_class
         attr_accessor :custom_filters, :encoders
 
+        include Verse::Util
+
         def managed_methods
           @managed_methods ||= Set.new
         end
@@ -18,7 +20,7 @@ module Verse
         # The record class used by this repository.
         # This is used to create new instances of the model.
         def model_class
-          @model_class || __default_record_name__.constantize
+          @model_class || Reflection.constantize(__default_record_name__)
         end
 
         def managed_methods?(name)

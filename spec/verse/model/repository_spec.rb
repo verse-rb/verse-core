@@ -6,7 +6,8 @@ require_relative "../spec_data/mock_auth_context"
 
 RSpec.describe Verse::Model::Repository::Base do
   before do
-    Verse.start(:server)
+    Verse.start(:server, config_path: File.join(__dir__, "../spec_data/config.yml"))
+
     PostRepository.clear
     UserRepository.clear
 

@@ -72,7 +72,13 @@ class InMemoryRepository < Verse::Model::Repository::Base
     included: [],
     record: self.class.model_class
   )
-    raise NotImplementedError, "please implement find_by"
+    filters = encode_filters(filters)
+    query = filtering.filter_by(scope, filters, self.class.custom_filters)
+
+    record = query.first
+
+    set = prepare_included(included, query, record: record)
+
   end
 
   def index(
@@ -87,7 +93,7 @@ class InMemoryRepository < Verse::Model::Repository::Base
     filters = encode_filters(filters)
     query = filtering.filter_by(scope, filters, self.class.custom_filters)
 
-    query[iteems_per_page * (page - 1), items_per_page]
+    query = query[items_per_page * (page - 1), items_per_page]
 
     set = prepare_included(included, query, record: record)
 
@@ -112,13 +118,8 @@ class InMemoryRepository < Verse::Model::Repository::Base
 
   def scoped(action)
     @auth_context.can!(action, self.class.resource) do |scope|
-      if scope.authorized_scopes.to_a.sort != %w[all custom]
-        raise "the object #{self.class.resource} doesn't follow default scoping methods.\n" \
-              "Please redefined #{self.class}#scoped method"
-      end
-
-      scope.all? { @@data }
-      scope.custom? { |id| @@data.select{ |h| h[pkey] == id } }
+      scope.all? { self.class.data }
+      scope.custom? { |id| self.class.data.select{ |h| h[pkey] == id } }
     end
   end
 end

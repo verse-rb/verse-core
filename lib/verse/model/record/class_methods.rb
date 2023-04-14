@@ -8,6 +8,8 @@ module Verse
 
         attr_reader :fields, :relations
 
+        include Verse::Util
+
         # get or set the type of the record
         # if not set, it will be infered from the class name
         # e.g. UserRecord => users
@@ -53,20 +55,20 @@ module Verse
         # @param primary_key [Symbol] the primary key of the relation
         # @param foreign_key [Symbol] the foreign key of the relation
         # @param repository [String] the repository of the relation
-        # @param serializer [String] the serializer of the relation
+        # @param record [String] the record of the relation
         # @param opts [Hash] the options of the relation
         #
         # @option opts [Proc] :if a proc to check if the relation should be included.
         #                     Used for example to include a relation only if a condition is met (polymorphism).
-        def belongs_to(relation_name, primary_key: nil, foreign_key: nil, repository: nil, serializer: nil, **opts)
+        def belongs_to(relation_name, primary_key: nil, foreign_key: nil, repository: nil, record: nil, **opts)
           foreign_key ||= "#{relation_name}_id"
-          repository ||= "App::Model::#{relation_name.to_s.classify}Repository"
+          repository ||= "App::Model::#{StringUtil.camelize(relation_name.to_s)}Repository"
 
           relation relation_name, array: false do |collection, auth_context, sub_included|
-            repository = repository.constantize if repository.is_a?(String)
-            serializer ||= repository.model_class
-            serializer = serializer.constantize if serializer.is_a?(String)
-            primary_key ||= serializer.primary_key
+            repository = Reflection.constantize(repository) if repository.is_a?(String)
+            record ||= repository.model_class
+            record = Reflection.constantize(record) if record.is_a?(String)
+            primary_key ||= record.primary_key
 
             included = repository.new(
               auth_context
@@ -77,13 +79,13 @@ module Verse
                   next if condition && !condition.call(x)
 
                   # check key_type using model structure
-                  pkey_info = serializer.fields.fetch(primary_key){ raise "primary key name not found: `#{primary_key}`" }
+                  pkey_info = record.fields.fetch(primary_key){ raise "primary key name not found: `#{primary_key}`" }
 
-                  Verse::Model::Serializer::Converter.convert(x[foreign_key.to_sym], pkey_info[:type])
+                  Verse::Model::record::Converter.convert(x[foreign_key.to_sym], pkey_info[:type])
                 }.compact
               },
               included: sub_included,
-              serializer: serializer
+              record: record
             )
 
             [
@@ -102,16 +104,16 @@ module Verse
           end
         end
 
-        def has_many(relation_name, primary_key: nil, foreign_key: nil, repository: nil, serializer: nil, **opts) # rubocop:disable Naming/PredicateName
-          foreign_key ||= "#{type.singularize}_id"
+        def has_many(relation_name, primary_key: nil, foreign_key: nil, repository: nil, record: nil, **opts) # rubocop:disable Naming/PredicateName
+          foreign_key ||= "#{Verse.inflector.singularize(type)}_id"
 
-          repository ||= "App::Model::#{relation_name.to_s.classify}Repository"
+          repository ||= "App::Model::#{StringUtil.camelize(relation_name.to_s)}Repository"
 
           relation relation_name, array: true do |collection, auth_context, sub_included|
-            repository = repository.constantize if repository.is_a?(String)
-            serializer ||= repository.model_class
-            serializer = serializer.constantize if serializer.is_a?(String)
-            primary_key ||= serializer.primary_key
+            repository = Reflection.constantize(repository) if repository.is_a?(String)
+            record ||= repository.model_class
+            record = Reflection.constantize(record) if record.is_a?(String)
+            primary_key ||= record.primary_key
 
             included = repository.new(
               auth_context
@@ -122,13 +124,13 @@ module Verse
                   next if condition && !condition.call(x)
 
                   # check key_type using model structure
-                  pkey_info = serializer.fields[primary_key]
+                  pkey_info = record.fields[primary_key]
 
-                  Verse::Model::Serializer::Converter.convert(x[primary_key.to_sym], pkey_info[:type])
+                  Verse::Model::record::Converter.convert(x[primary_key.to_sym], pkey_info[:type])
                 }.compact
               },
               included: sub_included,
-              serializer: serializer
+              record: record
             )
 
             [
@@ -153,7 +155,7 @@ module Verse
           repository ||= "App::Model::#{relation_name.to_s.classify}Repository"
 
           relation relation_name, array: false do |collection, auth_context, sub_included|
-            repository = repository.constantize if repository.is_a?(String)
+            repository = Reflection.constantize(repository) if repository.is_a?(String)
             primary_key ||= repository.model_class.primary_key
 
             included = repository.new(
@@ -167,7 +169,7 @@ module Verse
                   # check key_type using model structure
                   pkey_info = repository.model_class.fields[primary_key]
 
-                  Verse::Model::Serializer::Converter.convert(x[primary_key.to_sym], pkey_info[:type])
+                  Verse::Model::record::Converter.convert(x[primary_key.to_sym], pkey_info[:type])
                 }.compact
               },
               included: sub_included
@@ -189,7 +191,7 @@ module Verse
           end
         end
 
-        def field(name, type = :any, key: nil, primary: false, &block)
+        def field(name, type: :any, key: nil, primary: false, &block)
           key ||= name.to_sym
           @fields[key] = { name: name, type: type }
 
@@ -217,17 +219,23 @@ module Verse
         def infer_record_type_by_class_name
           regexp = /(::)?([a-zA-Z0-9_]+)$/
           Verse.inflector.pluralize(
-            name[regexp].gsub(regexp, "\\2").gsub(/(.?)Record$/, "\\1").underscore
+            StringUtil.underscore(
+              name[regexp].gsub(regexp, "\\2").gsub(/(.?)Record$/, "\\1")
+            )
           )
         end
 
-        def infer_serializer_for(name)
-          klass = name.to_s.singularize.classify
+        def infer_record_for(name)
+          klass = StringUtil.camelize(
+            Verse.inflector.singularize(name.to_s)
+          )
 
-          if serializer_root_path == ""
-            klass.to_s.classify
+          if record_root_path == ""
+            StringUtil.camelize(klass.to_s)
           else
-            [record_root_path, klass.to_s].join("::").classify
+            StringUtil.camelize(
+              [record_root_path, klass.to_s].join("::")
+            )
           end
         end
       end

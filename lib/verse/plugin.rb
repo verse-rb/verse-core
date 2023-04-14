@@ -113,7 +113,7 @@ module Verse
 
       logger.debug{ "Plugin `#{name}`: Initializing plugin" }
 
-      plugin_class = Reflection.get(type)
+      plugin_class = Reflection.constantize(type)
       plugin = plugin_class.new(name.to_s, config, dependencies, logger)
 
       register_plugin(plugin)

@@ -9,7 +9,7 @@ module Verse
       # @param string [String] the string to get the constant from
       # @param object_space [Object] the object space to search in
       # @return [Object] the constant
-      def get(string, object_space = ObjectSpace)
+      def constantize(string, object_space = ObjectSpace)
         if string[0..1] == "::"
           string = string[2..]
         end
