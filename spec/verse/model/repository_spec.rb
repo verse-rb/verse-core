@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require_relative "../data/model/post_repository"
-require_relative "../data/model/user_repository"
-require_relative "../data/mock_auth_context"
+require_relative "../spec_data/model/post_repository"
+require_relative "../spec_data/model/user_repository"
+require_relative "../spec_data/mock_auth_context"
 
 RSpec.describe Verse::Model::Repository::Base do
   before do

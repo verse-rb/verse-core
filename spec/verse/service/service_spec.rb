@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require_relative "../data/test_service"
-require_relative "../data/mock_auth_context"
+require_relative "../spec_data/test_service"
+require_relative "../spec_data/mock_auth_context"
 
 RSpec.describe Verse::Service::Base do
   subject { TestService }
