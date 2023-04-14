@@ -9,6 +9,7 @@ class InMemoryRepository < Verse::Model::Repository::Base
     def inherited(subclass)
       subclass.instance_variable_set(:@data, [])
       subclass.instance_variable_set(:@id, 0)
+
       super
     end
   end
@@ -53,7 +54,7 @@ class InMemoryRepository < Verse::Model::Repository::Base
 
     row = attributes.merge(id: self.class.id)
 
-    self.class.data[self.class.id] = row
+    self.class.data << row
   end
 
   def delete(id, scope = scoped(:delete))
@@ -67,7 +68,7 @@ class InMemoryRepository < Verse::Model::Repository::Base
   end
 
   def find_by(
-    filter,
+    filters,
     scope: scoped(:read),
     included: [],
     record: self.class.model_class
@@ -75,10 +76,13 @@ class InMemoryRepository < Verse::Model::Repository::Base
     filters = encode_filters(filters)
     query = filtering.filter_by(scope, filters, self.class.custom_filters)
 
-    record = query.first
+    result = query.first
 
-    set = prepare_included(included, query, record: record)
+    return if result.nil?
 
+    set = prepare_included(included, [result], record: record)
+
+    record.new(result, include_set: set)
   end
 
   def index(

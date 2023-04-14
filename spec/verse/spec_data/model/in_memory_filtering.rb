@@ -45,6 +45,7 @@ module InMemoryFiltering
   def self.filter_by(collection, filtering_parameters, custom_filters)
     return collection if filtering_parameters.nil? || filtering_parameters.empty?
 
+
     collection = collection.lazy
 
     filtering_parameters.each do |key, value|
@@ -59,7 +60,7 @@ module InMemoryFiltering
 
       operation ||= "eq"
 
-      collection = OPERATIONS.fetch(operation.to_sym).call(collection, column_name, value)
+      collection = OPERATIONS.fetch(operation.to_sym).call(collection, column_name.to_sym, value)
     end
 
     collection.to_a

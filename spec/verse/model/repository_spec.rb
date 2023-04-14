@@ -28,9 +28,15 @@ RSpec.describe Verse::Model::Repository::Base do
     it "can find user" do
       user = @users.find_by({ name: "John" })
 
-      expect(user).to be_a(User)
+      expect(user).to be_a(UserRecord)
       expect(user.name).to eq("John")
       expect(user.id).to eq(1)
+    end
+
+    it "can find using filter" do
+      user = @users.find_by({ name__in: ["John", "Jane"] })
+
+      expect(user).not_to be_nil
     end
 
     it "returns nil if not found" do

@@ -17,10 +17,11 @@ module Verse
           name.gsub(/Repository$/, "Record")
         end
 
-        # The record class used by this repository.
-        # This is used to create new instances of the model.
+        # This is the record class that this repository is managing.
+        # It is used to build new records object.
+        # @return [Class] the record class for this repository
         def model_class
-          @model_class || Reflection.constantize(__default_record_name__)
+          @model_class ||= Reflection.constantize(__default_record_name__)
         end
 
         def managed_methods?(name)

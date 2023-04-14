@@ -4,7 +4,7 @@ module Verse
   module Model
     module Record
       module ClassMethods
-        attr_accessor :record_root_path, :repositories_root_path, :primary_key
+        attr_accessor :record_root_path, :repositories_root_path
 
         attr_reader :fields, :relations
 
@@ -19,6 +19,14 @@ module Verse
             @type = value
           else
             @type ||= infer_record_type_by_class_name
+          end
+        end
+
+        def primary_key(value = nil)
+          if value
+            @primary_key = value
+          else
+            @primary_key ||= :id
           end
         end
 
