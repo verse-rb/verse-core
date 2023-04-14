@@ -45,7 +45,6 @@ module InMemoryFiltering
   def self.filter_by(collection, filtering_parameters, custom_filters)
     return collection if filtering_parameters.nil? || filtering_parameters.empty?
 
-
     collection = collection.lazy
 
     filtering_parameters.each do |key, value|

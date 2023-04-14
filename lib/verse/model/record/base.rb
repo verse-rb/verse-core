@@ -62,7 +62,7 @@ module Verse
 
         # Return the fields to json
         # @return [String] The json string.
-        def to_json
+        def to_json(*_args)
           to_h.to_json
         end
 

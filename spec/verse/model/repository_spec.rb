@@ -24,7 +24,6 @@ RSpec.describe Verse::Model::Repository::Base do
     @accounts = AccountRepository.new(@auth_context)
     @comments = CommentRepository.new(@auth_context)
 
-
     id_john = @users.create(name: "John")
     @accounts.create(user_id: id_john, email: "john@example.tld")
 
@@ -76,7 +75,7 @@ RSpec.describe Verse::Model::Repository::Base do
 
       expect(out).to be true
 
-      user = @users.find_by({id: 1})
+      user = @users.find_by({ id: 1 })
 
       expect(user).to be_a(UserRecord)
       expect(user.name).to eq("John Doe")

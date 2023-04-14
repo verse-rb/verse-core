@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Verse
   module Model
     # This class is used to store included data for a record.
@@ -46,7 +47,6 @@ module Verse
       def get_lookup_method(namespace)
         @lookup_method_table[namespace]
       end
-
     end
   end
 end

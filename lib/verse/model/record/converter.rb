@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Verse
   module Model
     module Record
@@ -7,9 +9,9 @@ module Verse
         def convert(value, type)
           return value if value.nil?
 
-          conv = @converters.fetch(type) { raise "unsupported field type: `#{type}`"}
+          conv = @converters.fetch(type) { raise "unsupported field type: `#{type}`" }
 
-          conv.call(value) if conv
+          conv&.call(value)
         end
 
         def add_converter(type, &block)
@@ -32,7 +34,6 @@ module Verse
             raise "cannot convert from `#{obj.class}`"
           end
         end
-
       end
     end
   end

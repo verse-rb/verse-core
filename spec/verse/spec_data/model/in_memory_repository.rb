@@ -52,7 +52,7 @@ class InMemoryRepository < Verse::Model::Repository::Base
 
     target.merge!(attributes)
 
-    return true
+    true
   end
 
   def create(attributes)
@@ -102,7 +102,7 @@ class InMemoryRepository < Verse::Model::Repository::Base
     page: 1, items_per_page: 1000,
     sort: nil,
     record: self.class.model_class,
-    query_count: true # rubocop:disable Lint/UnusedMethodArgument
+    query_count: true
   )
     filters = encode_filters(filters)
     query = filtering.filter_by(scope, filters, self.class.custom_filters)
@@ -123,19 +123,16 @@ class InMemoryRepository < Verse::Model::Repository::Base
           b = b[field.to_sym]
 
           result = \
-            case
-            when a.nil?
+            if a.nil?
               1
-            when b.nil?
+            elsif b.nil?
               -1
             else
               a <=> b
             end
 
-          result = result * (1 << (count-x))
+          result *= (1 << (count - x))
           result = -result if direction == :desc
-
-          x + 1
 
           sum + result
         end

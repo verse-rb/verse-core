@@ -71,7 +71,7 @@ module Verse
         def belongs_to(relation_name, primary_key: nil, foreign_key: nil, repository: nil, record: nil, **opts)
           foreign_key ||= "#{relation_name}_id"
 
-          root = self.name.split(/::[^:]+$/).first
+          root = name.split(/::[^:]+$/).first
           repository ||= "#{root}::#{StringUtil.camelize(relation_name.to_s)}Repository"
 
           relation relation_name, array: false do |collection, auth_context, sub_included|
@@ -105,8 +105,8 @@ module Verse
                   raise "[belongs_to #{name}:#{relation_name}] primary key not found: #{primary_key}"
                 end.to_s
               end, # Create index key
-              lambda do |record| # Acces index key
-                record.fetch(foreign_key.to_s) do
+              lambda do |inc_record| # Acces index key
+                inc_record.fetch(foreign_key.to_s) do
                   raise "[belongs_to #{name}:#{relation_name}] foreign key not found: #{foreign_key}"
                 end.to_s
               end
@@ -117,7 +117,7 @@ module Verse
         def has_many(relation_name, primary_key: nil, foreign_key: nil, repository: nil, record: nil, **opts) # rubocop:disable Naming/PredicateName
           foreign_key ||= "#{Verse.inflector.singularize(type)}_id"
 
-          root = self.name.split(/::[^:]+$/).first
+          root = name.split(/::[^:]+$/).first
           repository ||= "#{root}::#{StringUtil.camelize(relation_name.to_s)}Repository"
 
           relation relation_name, array: true do |collection, auth_context, sub_included|
@@ -151,8 +151,8 @@ module Verse
                   raise "[belongs_to #{name}:#{relation_name}] primary key not found: #{foreign_key}"
                 end.to_s
               end, # Create index key
-              lambda do |record| # Acces index key
-                record.fetch(primary_key.to_s) do
+              lambda do |inc_record| # Acces index key
+                inc_record.fetch(primary_key.to_s) do
                   raise "[belongs_to #{name}:#{relation_name}] foreign key not found: #{primary_key}"
                 end.to_s
               end
@@ -163,7 +163,7 @@ module Verse
         def has_one(relation_name, primary_key: nil, foreign_key: nil, repository: nil, **opts) # rubocop:disable Naming/PredicateName
           foreign_key ||= "#{Verse.inflector.singularize(type)}_id"
 
-          root = self.name.split(/::[^:]+$/).first
+          root = name.split(/::[^:]+$/).first
 
           repository ||= "#{root}::#{StringUtil.camelize(relation_name.to_s)}Repository"
 

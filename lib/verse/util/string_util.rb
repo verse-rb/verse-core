@@ -29,7 +29,6 @@ module Verse
               .tr("-", "_")
               .downcase
       end
-
     end
   end
 end
