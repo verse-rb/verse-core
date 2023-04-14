@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "spec_helper"
 
 require_relative "./data/plugins_test"
@@ -39,18 +41,20 @@ RSpec.describe Verse::Plugin do
         expect do
           Verse.start(:server,
                       config_path: File.join(__dir__, "data", "plugin_config_bad_1.yml"))
-        end.to raise_error(Verse::Plugin::DependencyError,
-                           "Plugin `plugin_with_dependencies` depends on " \
-                           "`dependent_plugin` but it is not found.")
+        end.to raise_error(
+          Verse::Plugin::DependencyError,
+          Verse::Plugin::DependencyError::ERROR_MSG_DEPENDS % ["plugin_with_dependencies", "dependent_plugin"]
+        )
       end
 
       it "fails to load the plugin if the dependency is not met (2)" do
         expect do
           Verse.start(:server,
                       config_path: File.join(__dir__, "data", "plugin_config_bad_2.yml"))
-        end.to raise_error(Verse::Plugin::DependencyError,
-                           "Plugin `another_plugin_with_dependencies <plugin_with_dependencies>` depends" \
-                           " on `dependent_plugin_2` (via dependent_plugin) but it is not found.")
+        end.to raise_error(
+          Verse::Plugin::DependencyError,
+          Verse::Plugin::DependencyError::ERROR_MSG_DEPENDS_MAP % ["another_plugin_with_dependencies <plugin_with_dependencies>", "dependent_plugin", "dependent_plugin_2"]
+        )
       end
     end
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Verse
   module Util
     module Reflection
@@ -9,7 +11,7 @@ module Verse
       # @return [Object] the constant
       def get(string, object_space = ObjectSpace)
         if string[0..1] == "::"
-          string = string[2..-1]
+          string = string[2..]
         end
 
         get_path(string.split("::"), object_space)
@@ -17,13 +19,15 @@ module Verse
         raise NameError, "Unable to find constant #{string}", e.backtrace
       end
 
+      private
+
       # :nodoc:
-      private def get_path(path, object_space = ObjectSpace)
+      def get_path(path, object_space = ObjectSpace)
         return object_space if path.empty?
 
         constant = object_space.const_get(path.first)
 
-        get_path(path[1..-1], constant)
+        get_path(path[1..], constant)
       end
     end
   end

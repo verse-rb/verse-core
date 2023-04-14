@@ -15,7 +15,7 @@ module Verse
 
         @scopes = @context.list_scopes(@action, @resource)
 
-        @scopes.lazy.map(&:to_sym).select{ |x| x != :custom }.each do |scope|
+        @scopes.lazy.map(&:to_sym).reject{ |x| x == :custom }.each do |scope|
           define_singleton_method("#{scope}?") do |&block|
             return unless @scope == scope
 

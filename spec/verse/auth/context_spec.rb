@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 require "spec_helper"
-require "spec/mock_auth_context"
+require "verse/spec/mock_auth_context"
 
 RSpec.describe Verse::Auth::Context do
   it "scopes correctly" do

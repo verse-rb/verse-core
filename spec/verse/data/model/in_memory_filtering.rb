@@ -9,7 +9,7 @@ module InMemoryFiltering
     eq: ->(col, column, value) {
       case value
       when Array
-        if value.size == 0
+        if value.empty?
           []
         else
           col.select{ |x| value.include?(x[column]) }
@@ -18,7 +18,7 @@ module InMemoryFiltering
         col.select{ |x| x[column] == value }
       end
     },
-    neq: ->(col, column, value) { col.select{ |x| x[column] != value } },
+    neq: ->(col, column, value) { col.reject{ |x| x[column] == value } },
     prefix: ->(col, column, value) { col.select{ |x| x[column].to_s.start_with?(value) } },
     in: ->(col, column, value) { col.select{ |x| value.include?(x[column]) } },
     match: ->(col, column, value) { col.select{ |x| x[column].to_s =~ regexp(value) } },

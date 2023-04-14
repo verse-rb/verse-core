@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "../data/test_service"
 require_relative "../data/mock_auth_context"
 

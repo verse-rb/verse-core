@@ -1,24 +1,7 @@
+# frozen_string_literal: true
+
 module Verse
   module_function
-
-  # Initialize the microservice within the current path
-  protected def init(
-    root_path:,
-    logger:,
-    config_path:
-  )
-    # Generate unique ID for the lifetime of the service.
-    @service_id   = SecureRandom.alphanumeric(12)
-    @environment  = ENV.fetch("APP_ENVIRONMENT", "development").to_sym
-    @root_path    = root_path
-    @logger       = logger
-
-    Verse::Config.init(config_path)
-    Verse::I18n.init
-
-    Verse::Plugin.load_configuration(Verse::Config.config)
-    Verse::Plugin.init
-  end
 
   def service_id
     @service_id
@@ -48,5 +31,26 @@ module Verse
     Verse::I18n.load_i18n
 
     Verse::Plugin.start(mode)
+  end
+
+  protected
+
+  # Initialize the microservice within the current path
+  def init(
+    root_path:,
+    logger:,
+    config_path:
+  )
+    # Generate unique ID for the lifetime of the service.
+    @service_id = SecureRandom.alphanumeric(12)
+    @environment  = ENV.fetch("APP_ENVIRONMENT", "development").to_sym
+    @root_path    = root_path
+    @logger       = logger
+
+    Verse::Config.init(config_path)
+    Verse::I18n.init
+
+    Verse::Plugin.load_configuration(Verse::Config.config)
+    Verse::Plugin.init
   end
 end

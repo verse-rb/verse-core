@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Verse::Util::StringUtil do
   subject{ Verse::Util::StringUtil }
 

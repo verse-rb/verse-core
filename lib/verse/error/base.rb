@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Verse
   module Error
     class Base < RuntimeError

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Verse
   module Model
     module Record
@@ -225,7 +227,7 @@ module Verse
           if serializer_root_path == ""
             klass.to_s.classify
           else
-            [record_root_path, "#{klass}"].join("::").classify
+            [record_root_path, klass.to_s].join("::").classify
           end
         end
       end

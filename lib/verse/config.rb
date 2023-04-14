@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "util/hash_util"
 
 module Verse
@@ -40,7 +42,7 @@ module Verse
 
       @config.merge!(
         HashUtil.deep_symbolize_keys(
-          YAML.load(yaml_content)
+          YAML.safe_load(yaml_content)
         )
       )
     end

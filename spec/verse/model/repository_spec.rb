@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "../data/model/post_repository"
 require_relative "../data/model/user_repository"
 require_relative "../data/mock_auth_context"

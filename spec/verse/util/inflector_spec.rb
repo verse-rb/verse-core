@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Verse::Util::Inflector do
   subject { Verse::Util::Inflector.new }
 

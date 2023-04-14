@@ -16,21 +16,17 @@ module Verse
         init_dependencies
       end
 
-      protected def init_dependencies
-        dependencies.each do |dep|
-          define_singleton_method(dep) do
-            Verse::Plugin[@dep_config.fetch(dep, dep)]
-          end
-        end
-      end
-
       def check_dependencies!
-        dependencies.each do |x|
-          send(x)
+        dependencies.each do |dep|
+          send(dep)
         rescue NotFoundError => e
-          raise DependencyError, "Plugin `#{name}` depends on `#{dep}` (via #{x}) but it is not found." if dep = dep_config[x]
+          dep_map = dep_config[dep]
 
-          raise DependencyError, "Plugin `#{name}` depends on `#{x}` but it is not found."
+          if dep_map
+            raise DependencyError, DependencyError::ERROR_MSG_DEPENDS_MAP % [name, dep, dep_map]
+          end
+
+          raise DependencyError, DependencyError::ERROR_MSG_DEPENDS % [name, dep]
         end
       end
 
@@ -53,6 +49,16 @@ module Verse
 
       # This is the last step of the shutdown process.
       def on_finalize; end
+
+      protected
+
+      def init_dependencies
+        dependencies.each do |dep|
+          define_singleton_method(dep) do
+            Verse::Plugin[@dep_config.fetch(dep, dep)]
+          end
+        end
+      end
     end
   end
 end

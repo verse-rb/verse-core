@@ -10,7 +10,11 @@ module Verse
 
     Error = Class.new(StandardError)
     NotFoundError = Class.new(Error)
-    DependencyError = Class.new(Error)
+
+    class DependencyError < Error
+      ERROR_MSG_DEPENDS_MAP = "Plugin `%s` depends on `%s` (as `%s`) but it is not found."
+      ERROR_MSG_DEPENDS = "Plugin `%s` depends on `%s` but it is not found."
+    end
 
     @plugins = {}
 
@@ -51,18 +55,6 @@ module Verse
       end
     end
 
-    private def infer_name_and_class(str)
-      name         = str.scan(/([^<][\w:]+)/).first&.first
-      klass_name   = str.scan(/<([\w:]+)>/).first&.first
-      klass_name ||= name
-
-      if klass_name !~ /[A-Z]/
-        klass_name = "Verse::Plugin::#{StringUtil.camelize(klass_name)}::Plugin"
-      end
-
-      [name, klass_name]
-    end
-
     # Return the plugin with the given name.
     # @param name [String] the name of the plugin
     # @return [Verse::Plugin::Base+] the plugin
@@ -83,7 +75,7 @@ module Verse
     end
 
     def start(mode)
-      @plugins.values.each do |x|
+      @plugins.each_value do |x|
         x.on_start(mode)
       end
     rescue StandardError => e
@@ -92,7 +84,7 @@ module Verse
     end
 
     def stop
-      @plugins.values.each do |p|
+      @plugins.each_value do |p|
         p.on_stop
       rescue StandardError => e
         Verse.logger.error(e)
@@ -100,7 +92,7 @@ module Verse
     end
 
     def finalize
-      @plugins.values.each do |p|
+      @plugins.each_value do |p|
         p.on_finalize
       rescue StandardError => e
         Verse.logger.error(e)
@@ -109,10 +101,12 @@ module Verse
       @plugins.clear
     end
 
+    protected
+
     # Load a specific plugin
     # @param plugin [Hash] the plugin configuration
     # @param logger [Logger] the logger to use when initializing the plugin
-    protected def load_plugin(plugin, logger = Verse.logger)
+    def load_plugin(plugin, logger = Verse.logger)
       type = plugin.fetch(:class)
       name = plugin.fetch(:name, type)
       config = plugin.fetch(:config, {})
@@ -134,12 +128,26 @@ module Verse
 
     # Add plugin to the list of loaded plugins
     # @param plugin [Verse::Plugin::Base+] the plugin to register
-    protected def register_plugin(plugin)
+    def register_plugin(plugin)
       name = plugin.name.to_sym
 
       @plugins.key?(name) and raise "Plugin already registered: `#{name}`"
 
       @plugins[name] = plugin
+    end
+
+    private
+
+    def infer_name_and_class(str)
+      name = str.scan(/([^<][\w:]+)/).first&.first
+      klass_name   = str.scan(/<([\w:]+)>/).first&.first
+      klass_name ||= name
+
+      if klass_name !~ /[A-Z]/
+        klass_name = "Verse::Plugin::#{StringUtil.camelize(klass_name)}::Plugin"
+      end
+
+      [name, klass_name]
     end
   end
 end
