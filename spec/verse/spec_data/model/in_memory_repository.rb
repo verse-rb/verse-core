@@ -46,14 +46,13 @@ class InMemoryRepository < Verse::Model::Repository::Base
   end
 
   def update(id, attributes, scope = scoped(:update))
-    target = scope.find{ |record| record[pkey] == id }
+    target = scope.find{ |record| record[self.class.primary_key] == id }
 
     return false unless target
 
-    target.clear
     target.merge!(attributes)
 
-    target
+    return true
   end
 
   def create(attributes)
@@ -69,7 +68,7 @@ class InMemoryRepository < Verse::Model::Repository::Base
   end
 
   def delete(id, scope = scoped(:delete))
-    target = scope.find{ |record| record[pkey] == id }
+    target = scope.find{ |record| record[self.class.primary_key] == id }
 
     return false unless target
 

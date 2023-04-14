@@ -70,6 +70,33 @@ RSpec.describe Verse::Model::Repository::Base do
     end
   end
 
+  describe "#update" do
+    it "can update user" do
+      out = @users.update(1, { name: "John Doe" })
+
+      expect(out).to be true
+
+      user = @users.find_by({id: 1})
+
+      expect(user).to be_a(UserRecord)
+      expect(user.name).to eq("John Doe")
+      expect(user.id).to eq(1)
+    end
+
+    it "returns false if not found" do
+      out = @users.update(999, { name: "John Doe" })
+      expect(out).to be false
+    end
+  end
+
+  describe "#update!" do
+    it "throws error if not found" do
+      expect do
+        @users.update!(999, { name: "John Doe" })
+      end.to raise_error(Verse::Error::RecordNotFound)
+    end
+  end
+
   describe "#index" do
     it "can index users" do
       users = @users.index({})

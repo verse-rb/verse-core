@@ -187,6 +187,14 @@ module Verse
           @next_method_mode = nil
         end
 
+        def primary_key(value = nil)
+          if value
+            @primary_key = value
+          end
+
+          @primary_key ||= :id
+        end
+
         # Can be redefined by childs in case the primary key must be in a certain
         # form (hmmm MongoDb ObjectID?)
         def pkeyify(pkey)
