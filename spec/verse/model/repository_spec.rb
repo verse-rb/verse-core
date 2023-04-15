@@ -14,7 +14,7 @@ RSpec.describe Verse::Model::Repository::Base do
     CommentRepository.clear
     AccountRepository.clear
 
-    @auth_context = Spec::Auth::MockContext.new(["*.*.*"])
+    @auth_context = Verse::Spec::Auth::MockContext.new(["*.*.*"])
 
     # create data
     @users = UserRepository.new(@auth_context)

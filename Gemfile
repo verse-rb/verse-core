@@ -14,3 +14,5 @@ gem "rubocop", "~> 1.21"
 gem "pry"
 
 gem "simplecov"
+
+gem "bootsnap", "~> 1.16"

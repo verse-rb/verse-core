@@ -28,9 +28,21 @@ module Verse
       config_path: config_path
     )
 
+    @started = true
+    @on_boot_callbacks&.each(&:call)
+    @on_boot_callbacks&.clear
+
     Verse::I18n.load_i18n
 
     Verse::Plugin.start(mode)
+  end
+
+  def on_boot(&block)
+    if @started
+      block.call
+    else
+      (@on_boot_callbacks ||= []) << block
+    end
   end
 
   protected

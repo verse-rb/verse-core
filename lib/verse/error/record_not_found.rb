@@ -4,7 +4,7 @@ require_relative "./base"
 
 module Verse
   module Error
-    class RecordNotFound < Base
+    class RecordNotFound < NotFound
       http_code 404
       message "verse.errors.record_not_found"
     end

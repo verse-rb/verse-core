@@ -28,6 +28,10 @@ module Verse
       #   end
       # ```
       #
+      # Only the block matching the scope of the current context will be executed.
+      # If no block is matching the scope, then the else? block will be executed.
+      # If no else? block is defined, then the action will be rejected.
+      #
       # @param action [Symbol] the action on the resource we want to check
       # @param resource [Symbol] the resource we want to check
       # @param block [Proc] the block used to define the scope.
@@ -44,33 +48,33 @@ module Verse
         result
       end
 
-      def can?(_caction, _resource)
+      def can?(_action, _resource)
         raise UnimplementedError, "can? must be implemented"
       end
 
-      # Confirm that the security context has been checked
+      # Confirm that the security context has been checked.
+      # This method is used to bypass security check, or allow
+      # free access to a resource.
       def mark_as_checked!
         @checked = true
       end
 
       alias_method :no_authorization!, :mark_as_checked!
 
+      # @return [Boolean] whether the security context has been checked
       def checked?
         !!@checked
       end
 
+      # Raise an error if the security context is not met
       def reject!
         raise UnauthorizedError, "unauthorized"
       end
 
+      # @param resource [Symbol] the resource we want to check
+      # @return [Object] the data associated with the resource
       def [](resource)
         @data[resource.to_sym]
-      end
-
-      protected
-
-      def list_scopes(_action, _resource)
-        raise UnimplementedError, "list_scopes must be implemented"
       end
     end
   end

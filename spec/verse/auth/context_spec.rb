@@ -22,14 +22,14 @@ RSpec.describe Verse::Auth::Context do
         end
       end
 
-      context = Spec::Auth::MockContext.new(right, data: { users: ["1234"] })
+      context = Verse::Spec::Auth::MockContext.new(right, data: { users: ["1234"] })
       expect(can_method.call(context)).to eq(value)
     end
   end
 
   it "rejects correctly" do
     # Zero rights.
-    @context = Spec::Auth::MockContext.new([])
+    @context = Verse::Spec::Auth::MockContext.new([])
 
     can_method = proc do |context|
       context.can!(:read, :users) do |scope|

@@ -21,6 +21,12 @@ module Verse
             optional(:dep).filled(:hash)
           end
         end
+
+        optional(:logging).hash do
+          required(:level).filled(:string)
+          optional(:file).filled(:string)
+          optional(:show_full_error).filled(:bool)
+        end
       end
 
       rule(:service_name) do
