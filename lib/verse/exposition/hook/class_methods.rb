@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Verse
   module Exposition
     module Hook
@@ -5,6 +7,7 @@ module Verse
         attr_reader :error_handlers
 
         def inherited(subclass)
+          super
           subclass.instance_variable_set(:@error_handlers, [])
         end
 

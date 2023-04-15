@@ -1,8 +1,9 @@
+# frozen_string_literal: true
+
 module Verse
   module Exposition
     module Hook
       class Base
-
         extend ClassMethods
 
         attr_reader :exposition_class, :method, :metablock
@@ -37,7 +38,6 @@ module Verse
         def register_impl
           raise NotImplementedError, "register_impl must be implemented"
         end
-
       end
     end
   end

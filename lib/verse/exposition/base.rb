@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "./class_methods"
 
 module Verse
@@ -9,7 +11,7 @@ module Verse
 
       @handlers = []
 
-      def initialize(auth_context, action, hook, **fields)
+      def initialize(auth_context, action, _hook, **fields)
         @auth_context = auth_context
         @current_action = action
 
@@ -21,11 +23,9 @@ module Verse
       end
 
       def service
-        if self.class.service_class
-          @service ||= self.class.service_class.new(auth_context)
-        else
-          nil
-        end
+        return unless self.class.service_class
+
+        @service ||= self.class.service_class.new(auth_context)
       end
 
       def run(&block)
@@ -46,8 +46,6 @@ module Verse
 
         previous_handler
       end
-
-
     end
   end
 end

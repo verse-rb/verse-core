@@ -1,11 +1,12 @@
+# frozen_string_literal: true
+
 module Verse
   module Exposition
     module ClassMethods
-
       attr_reader :service_class, :exposed_endpoints
 
       def all_expositions
-        @@all_expositions ||= []
+        @all_expositions ||= []
       end
 
       # Set or return the description for this exposition.
@@ -40,7 +41,7 @@ module Verse
 
               return service if service
 
-              service = service_class.new(auth_context, expo: self.name)
+              service = service_class.new(auth_context, expo: name)
               instance_variable_set("@#{service_name}", service)
 
               service
@@ -144,8 +145,6 @@ module Verse
       def inherited(subklass)
         super
 
-        scope = self
-
         subklass.instance_eval do
           @service_class = nil
           @desc = nil
@@ -154,7 +153,6 @@ module Verse
 
         all_expositions << subklass
       end
-
     end
   end
 end

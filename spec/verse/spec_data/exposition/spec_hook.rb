@@ -1,17 +1,18 @@
+# frozen_string_literal: true
+
 # This is a very bare minimum hook implementation,
 # which can be called by `SpecHook.trigger_exposition(input)`
 class SpecHook < Verse::Exposition::Hook::Base
-
   attr_reader :some_data
 
-  @@callback = nil
+  @callback = nil
 
-  def self.callbacks
-    @@callback
-  end
+  class << self
+    attr_accessor :callback
 
-  def self.trigger_exposition(input)
-    @@callback.call(input)
+    def self.trigger_exposition(input)
+      callback.call(input)
+    end
   end
 
   def initialize(exposition_class, some_data)
@@ -20,7 +21,7 @@ class SpecHook < Verse::Exposition::Hook::Base
   end
 
   def register_impl
-    @@callback = proc do |input|
+    self.class.callback = proc do |input|
       @metablock.process_input(input)
 
       exposition = create_exposition(

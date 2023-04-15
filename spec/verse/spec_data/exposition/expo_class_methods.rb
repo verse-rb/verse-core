@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ExpoClassMethods
   def on_spec_hook(some_data)
     SpecHook.new(self, some_data)

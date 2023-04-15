@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "../spec_data/exposition/expo_class_methods"
 require_relative "../spec_data/exposition/spec_hook"
 
@@ -14,6 +16,5 @@ RSpec.describe Verse::Exposition do
   end
 
   it "can do something" do
-
   end
 end

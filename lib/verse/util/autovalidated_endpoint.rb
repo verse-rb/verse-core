@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "dry-logic"
 require "dry-validation"
 
@@ -30,6 +32,7 @@ module Verse
         result = input_schema.call(input)
 
         raise Verse::Error::ValidationFailed, result unless result.success?
+
         result.output.to_h
       end
 
@@ -43,6 +46,7 @@ module Verse
         result = output_schema.call(output)
 
         raise Verse::Error::ValidationFailed, result unless result.success?
+
         result.output.to_h
       end
 
@@ -53,9 +57,11 @@ module Verse
       def input(schema = nil, &block)
         if schema
           raise ArgumentError, "You can't use both schema and block" if block_given?
+
           @input_schema = schema
         else
           raise ArgumentError, "You must provide a block" unless block_given?
+
           @input_schema = Dry::Schema.Params(&block)
         end
       end
@@ -67,13 +73,14 @@ module Verse
       def output(schema = nil, &block)
         if schema
           raise ArgumentError, "You can't use both schema and block" if block_given?
+
           @output_schema = schema
         else
           raise ArgumentError, "You must provide a block" unless block_given?
+
           @output_schema = Dry::Schema.Params(&block)
         end
       end
-
     end
   end
 end

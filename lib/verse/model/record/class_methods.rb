@@ -256,6 +256,7 @@ module Verse
 
           if primary
             raise "field: primary key already defined: #{@primary_key}" if @primary_key
+
             @primary_key = key
           end
 
