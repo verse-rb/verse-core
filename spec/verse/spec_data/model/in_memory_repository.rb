@@ -45,15 +45,15 @@ class InMemoryRepository < Verse::Model::Repository::Base
     else
       begin
         @in_transaction = true
-        trigger_after_commit
         yield
       ensure
+        trigger_after_commit
         @in_transaction = false
       end
     end
   end
 
-  def update(id, attributes, scope = scoped(:update))
+  def update_impl(id, attributes, scope = scoped(:update))
     target = scope.find{ |record| record[self.class.primary_key] == id }
 
     return false unless target
@@ -63,12 +63,12 @@ class InMemoryRepository < Verse::Model::Repository::Base
     true
   end
 
-  def create(attributes)
+  def create_impl(attributes)
     self.class.id_sequence += 1
 
     id_sequence = self.class.id_sequence
 
-    row = {self.class.primary_key => id_sequence}.merge(attributes)
+    row = { self.class.primary_key => id_sequence }.merge(attributes)
 
     self.class.data << row
 
@@ -85,7 +85,7 @@ class InMemoryRepository < Verse::Model::Repository::Base
     true
   end
 
-  def find_by(
+  def find_by_impl(
     filters,
     scope: scoped(:read),
     included: [],
@@ -103,18 +103,16 @@ class InMemoryRepository < Verse::Model::Repository::Base
     record.new(result, include_set: set)
   end
 
-  def index(
+  def index_impl(
     filters,
-    scope: scoped(:read),
+    scope:,
     included: [],
     page: 1, items_per_page: 1000,
     sort: nil,
     record: self.class.model_class,
     query_count: true
   )
-    filters = encode_filters(filters)
     query = filtering.filter_by(scope, filters, self.class.custom_filters)
-
     query = query[items_per_page * (page - 1), items_per_page]
 
     set = prepare_included(included, query, record: record)

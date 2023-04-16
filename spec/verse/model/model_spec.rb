@@ -4,6 +4,7 @@ require_relative "../spec_data/model/post_repository"
 require_relative "../spec_data/model/user_repository"
 require_relative "../spec_data/model/comment_repository"
 require_relative "../spec_data/model/account_repository"
+require_relative "../spec_data/dummy_event_manager"
 
 # Test both repositories and records
 RSpec.describe Verse::Model::Repository::Base do
@@ -28,27 +29,84 @@ RSpec.describe Verse::Model::Repository::Base do
     @accounts = AccountRepository.new(@auth_context)
     @comments = CommentRepository.new(@auth_context)
 
-    id_john = @users.create(name: "John")
-    @accounts.create(
-      user_id: id_john,
-      email: "john@example.tld",
-      status: :active
-    )
+    id_john = nil
+    id_jane = nil
 
-    id_jane = @users.create(name: "Jane")
-    @accounts.create(
-      user_id: id_jane,
-      email: "jane@example.tld",
-      status: :inactive
-    )
+    @users.no_event{ |r|
+      id_john = r.create(name: "John")
+      id_jane = r.create(name: "Jane")
+    }
 
-    id_post1 = @posts.create(title: "Hello", user_id: id_john)
-    @comments.create(post_id: id_post1, user_id: id_john, content: "Hello World")
-    @comments.create(post_id: id_post1, user_id: id_jane, content: "Hello John!")
+    @accounts.no_event{ |r|
+      r.create(
+        user_id: id_john,
+        email: "john@example.tld",
+        status: :active
+      )
 
-    id_post2 = @posts.create(title: "World", user_id: id_jane)
-    @comments.create(post_id: id_post2, user_id: id_john, content: "World Hello")
-    @comments.create(post_id: id_post2, user_id: id_jane, content: "World John!")
+      r.create(
+        user_id: id_jane,
+        email: "jane@example.tld",
+        status: :inactive
+      )
+    }
+
+    id_post1 = nil
+    id_post2 = nil
+
+    @posts.no_event{ |_r|
+      id_post1 = @posts.create(title: "Hello", user_id: id_john)
+      id_post2 = @posts.create(title: "World", user_id: id_jane)
+    }
+
+    @comments.no_event{ |r|
+      r.create(post_id: id_post1, user_id: id_john, content: "Hello World")
+      r.create(post_id: id_post1, user_id: id_jane, content: "Hello John!")
+    }
+
+    @comments.no_event{ |r|
+      r.create(post_id: id_post2, user_id: id_john, content: "World Hello")
+      r.create(post_id: id_post2, user_id: id_jane, content: "World John!")
+    }
+  end
+
+  describe "#self.table" do
+    it "should infer table name" do
+      expect(UserRepository.table).to eq("users")
+      expect(PostRepository.table).to eq("posts")
+      expect(CommentRepository.table).to eq("comments")
+      expect(AccountRepository.table).to eq("accounts")
+    end
+
+    it "can be overriden" do
+      UserRepository.table "custom_users"
+      expect(UserRepository.table).to eq("custom_users")
+    end
+  end
+
+  describe "events emissions" do
+    before :each do
+      Verse.event_manager = DummyEventManager.new
+    end
+
+    after :each do
+      Verse.event_manager = nil
+    end
+
+    it "emits events on create" do
+      expect(Verse.event_manager).to receive(:publish).with("verse_spec.user.created", { args: [name: "Joe"], metadata: {}, resource_id: "103" })
+      @users.create(name: "Joe")
+    end
+
+    it "emit events on update" do
+      expect(Verse.event_manager).to receive(:publish).with("verse_spec.user.updated", { args: [{ name: "John Doe" }], metadata: {}, resource_id: "101" })
+      @users.update(101, { name: "John Doe" })
+    end
+
+    it "doesn't emit event with block no_event" do
+      expect(Verse.event_manager).not_to receive(:publish)
+      @users.no_event{ |r| r.create(name: "Luis") }
+    end
   end
 
   describe "#find_by" do
@@ -197,4 +255,12 @@ RSpec.describe Verse::Model::Repository::Base do
       expect(users.first.account).to be_a(AccountRecord)
     end
   end
+
+  describe "encoders" do
+    it "encode fields correctly" do
+      email = AccountRepository.data.first[:email]
+      expect(EmailEncoder.decode(email)).to eq("john@example.tld")
+    end
+  end
+
 end

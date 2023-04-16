@@ -206,7 +206,7 @@ module Verse
                   condition = opts[:if]
                   next if condition && !condition.call(x)
 
-                  pkey_info = self.fields[primary_key]
+                  pkey_info = fields[primary_key]
 
                   Verse::Model::Record::Converter.convert(
                     x[primary_key],

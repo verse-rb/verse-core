@@ -9,7 +9,7 @@ class CommentRecord < Verse::Model::Record::Base
   field :user_id
   field :post_id
 
-  field :content, type: String
+  field :content, type: :string
 
   belongs_to :user
   belongs_to :post

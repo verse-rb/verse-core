@@ -31,24 +31,17 @@ module Verse
         # Set a custom name for the table/namespace used by this repository.
         def table(name = nil)
           @table = name if name
-          @table || self.name.underscore.gsub(/_repository$/, "")
+          @table || Verse.inflector.pluralize(
+            StringUtil.underscore(self.name).gsub(/_repository$/, "")
+          )
         end
 
-        def resource(name = nil, aggregate: true, root: Verse.service_name)
-          if aggregate.is_a?(String)
-            @event_resource = [root, aggregate, name].compact.join(".")
-            @iam_resource = [root, aggregate].compact.join(".")
+        def resource(name = nil)
+          if name
+            @resource = name
           else
-            @event_resource = @iam_resource = [root, name].compact.join(".")
+            @resource ||= [Verse.service_name, Verse.inflector.singularize(table)].join(".")
           end
-        end
-
-        def event_resource
-          @event_resource || [Verse.service_name, table].join(".")
-        end
-
-        def iam_resource
-          @iam_resource || [Verse.service_name, table].join(".")
         end
 
         # Flag the next defined method as an event method.
@@ -77,8 +70,10 @@ module Verse
         end
 
         def define_query_method(method, method_name)
-          define_method(method_name) do |*args|
-            with_db_mode(:r){ method.bind(self).call(*args) }
+          define_method(method_name) do |*args, **opts|
+            mode(:r) do
+              method.bind(self).call(*args, **opts)
+            end
           end
         end
 
@@ -92,78 +87,75 @@ module Verse
           end
 
           define_method(method_name) do |*args|
-            name ||= Verse.inflector.inflect_past(method_name)
-            event_path = [self.class.event_resource, name].join(".")
+            mode(:rw) do
+              name ||= Verse.inflector.inflect_past(method_name)
 
-            transaction do
-              result = nil
+              event_path = [self.class.resource, name].join(".")
 
-              # store the event first
-              old_event_cause = @event_cause
-              begin
-                # detect whether the event is caused by another event. Example:
-                #
-                #   event
-                #   def trigger(resource, scope)
-                #     update(resource, triggered: true)
-                #   end
-                #
-                # This will run two events:
-                #  - updated(metadata: {cause: "domain.resource.triggered"})
-                #  - triggered(metadata: {})
-                #
+              transaction do
+                result = nil
 
-                metadata = @metadata.dup # duplicate because we might change metadata before commit.
-                metadata.merge!(cause: @event_cause) if @event_cause
+                # store the event first
+                old_event_cause = @event_cause
+                begin
+                  # detect whether the event is caused by another event. Example:
+                  #
+                  #   event
+                  #   def trigger(resource, scope)
+                  #     update(resource, triggered: true)
+                  #   end
+                  #
+                  # This will run two events:
+                  #  - updated(metadata: {cause: "domain.resource.triggered"})
+                  #  - triggered(metadata: {})
+                  #
+                  metadata = @metadata.dup # duplicate because we might change metadata before commit.
+                  metadata.merge!(cause: @event_cause) if @event_cause
 
-                @event_cause = event_path
+                  @event_cause = event_path
 
-                if creation
-                  result = method.bind(self).call(*args)
+                  if creation
+                    result = method.bind(self).call(*args)
 
-                  if result.class != Integer && result.class != String
-                    raise "must returns a String or Integer which is the id of the newly created model, but #{result.class} given."
-                  end
-
-                  unless @disable_event
-                    after_commit do
-                      Verse.event_manager&.publish(event_path, {
-                                                     resource_model: self.class.event_resource,
-                                                     resource_id: result.to_s,
-                                                     event: event_path,
-                                                     args: args,
-                                                     metadata: metadata,
-                                                     created_at: Time.current
-                                                   })
+                    if result.class != Integer && result.class != String
+                      raise "must returns a String or Integer which is the id of" \
+                            " the newly created model, but #{result.class} given."
                     end
-                  end
 
-                else
-                  id = args[index]
-                  arg2 = args.dup
-                  arg2.slice!(index)
-
-                  result = method.bind(self).call(*args)
-
-                  unless @disable_event
-                    after_commit do
-                      Verse.event_manager&.publish(event_path, {
-                                                     resource_model: self.class.event_resource,
-                                                     resource_id: id.to_s,
-                                                     event: event_path,
-                                                     args: arg2,
-                                                     metadata: metadata,
-                                                     created_at: Time.current
-                                                   })
+                    unless @disable_event
+                      after_commit do
+                        Verse.publish(event_path, {
+                                        resource_id: result.to_s,
+                                        args: args,
+                                        metadata: metadata
+                                      })
+                      end
                     end
-                  end
 
+                  else
+                    id = args[index]
+                    arg2 = args.dup
+                    arg2.slice!(index)
+
+                    result = method.bind(self).call(*args)
+
+                    unless @disable_event
+                      after_commit do
+                        Verse.publish(event_path, {
+                                        resource_id: id.to_s,
+                                        args: arg2,
+                                        metadata: metadata,
+                                      })
+                      end
+                    end
+
+                  end
+                ensure
+                  @event_cause = old_event_cause # revert the cause.
                 end
-              ensure
-                @event_cause = old_event_cause # revert the cause.
-              end
 
-              result
+                result
+              end
             end
           end
         end
@@ -194,7 +186,6 @@ module Verse
 
           @primary_key ||= :id
         end
-
       end
     end
   end

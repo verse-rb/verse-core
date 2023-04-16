@@ -1,4 +1,4 @@
-service_name: verse-spec
+service_name: verse_spec
 description: general testing of verse core.
 
 logging:

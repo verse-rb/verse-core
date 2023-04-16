@@ -33,18 +33,31 @@ module Verse
           # :nocov:
         end
 
-        def update(id, attributes, scope = scoped(:update))
+        event
+        def update(id, attributes, scope = scoped(:updated))
+          attributes = encode(attributes)
+          update_impl(id, attributes, scope)
+        end
+
+        protected def update_impl(id, attributes, scope)
           # :nocov:
           raise NotImplementedError, "please implement update"
           # :nocov:
         end
 
+        event("created", creation: true)
         def create(attributes, scope = scoped(:create))
+          attributes = encode(attributes)
+          create_impl(attributes)
+        end
+
+        protected def create_impl(attributes)
           # :nocov:
           raise NotImplementedError, "please implement create"
           # :nocov:
         end
 
+        event("deleted")
         def delete(id, scope = scoped(:delete))
           # :nocov:
           raise NotImplementedError, "please implement delete"
@@ -57,13 +70,53 @@ module Verse
           included: [],
           record: self.class.model_class
         )
+          filter = encode_filters(filter)
+          find_by_impl(
+            filter,
+            scope: scope,
+            included: included,
+            record: record
+          )
+        end
+
+        def find_by_impl(
+          filter,
+          scope: scoped(:read),
+          included: [],
+          record: self.class.model_class
+        )
           # :nocov:
           raise NotImplementedError, "please implement find_by"
           # :nocov:
         end
 
+        query
         def index(
           filters = {},
+          scope: scoped(:read),
+          included: [],
+          page: 1,
+          items_per_page: 1_000,
+          sort: nil,
+          record: self.class.model_class,
+          query_count: true
+        )
+          filters = encode_filters(filters)
+
+          index_impl(
+            filters,
+            scope: scope,
+            included: included,
+            page: page,
+            items_per_page: items_per_page,
+            sort: sort,
+            record: record,
+            query_count: query_count
+          )
+        end
+
+        protected def index_impl(
+          filters,
           scope: scoped(:read),
           included: [],
           page: 1,
@@ -77,6 +130,7 @@ module Verse
           # :nocov:
         end
 
+        ## === Selectors throwing exceptions ===
         def find_by!(filters, **opts)
           record = find_by(filters, **opts)
 
@@ -94,6 +148,7 @@ module Verse
           output = delete(id, scope)
           raise Verse::Error::RecordNotFound, id unless output
         end
+        ## === ===
 
         def with_metadata(metadata)
           old_metadata = @metadata
@@ -101,6 +156,11 @@ module Verse
           yield
         ensure
           @metadata = old_metadata
+        end
+
+        # Redefine if the adapter allow multiple connection for read or write.
+        def mode(_read_write)
+          yield
         end
 
         def chunked_index(filters: {}, scope: scoped(:read), included: [], page: 1, items_per_page: 50, sort: nil)
@@ -128,7 +188,7 @@ module Verse
         #
         def no_event
           @disable_event = true
-          yield
+          yield(self)
         ensure
           @disable_event = false
         end
