@@ -114,6 +114,7 @@ class InMemoryRepository < Verse::Model::Repository::Base
   )
     query = filtering.filter_by(scope, filters, self.class.custom_filters)
     query = query[items_per_page * (page - 1), items_per_page]
+    query ||= [] # in case we are out of bound, it returns nil :(
 
     set = prepare_included(included, query, record: record)
 
@@ -146,8 +147,7 @@ class InMemoryRepository < Verse::Model::Repository::Base
     end
 
     metadata = {}
-    count = query_count ? query.size : nil
-    metadata[:count] = count if count
+    metadata[:count] = query.size if query_count
 
     Verse::Util::ArrayWithMetadata.new(
       query.map{ |elm| record.new(elm, include_set: set) },

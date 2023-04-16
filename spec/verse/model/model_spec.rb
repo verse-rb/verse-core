@@ -262,4 +262,16 @@ RSpec.describe Verse::Model::Repository::Base do
       expect(EmailEncoder.decode(email)).to eq("john@example.tld")
     end
   end
+
+  describe "chunked index" do
+    it "can index users" do
+      100.times do |x|
+        @users.create(name: "John #{x}")
+      end
+
+      # It's a very quick test, as we already test the
+      # chunked iterator in the util spec folder.
+      expect(@users.chunked_index({}).to_a.size).to eq 102
+    end
+  end
 end

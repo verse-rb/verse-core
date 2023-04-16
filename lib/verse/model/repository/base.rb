@@ -163,10 +163,10 @@ module Verse
           yield
         end
 
-        def chunked_index(filters: {}, scope: scoped(:read), included: [], page: 1, items_per_page: 50, sort: nil)
+        def chunked_index(filters, scope: scoped(:read), included: [], page: 1, items_per_page: 50, sort: nil)
           Verse::Util::Iterator.chunk_iterator page do |current_page|
             result = index(
-              filters: filters,
+              filters,
               scope: scope,
               included: included,
               page: current_page,
