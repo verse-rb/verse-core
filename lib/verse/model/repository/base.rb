@@ -46,7 +46,7 @@ module Verse
         end
 
         event("created", creation: true)
-        def create(attributes, scope = scoped(:create))
+        def create(attributes, _scope = scoped(:create))
           attributes = encode(attributes)
           create_impl(attributes)
         end

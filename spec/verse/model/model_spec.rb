@@ -262,5 +262,4 @@ RSpec.describe Verse::Model::Repository::Base do
       expect(EmailEncoder.decode(email)).to eq("john@example.tld")
     end
   end
-
 end
