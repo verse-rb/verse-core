@@ -35,6 +35,7 @@ module Verse
         handlers = self.class.handlers
 
         handlers.reverse_each do |(handler_class, opts)|
+          opts ||= {}
           previous_handler = handler_class.new(previous_handler, self, **opts)
         end
 

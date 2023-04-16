@@ -41,7 +41,7 @@ module Verse
 
               return service if service
 
-              service = service_class.new(auth_context, expo: name)
+              service = service_class.new(auth_context, expo: self.class.name)
               instance_variable_set("@#{service_name}", service)
 
               service
@@ -141,6 +141,10 @@ module Verse
       def remove_handler(klass)
         @handlers ||= superclass.handlers.dup
         @handlers.reject!{ |x| x.first == klass }
+      end
+
+      def clear_handlers
+        @handlers&.clear
       end
 
       def inherited(subklass)

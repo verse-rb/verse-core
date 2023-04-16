@@ -7,6 +7,8 @@ class AccountRecord < Verse::Model::Record::Base
   field :id, primary: true
   field :email, type: String
 
+  enum :status, %i[active inactive]
+
   field :user_id
 
   belongs_to :user

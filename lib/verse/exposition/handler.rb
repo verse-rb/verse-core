@@ -10,14 +10,16 @@ module Verse
         @handler = handler
         @exposition = exposition
         @opts = opts
-
-        @callback ||= -> {
-          handler.call
-        }
       end
 
       def call
-        @callback.call
+        call_next
+      end
+
+      protected
+
+      def call_next
+        handler.call
       end
     end
   end

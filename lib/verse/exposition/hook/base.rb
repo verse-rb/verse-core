@@ -36,7 +36,9 @@ module Verse
         end
 
         def register_impl
+          # :nocov:
           raise NotImplementedError, "register_impl must be implemented"
+          # :nocov:
         end
       end
     end

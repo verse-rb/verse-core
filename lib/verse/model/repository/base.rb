@@ -16,27 +16,39 @@ module Verse
         end
 
         def filtering
-          raise NotImplementedError, "please implement filtering algorithm"
+          # :nocov:
+          raise NotImplementedError, "please implement filtering algorithm" # :nocov:
+          # :nocov:
         end
 
         def transaction(&block)
-          raise NotImplementedError
+          # :nocov:
+          raise NotImplementedError, "please implement transaction"
+          # :nocov:
         end
 
         def after_commit(&block)
-          raise NotImplementedError
+          # :nocov:
+          raise NotImplementedError, "please implement after_commit"
+          # :nocov:
         end
 
         def update(id, attributes, scope = scoped(:update))
+          # :nocov:
           raise NotImplementedError, "please implement update"
+          # :nocov:
         end
 
         def create(attributes, scope = scoped(:create))
+          # :nocov:
           raise NotImplementedError, "please implement create"
+          # :nocov:
         end
 
         def delete(id, scope = scoped(:delete))
+          # :nocov:
           raise NotImplementedError, "please implement delete"
+          # :nocov:
         end
 
         def find_by(
@@ -45,7 +57,9 @@ module Verse
           included: [],
           record: self.class.model_class
         )
+          # :nocov:
           raise NotImplementedError, "please implement find_by"
+          # :nocov:
         end
 
         def index(
@@ -58,7 +72,9 @@ module Verse
           record: self.class.model_class,
           query_count: true
         )
+          # :nocov:
           raise NotImplementedError, "please implement index"
+          # :nocov:
         end
 
         def find_by!(filters, **opts)
@@ -186,7 +202,9 @@ module Verse
         end
 
         def scoped(action)
+          # :nocov:
           raise NotImplementedError, "please redefine scoped on child repositories and use @auth_context to filter."
+          # :nocov:
         end
 
         def can_create?(auth_context, &block)

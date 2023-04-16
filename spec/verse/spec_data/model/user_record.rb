@@ -4,7 +4,7 @@ class UserRecord < Verse::Model::Record::Base
   self.record_root_path       = ""
   self.repositories_root_path = ""
 
-  field :id, primary: true, type: Integer
+  field :id, primary: true, type: :int
   field :name, type: String
 
   has_many :posts

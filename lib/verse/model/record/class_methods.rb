@@ -142,7 +142,7 @@ module Verse
           foreign_key ||= "#{Verse.inflector.singularize(type)}_id"
 
           root = name.split(/::[^:]+$/).first
-          repository ||= "#{root}::#{StringUtil.camelize(relation_name.to_s)}Repository"
+          repository ||= "#{root}::#{StringUtil.camelize(Verse.inflector.singularize(relation_name.to_s))}Repository"
 
           relation relation_name, array: true do |collection, auth_context, sub_included|
             repository = Reflection.constantize(repository) if repository.is_a?(String)
@@ -268,6 +268,8 @@ module Verse
         # define a enum field of the record
         # @param name [Symbol] the name (method) of the field
         # @param values [Array] the values of the enum
+        # @param field [Symbol] the name of the field underlying the enum (optional, name by default)
+        #                       if the field is not found, it will be created
         # @param prefix [String] the prefix of the enum methods
         # @param suffix [String] the suffix of the enum methods
         #
@@ -276,10 +278,13 @@ module Verse
         # class UserRecord < Verse::Model::Record::Base
         #   enum :status, [:active, :inactive], prefix: "is"
         # end
+        #
         # user = UserRecord.new(status: :active)
         # user.is_active? # => true
         # user.is_inactive? # => false
-        def enum(name, values, prefix: nil, suffix: nil)
+        def enum(name, values, field: name, prefix: nil, suffix: nil)
+          self.field(field) unless respond_to?(name)
+
           values.each do |value|
             method_name = [prefix, value, suffix].compact.join("_")
 
@@ -300,20 +305,6 @@ module Verse
               name[regexp].gsub(regexp, "\\2").gsub(/(.?)Record$/, "\\1")
             )
           )
-        end
-
-        def infer_record_for(name)
-          klass = StringUtil.camelize(
-            Verse.inflector.singularize(name.to_s)
-          )
-
-          if record_root_path == ""
-            StringUtil.camelize(klass.to_s)
-          else
-            StringUtil.camelize(
-              [record_root_path, klass.to_s].join("::")
-            )
-          end
         end
       end
     end

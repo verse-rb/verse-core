@@ -5,6 +5,7 @@ require_relative "../spec_data/model/user_repository"
 require_relative "../spec_data/model/comment_repository"
 require_relative "../spec_data/model/account_repository"
 
+# Test both repositories and records
 RSpec.describe Verse::Model::Repository::Base do
   before do
     Verse.start(:server, config_path: File.join(__dir__, "../spec_data/config.yml"))
@@ -23,10 +24,18 @@ RSpec.describe Verse::Model::Repository::Base do
     @comments = CommentRepository.new(@auth_context)
 
     id_john = @users.create(name: "John")
-    @accounts.create(user_id: id_john, email: "john@example.tld")
+    @accounts.create(
+      user_id: id_john,
+      email: "john@example.tld",
+      status: :active
+    )
 
     id_jane = @users.create(name: "Jane")
-    @accounts.create(user_id: id_jane, email: "jane@example.tld")
+    @accounts.create(
+      user_id: id_jane,
+      email: "jane@example.tld",
+      status: :inactive
+    )
 
     id_post1 = @posts.create(title: "Hello", user_id: 1)
     @comments.create(post_id: id_post1, user_id: id_john, content: "Hello World")
@@ -153,6 +162,19 @@ RSpec.describe Verse::Model::Repository::Base do
 
       expect(users.length).to eq(2)
       expect(users.first.account).to be_a(AccountRecord)
+    end
+
+    it "can index using nested includes + has_many/has_one" do
+      posts = @posts.index({}, included: ["user.account", "comments"])
+
+      expect(posts.length).to eq(2)
+      expect(posts.first.user).to be_a(UserRecord)
+      expect(posts.first.comments).to be_a(Array)
+      expect(posts.first.user.account).to be_a(AccountRecord)
+      expect(posts.first.user.account.active?).to be true
+    end
+
+    it "can fetch included of type belongs_to" do
     end
 
     it "can index using include and filter" do

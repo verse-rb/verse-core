@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "../spec_data/test_service"
+require_relative "../spec_data/service/test_service"
 
 RSpec.describe Verse::Service::Base do
   subject { TestService }

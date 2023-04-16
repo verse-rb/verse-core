@@ -1,6 +1,12 @@
 # frozen_string_literal: true
 
+require_relative "../service/test_service"
+
 class SampleExposition < Verse::Exposition::Base
+  desc "This is a sample exposition"
+
+  use_service test: TestService
+
   @output = false
 
   class << self
@@ -20,6 +26,8 @@ class SampleExposition < Verse::Exposition::Base
     end
   end
   def do_something
+    test.some_action # This is just to test the service
+
     self.class.output = {
       name: "#{params[:name]} Doe",
       context: context,
