@@ -7,7 +7,7 @@ module Verse
         extend self
 
         def convert(value, type)
-          return value if value.nil?
+          return value if value.nil? || type.nil?
 
           conv = @converters.fetch(type) { raise "unsupported field type: `#{type}`" }
 

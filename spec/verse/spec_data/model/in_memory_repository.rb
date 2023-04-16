@@ -6,18 +6,18 @@ require_relative "in_memory_filtering"
 # Used for the specs and testing the whole system.
 class InMemoryRepository < Verse::Model::Repository::Base
   class << self
-    attr_accessor :data, :id
+    attr_accessor :data, :id_sequence
 
     def inherited(subclass)
       subclass.instance_variable_set(:@data, [])
-      subclass.instance_variable_set(:@id, 0)
+      subclass.instance_variable_set(:@id_sequence, 0)
 
       super
     end
 
     def clear
       @data.clear
-      @id = 0
+      @id_sequence = 0
     end
   end
 
@@ -56,15 +56,15 @@ class InMemoryRepository < Verse::Model::Repository::Base
   end
 
   def create(attributes)
-    self.class.id += 1
+    self.class.id_sequence += 1
 
-    id = self.class.id
+    id_sequence = self.class.id_sequence
 
-    row = attributes.merge(id: id)
+    row = attributes.merge(self.class.primary_key => id_sequence)
 
     self.class.data << row
 
-    id
+    id_sequence
   end
 
   def delete(id, scope = scoped(:delete))

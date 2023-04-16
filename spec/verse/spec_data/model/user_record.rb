@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class UserRecord < Verse::Model::Record::Base
+  puts "load User record?"
   self.record_root_path       = ""
   self.repositories_root_path = ""
 

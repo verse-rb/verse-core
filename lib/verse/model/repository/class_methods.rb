@@ -195,11 +195,6 @@ module Verse
           @primary_key ||= :id
         end
 
-        # Can be redefined by childs in case the primary key must be in a certain
-        # form (hmmm MongoDb ObjectID?)
-        def pkeyify(pkey)
-          pkey
-        end
       end
     end
   end

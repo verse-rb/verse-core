@@ -186,6 +186,7 @@ module Verse
 
         def has_one(relation_name, primary_key: nil, foreign_key: nil, repository: nil, **opts) # rubocop:disable Naming/PredicateName
           foreign_key ||= "#{Verse.inflector.singularize(type)}_id"
+          primary_key ||= self.primary_key
 
           root = name.split(/::[^:]+$/).first
 
@@ -193,7 +194,6 @@ module Verse
 
           relation relation_name, array: false do |collection, auth_context, sub_included|
             repository = Reflection.constantize(repository) if repository.is_a?(String)
-            primary_key ||= repository.model_class.primary_key
 
             included = repository.new(
               auth_context
@@ -203,10 +203,12 @@ module Verse
                   condition = opts[:if]
                   next if condition && !condition.call(x)
 
-                  # check key_type using model structure
-                  pkey_info = repository.model_class.fields[primary_key]
+                  pkey_info = self.fields[primary_key]
 
-                  Verse::Model::Record::Converter.convert(x[primary_key.to_sym], pkey_info[:type])
+                  Verse::Model::Record::Converter.convert(
+                    x[primary_key.to_sym],
+                    pkey_info[:type]
+                  )
                 }.compact
               },
               included: sub_included
@@ -255,6 +257,7 @@ module Verse
           @fields[key] = { name: name, type: type, visible: visible }
 
           if primary
+            pp "define primary key: #{key} #{caller[0]}"
             raise "field: primary key already defined: #{@primary_key}" if @primary_key
 
             @primary_key = key
