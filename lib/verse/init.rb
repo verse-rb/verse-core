@@ -65,6 +65,8 @@ module Verse
       @logger.level = level.to_sym
     end
 
+    binding.pry
+
     Verse::I18n.init
 
     Verse::Plugin.load_configuration(Verse::Config.config)
