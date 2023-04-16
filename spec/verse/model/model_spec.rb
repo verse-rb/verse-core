@@ -15,6 +15,11 @@ RSpec.describe Verse::Model::Repository::Base do
     CommentRepository.clear
     AccountRepository.clear
 
+    PostRepository.id_sequence = 0
+    UserRepository.id_sequence = 100
+    CommentRepository.id_sequence = 200
+    AccountRepository.id_sequence = 300
+
     @auth_context = Verse::Spec::Auth::MockContext.new(["*.*.*"])
 
     # create data
@@ -37,11 +42,11 @@ RSpec.describe Verse::Model::Repository::Base do
       status: :inactive
     )
 
-    id_post1 = @posts.create(title: "Hello", user_id: 1)
+    id_post1 = @posts.create(title: "Hello", user_id: id_john)
     @comments.create(post_id: id_post1, user_id: id_john, content: "Hello World")
     @comments.create(post_id: id_post1, user_id: id_jane, content: "Hello John!")
 
-    id_post2 = @posts.create(title: "World", user_id: 2)
+    id_post2 = @posts.create(title: "World", user_id: id_jane)
     @comments.create(post_id: id_post2, user_id: id_john, content: "World Hello")
     @comments.create(post_id: id_post2, user_id: id_jane, content: "World John!")
   end
@@ -52,7 +57,7 @@ RSpec.describe Verse::Model::Repository::Base do
 
       expect(user).to be_a(UserRecord)
       expect(user.name).to eq("John")
-      expect(user.id).to eq(1)
+      expect(user.id).to eq(101)
     end
 
     it "can find using filter" do
@@ -66,6 +71,14 @@ RSpec.describe Verse::Model::Repository::Base do
 
       expect(user).to be_nil
     end
+
+    it "can uses custom filter" do
+      post = @posts.find_by({ user_name: "John" })
+      expect(post).not_to be_nil
+
+      post = @posts.find_by({ user_name: "Joe" })
+      expect(post).to be_nil
+    end
   end
 
   describe "#find_by!" do
@@ -78,15 +91,15 @@ RSpec.describe Verse::Model::Repository::Base do
 
   describe "#update" do
     it "can update user" do
-      out = @users.update(1, { name: "John Doe" })
+      out = @users.update(101, { name: "John Doe" })
 
       expect(out).to be true
 
-      user = @users.find_by({ id: 1 })
+      user = @users.find_by({ id: 101 })
 
       expect(user).to be_a(UserRecord)
       expect(user.name).to eq("John Doe")
-      expect(user.id).to eq(1)
+      expect(user.id).to eq(101)
     end
 
     it "returns false if not found" do
@@ -105,7 +118,7 @@ RSpec.describe Verse::Model::Repository::Base do
 
   describe "#delete" do
     it "can delete user" do
-      out = @users.delete(1)
+      out = @users.delete(101)
 
       expect(out).to be true
 
@@ -147,14 +160,14 @@ RSpec.describe Verse::Model::Repository::Base do
       users = @users.index({}, page: 1, items_per_page: 1)
 
       expect(users.size).to eq(1)
-      expect(users.first.id).to eq(1)
+      expect(users.first.id).to eq(101)
     end
 
     it "can index using sort" do
       users = @users.index({}, sort: { name: :asc })
 
       expect(users.length).to eq(2)
-      expect(users.first.id).to eq(2)
+      expect(users.first.id).to eq(102)
     end
 
     it "can index using include" do

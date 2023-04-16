@@ -161,7 +161,10 @@ module Verse
                   # check key_type using model structure
                   pkey_info = record.fields[primary_key]
 
-                  Verse::Model::Record::Converter.convert(x[primary_key.to_sym], pkey_info[:type])
+                  Verse::Model::Record::Converter.convert(
+                    x[primary_key.to_sym],
+                    pkey_info[:type]
+                  )
                 }.compact
               },
               included: sub_included,
@@ -185,8 +188,8 @@ module Verse
         end
 
         def has_one(relation_name, primary_key: nil, foreign_key: nil, repository: nil, **opts) # rubocop:disable Naming/PredicateName
-          foreign_key ||= "#{Verse.inflector.singularize(type)}_id"
-          primary_key ||= self.primary_key
+          foreign_key ||= "#{Verse.inflector.singularize(type)}_id".to_sym
+          primary_key ||= self.primary_key.to_sym
 
           root = name.split(/::[^:]+$/).first
 
@@ -206,7 +209,7 @@ module Verse
                   pkey_info = self.fields[primary_key]
 
                   Verse::Model::Record::Converter.convert(
-                    x[primary_key.to_sym],
+                    x[primary_key],
                     pkey_info[:type]
                   )
                 }.compact
@@ -257,7 +260,6 @@ module Verse
           @fields[key] = { name: name, type: type, visible: visible }
 
           if primary
-            pp "define primary key: #{key} #{caller[0]}"
             raise "field: primary key already defined: #{@primary_key}" if @primary_key
 
             @primary_key = key

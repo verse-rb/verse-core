@@ -15,6 +15,14 @@ class InMemoryRepository < Verse::Model::Repository::Base
       super
     end
 
+    # def id_sequence=(x)
+    #   @id_sequence = x
+    # end
+
+    # def id_sequence
+    #   @id_sequence
+    # end
+
     def clear
       @data.clear
       @id_sequence = 0
@@ -60,7 +68,7 @@ class InMemoryRepository < Verse::Model::Repository::Base
 
     id_sequence = self.class.id_sequence
 
-    row = attributes.merge(self.class.primary_key => id_sequence)
+    row = {self.class.primary_key => id_sequence}.merge(attributes)
 
     self.class.data << row
 
