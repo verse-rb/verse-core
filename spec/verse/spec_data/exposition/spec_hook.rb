@@ -10,8 +10,8 @@ class SpecHook < Verse::Exposition::Hook::Base
   class << self
     attr_accessor :callback
 
-    def self.trigger_exposition(input)
-      callback.call(input)
+    def trigger_exposition(input)
+      @callback.call(input)
     end
   end
 
@@ -22,16 +22,19 @@ class SpecHook < Verse::Exposition::Hook::Base
 
   def register_impl
     self.class.callback = proc do |input|
-      @metablock.process_input(input)
+      params = @metablock.process_input(input)
 
       exposition = create_exposition(
-        Verse::Spec::MockContext.all_access,
+        Verse::Spec::Auth::MockContext.all_access,
         context: "This is some contextual information",
-        some_data: @some_data
+        some_data: @some_data,
+        params: params
       )
 
+      method = @method
+
       output = exposition.run do
-        @method.bind(exposition).call
+        method.bind(self).call
       end
 
       @metablock.process_output(output)

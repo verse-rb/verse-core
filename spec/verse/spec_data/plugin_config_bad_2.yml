@@ -9,3 +9,6 @@ plugins:
     dep:
       dependent_plugin: dependent_plugin_2
   - name: dependent_plugin # Bad linking.
+logging:
+  level: warn
+  show_full_error: true

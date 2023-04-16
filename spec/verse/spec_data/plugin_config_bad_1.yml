@@ -7,3 +7,6 @@ plugins:
       foo: "bar"
   - name: plugin_with_dependencies
     # Missing dependencies
+logging:
+  level: warn
+  show_full_error: true

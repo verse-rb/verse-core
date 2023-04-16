@@ -13,3 +13,6 @@ plugins:
       dependent_plugin: dependent_plugin_2
   - name: dependent_plugin
   - name: dependent_plugin_2
+logging:
+  level: warn
+  show_full_error: true

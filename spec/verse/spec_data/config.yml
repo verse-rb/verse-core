@@ -1,2 +1,6 @@
 service_name: verse-spec
 description: general testing of verse core.
+
+logging:
+  level: warn
+  show_full_error: true

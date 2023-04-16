@@ -34,9 +34,9 @@ module Verse
       end
 
       rule(:plugins).each do |index:|
-        unless value[:name] =~ PLUGIN_NAME
-          key([:plugin, :name, index]).failure(:bad_format)
-        end
+        next if value[:name] =~ PLUGIN_NAME
+
+        key([:plugin, :name, index]).failure(:bad_format)
       end
     end
   end

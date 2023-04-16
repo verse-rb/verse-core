@@ -15,6 +15,17 @@ RSpec.describe Verse::Exposition do
     SampleExposition.register
   end
 
-  it "can do something" do
+  before do
+    Verse.start(:server, config_path: File.join(__dir__, "../spec_data/config.yml"))
+  end
+
+  it "run the block on trigger" do
+    SampleExposition.output = nil
+
+    SpecHook.trigger_exposition({ name: "John" })
+
+    expect(SampleExposition.output).to eq(
+      :context=>"This is some contextual information", :name=>"John Doe", :some_data=>{:data=>true}
+    )
   end
 end

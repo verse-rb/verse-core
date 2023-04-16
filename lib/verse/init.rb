@@ -60,6 +60,11 @@ module Verse
     @logger       = logger
 
     Verse::Config.init(config_path)
+
+    Config.config.dig(:logging, :level)&.tap do |level|
+      @logger.level = level.to_sym
+    end
+
     Verse::I18n.init
 
     Verse::Plugin.load_configuration(Verse::Config.config)

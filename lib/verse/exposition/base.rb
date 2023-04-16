@@ -22,12 +22,6 @@ module Verse
         end
       end
 
-      def service
-        return unless self.class.service_class
-
-        @service ||= self.class.service_class.new(auth_context)
-      end
-
       def run(&block)
         handler_chain = build_handlers do
           instance_eval(&block)

@@ -3,7 +3,7 @@
 module Verse
   module Exposition
     module ClassMethods
-      attr_reader :service_class, :exposed_endpoints
+      attr_reader :exposed_endpoints
 
       def all_expositions
         @all_expositions ||= []
@@ -76,6 +76,7 @@ module Verse
         end
       end
 
+      # :nodoc:
       def method_added(method_name)
         super
 
@@ -146,7 +147,6 @@ module Verse
         super
 
         subklass.instance_eval do
-          @service_class = nil
           @desc = nil
           @exposed_endpoints = {}
         end
