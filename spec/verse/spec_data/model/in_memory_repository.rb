@@ -94,13 +94,7 @@ class InMemoryRepository < Verse::Model::Repository::Base
     filters = encode_filters(filters)
     query = filtering.filter_by(scope, filters, self.class.custom_filters)
 
-    result = query.first
-
-    return if result.nil?
-
-    set = prepare_included(included, [result], record: record)
-
-    record.new(result, include_set: set)
+    query.first
   end
 
   def index_impl(
@@ -115,8 +109,6 @@ class InMemoryRepository < Verse::Model::Repository::Base
     query = filtering.filter_by(scope, filters, self.class.custom_filters)
     query = query[items_per_page * (page - 1), items_per_page]
     query ||= [] # in case we are out of bound, it returns nil :(
-
-    set = prepare_included(included, query, record: record)
 
     if sort
       count = sort.size
@@ -149,10 +141,8 @@ class InMemoryRepository < Verse::Model::Repository::Base
     metadata = {}
     metadata[:count] = query.size if query_count
 
-    Verse::Util::ArrayWithMetadata.new(
-      query.map{ |elm| record.new(elm, include_set: set) },
-      metadata: metadata
-    )
+    [query, metadata]
+
   end
 
   def after_commit(&block)

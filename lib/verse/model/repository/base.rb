@@ -71,12 +71,21 @@ module Verse
           record: self.class.model_class
         )
           filter = encode_filters(filter)
-          find_by_impl(
+
+          result = find_by_impl(
             filter,
             scope: scope,
             included: included,
             record: record
           )
+
+          return if result.nil?
+
+          result = decode(result)
+
+          set = prepare_included(included, [result], record: record)
+
+          record.new(result, include_set: set)
         end
 
         def find_by_impl(
@@ -103,7 +112,7 @@ module Verse
         )
           filters = encode_filters(filters)
 
-          index_impl(
+          collection, metadata = index_impl(
             filters,
             scope: scope,
             included: included,
@@ -112,6 +121,15 @@ module Verse
             sort: sort,
             record: record,
             query_count: query_count
+          )
+
+          set = prepare_included(included, collection, record: record)
+
+          Verse::Util::ArrayWithMetadata.new(
+            collection.map{ |elm| record.new(
+              decode(elm), include_set: set
+            ) },
+            metadata: metadata
           )
         end
 
@@ -233,13 +251,13 @@ module Verse
           dup = hash.dup
 
           dup.each do |key, value|
-            field = key.to_s.split("__").first
+            field, operator = key.to_s.split("__")
 
             encoder = self.class.encoders[field]
 
             next unless encoder
 
-            dup[key] = if field.is_a?(Array) && filtering.expect_array?(field)
+            dup[key] = if value.is_a?(Array) && filtering.expect_array?(operator)
                          value.map{ |x| encoder.encode(x) }
                        else
                          encoder.encode(value)
