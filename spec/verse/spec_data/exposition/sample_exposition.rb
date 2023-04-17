@@ -18,7 +18,9 @@ class SampleExposition < Verse::Exposition::Base
 
     input do
       required(:name).filled(:string)
+      optional(:mode).filled(:symbol)
     end
+
     output do
       required(:name).filled(:string)
       required(:context).filled(:string)
@@ -26,12 +28,16 @@ class SampleExposition < Verse::Exposition::Base
     end
   end
   def do_something
-    test.some_action # This is just to test the service
+    if params[:mode] != :unchecked
+      test.some_action # This is just to test the service
+    end
 
     self.class.output = {
       name: "#{params[:name]} Doe",
       context: context,
       some_data: some_data
     }
+
+    self.class.output
   end
 end

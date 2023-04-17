@@ -15,8 +15,8 @@ module Verse
         @roles[name] = rights
       end
 
-      def self.[](x)
-        new(@roles.fetch(x))
+      def self.[](name)
+        new(@roles.fetch(name))
       end
 
       attr_reader :custom_scopes, :metadata

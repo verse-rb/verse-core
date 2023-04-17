@@ -24,20 +24,24 @@ class SpecHook < Verse::Exposition::Hook::Base
     self.class.callback = proc do |input|
       params = @metablock.process_input(input)
 
+
+      ctx = Verse::Auth::Context[:superuser]
+
       exposition = create_exposition(
-        Verse::Auth::Context[:superuser],
+        ctx,
         context: "This is some contextual information",
         some_data: @some_data,
         params: params
       )
 
       method = @method
+      metablock = @metablock
 
-      output = exposition.run do
-        method.bind(self).call
+      exposition.run do
+        output = method.bind(self).call
+        metablock.process_output(output)
       end
 
-      @metablock.process_output(output)
     end
   end
 end

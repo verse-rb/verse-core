@@ -9,7 +9,7 @@ module Verse
 
       attr_reader :auth_context, :current_action, :hook
 
-      @handlers = []
+      @handlers = [Verse::Auth::CheckAuthenticationHandler]
 
       def initialize(auth_context, action, _hook, **fields)
         @auth_context = auth_context

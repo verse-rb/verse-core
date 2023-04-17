@@ -73,4 +73,18 @@ RSpec.describe Verse::Exposition do
 
     SampleExposition.clear_handlers
   end
+
+  it "raises if the authorization hasn't been checked" do
+    SampleExposition.clear_handlers
+    SampleExposition.append_handler(
+      Verse::Auth::CheckAuthenticationHandler
+    )
+
+    SampleExposition.output = nil
+
+    expect do
+      SpecHook.trigger_exposition({ name: "John", mode: :unchecked })
+    end.to raise_error(Verse::Error::Authorization)
+  end
+
 end
