@@ -6,13 +6,43 @@ module Verse
   module Auth
     # object describing authorizations
     class Context
-      AuthError = Class.new(StandardError)
-      UnauthorizedError = Class.new(AuthError)
+      @roles = {
+        superuser: ["*.*.*"],
+        anonymous: []
+      }
 
-      attr_reader :data
+      def self.[]=(name, rights)
+        @roles[name] = rights
+      end
 
-      def initialize
-        @data = {}
+      def self.[](x)
+        new(@roles.fetch(x))
+      end
+
+      attr_reader :custom_scopes, :metadata
+
+      # Use this class to mock an auth context for testing purposes.
+      #
+      # @param rights [Array] The list of rights allowed for this context.
+      #        Follow the format `["resource.action.scope"]`.
+      #        Wildcard `*` for all resources, actions or scopes.
+      #        Wildcard `?` for custom scopes.
+      # @param role [String] simulate a role name
+      # @param id [Integer] simulate a user id
+      #
+      # Example:
+      #
+      # ```
+      # Verse::Auth::Context.new(["users.read.*", "users.write.?"])
+      # ```
+      #
+      def initialize(rights = ["*.*.*"], custom_scopes: {}, metadata: {})
+        super()
+
+        @custom_scopes = custom_scopes.transform_keys(&:to_sym)
+        @metadata = metadata
+
+        generate_rights(rights)
       end
 
       # Check whether we can perform an action on a resource.
@@ -48,8 +78,13 @@ module Verse
         result
       end
 
-      def can?(_action, _resource)
-        raise UnimplementedError, "can? must be implemented"
+      def can?(action, resource)
+        resource = resource.to_s
+        action = action.to_s
+
+        scope = @rights.find{ |(res, act, _)| res =~ resource && act =~ action }
+
+        (scope && scope[2]) || false
       end
 
       # Confirm that the security context has been checked.
@@ -67,15 +102,42 @@ module Verse
       end
 
       # Raise an error if the security context is not met
+      # @raise [Verse::Auth::Context::UnauthorizedError]
       def reject!
-        raise UnauthorizedError, "unauthorized"
+        raise Verse::Error::Unauthorized, "unauthorized"
       end
 
+      # Check custom scope for a specific resource
       # @param resource [Symbol] the resource we want to check
-      # @return [Object] the data associated with the resource
+      # @return [Object] the custom data associated with the resource
       def [](resource)
-        @data[resource.to_sym]
+        @custom_scopes[resource.to_sym]
       end
+
+      protected def generate_rights(rights)
+        @rights = rights.map{ |x|
+          resource, action, scope = x.split(/\./)
+
+          Verse::Util::Assertion.assert(resource && action && scope) do
+            "string must be in the format `[resource].[action].[scope]`"
+          end
+
+          resource_regexp = Regexp.new(resource.gsub("*", ".*"))
+          action_regexp = Regexp.new(action.gsub("*", ".*"))
+          scope = scope.gsub("*", "all").gsub(/^\?$/, "custom")
+
+          if scope == "custom"
+            raise "custom scope `?` not allowed for wildcard resources" if resource == "*"
+
+            unless self[resource.to_sym]
+              raise "custom scope `?` found for resource `#{resource}` but no custom data was given"
+            end
+          end
+
+          [resource_regexp, action_regexp, scope.to_sym]
+        }
+      end
+
     end
   end
 end

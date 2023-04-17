@@ -25,7 +25,7 @@ class SpecHook < Verse::Exposition::Hook::Base
       params = @metablock.process_input(input)
 
       exposition = create_exposition(
-        Verse::Spec::Auth::MockContext.all_access,
+        Verse::Auth::Context[:superuser],
         context: "This is some contextual information",
         some_data: @some_data,
         params: params

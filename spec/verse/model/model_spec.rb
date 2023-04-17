@@ -21,7 +21,7 @@ RSpec.describe Verse::Model::Repository::Base do
     CommentRepository.id_sequence = 200
     AccountRepository.id_sequence = 300
 
-    @auth_context = Verse::Spec::Auth::MockContext.new(["*.*.*"])
+    @auth_context = Verse::Auth::Context[:superuser]
 
     # create data
     @users = UserRepository.new(@auth_context)
