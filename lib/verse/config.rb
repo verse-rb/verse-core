@@ -29,15 +29,19 @@ module Verse
     def init(config_path = "./config")
       @config = {}
 
-      [
+      lookup = [
         File.join(config_path, "config.yml"),
         File.join(config_path, "config.#{Verse.environment}.yml"),
         File.join(config_path),
       ].select do |file|
         File.exist?(file) && !File.directory?(file)
-      end.each do |file|
-        inject_to_config(file)
       end
+
+      if lookup.empty?
+        raise "No config file found (looked at #{config_path})"
+      end
+
+      lookup.each(&method(:inject_to_config))
 
       result = Verse::Config::Schema.new.call(
         @config

@@ -1,0 +1,9 @@
+service_name: ejar3_services_base_test
+description: Configuration testing
+logger:
+  level: warn
+em:
+  adapter: mock
+show_error_details: true
+a_key_getting_overriden: Not overriden
+general_key: 1
