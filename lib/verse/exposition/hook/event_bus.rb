@@ -9,9 +9,10 @@ module Verse
       class EventBus < Base
         attr_reader :method, :channels, :type
 
-        def initialize(exposition, channels, type: :jetstream, **opts)
-          root = exposition.event_path || ""
-
+        # @param exposition [Verse::Exposition::Base] The exposition instance
+        # @param channels [Array<String>] The list of channels to listen to
+        # @param type [Symbol] The type of listener. `:broadcast`, `:consumer` or `:command`
+        def initialize(exposition, channel, type: Verse::Event::Manager::MODE_CONSUMER, ack_type: :on_receive,  **opts)
           @type = type
           @opts = opts
 
@@ -20,103 +21,90 @@ module Verse
           }.freeze
         end
 
-        def render_output(path, output, metadata, is_error:)
+        # @return [Array<String>] The list of channels to listen to,
+        #   with the service name prepended when the type is command
+        #   unless absolute_path is set to true
+        def channel_path
+          if type != Verse::Event::Manager::MODE_COMMAND || @opts[:absolute_path]
+            return @channels
+          end
+
+          @channels.map{ |c| [Verse.service_name, c].join(".") }
+        end
+
+        # r command output to publish in the reply channel
+        def create_output_message(topic, output, is_error:)
           if is_error
             {
-              path: path,
-              metadata: metadata,
+              topic: topic,
               error: {
                 type: output.class.name,
                 message: output.message,
                 details: output.respond_to?(:details) ? output.details : nil,
                 source: output.respond_to?(:source) ? output.source : nil
               }
-            }.to_json
+            }
           else
             {
-              path: path,
-              metadata: metadata,
-              result: output
-            }.to_json
+              topic: topic,
+              output: output
+            }
           end
         end
 
-        def absolute_channels
-          if type == :command && !@opts[:absolute_path]
-            @channels.map{ |c| [EFrame.service_name, c].join(".") }
-          else
-            @channels
-          end
+        def allow_reply?
+          Verse::Event::Manager::MODE_COMMAND && !@opts[:no_reply]
         end
 
-        def register(exposition_class, block, meta)
-          method = @method
-          expo_method_name = block.original_name
-          hook = self
-
-          if EFrame.event_manager.nil?
-            EFrame.logger.warn{ "Your service doesn't have event manager setup. Exposition linked to events won't be registered." }
+        def register_impl
+          if Verse.event_manager.nil?
+            Verse.logger.warn{ "Your service doesn't have event manager setup. Exposition linked to events won't be registered." }
             return false
           end
 
           absolute_channels.each do |c|
-            EFrame.event_manager.subscribe(c, @type) do |message, reply, subject|
-              EFrame.logger.debug{ "Received event #{subject}"}
-
-              message = message.deep_symbolize_keys
+            Verse.event_manager.subscribe(c, @type) do |message, reply_to, subject|
+              Verse.logger.debug{ "Received event #{subject}"}
 
               begin
-                safe_params = meta.process_input(message)
+                safe_params = meta.process_input(message.content)
 
-                exposition = exposition_class.new(EFrame::Iam.system_context,
-                  expo_method_name,
-                  hook,
-                  unsafe_message: message,
+                exposition = create_exposition(
+                  auth_context_for(message),
+                  message: message,
                   reply: reply,
                   subject: subject,
                   params: safe_params,
                   metadata: {}
                 )
 
-                output = nil
-                is_error = false
+                method = @method
+                metablock = @metablock
 
                 exposition.run do
-                  method_name = "#{exposition_class.name}##{block.original_name}"
-                  EFrame.logger.info{ "CALL #{method_name} on #{subject}" }
-
-                  metadata = service&.metadata
-                  metadata[:expo] = method_name if metadata
-
-                  output = block.bind(self).call
+                  output = metablock.process_output(
+                    method.bind(self).call
+                  )
                 end
-              rescue RuntimeError => e
-                EFrame.logger.warn{ "Error while processing for method at #{block.source_location.join(":")}" }
-                EFrame.logger.warn(e)
+              rescue e
+                Verse.logger.warn{ "Error while processing for method at #{block.source_location.join(":")}" }
+                Verse.logger.warn(e)
 
                 is_error = true
                 output = e
-
-                self.class.error_handlers.each do |handler|
-                  handler.call(e)
-                end
               end
 
-              if @type == :command && !reply.empty?
-                output = EFrame::Model::Serializer::JsonApiRenderer.new.render(output)
-
-                out = render_output(
-                  subject, output, {}, is_error: is_error
+              if allow_reply? && !(reply.nil? || reply.blank?)
+                out = create_output_message(
+                  subject, output, is_error: is_error
                 )
 
-                EFrame.logger.debug{ "reply to #{reply}"}
-                EFrame.event_manager.publish(
+                Verse.logger.debug{ "Reply to #{reply}"}
+                Verse.event_manager.publish(
                   reply, out
                 )
               end
 
-              # reraise the error after notifying the requester (if any)
-              # raise output if is_error
             end
           end
         end
