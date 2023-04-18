@@ -5,7 +5,7 @@ require_relative "../spec_data/exposition/spec_hook"
 require_relative "../spec_data/exposition/sample_handlers"
 
 # Add the helpers
-Verse::Exposition::ClassMethods.include(
+Verse::Exposition::Base.extend(
   ExpoClassMethods
 )
 

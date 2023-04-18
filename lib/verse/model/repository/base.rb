@@ -99,7 +99,7 @@ module Verse
 
         query
         def index(
-          filters = {},
+          filters,
           scope: scoped(:read),
           included: [],
           page: 1,
