@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 require "spec_helper"
 
 RSpec.describe Verse::Event::LocalEventManager do
-
   around(:each) do |example|
     Timeout.timeout(5) do
       example.run
@@ -50,7 +51,7 @@ RSpec.describe Verse::Event::LocalEventManager do
 
   context "#request" do
     it "can request" do
-      @test_manager.subscribe("hello.world") do |message, subject|
+      @test_manager.subscribe("hello.world") do |message, _subject|
         message.reply("YES")
       end
 
@@ -63,5 +64,4 @@ RSpec.describe Verse::Event::LocalEventManager do
       )
     end
   end
-
 end

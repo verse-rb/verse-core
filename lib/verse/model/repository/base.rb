@@ -75,8 +75,6 @@ module Verse
           result = find_by_impl(
             filter,
             scope: scope,
-            included: included,
-            record: record
           )
 
           return if result.nil?
@@ -115,20 +113,20 @@ module Verse
           collection, metadata = index_impl(
             filters,
             scope: scope,
-            included: included,
             page: page,
             items_per_page: items_per_page,
             sort: sort,
-            record: record,
             query_count: query_count
           )
 
           set = prepare_included(included, collection, record: record)
 
           Verse::Util::ArrayWithMetadata.new(
-            collection.map{ |elm| record.new(
-              decode(elm), include_set: set
-            ) },
+            collection.map{ |elm|
+              record.new(
+                decode(elm), include_set: set
+              )
+            },
             metadata: metadata
           )
         end

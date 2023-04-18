@@ -12,7 +12,9 @@ module Verse
         # @param exposition [Verse::Exposition::Base] The exposition instance
         # @param channels [Array<String>] The list of channels to listen to
         # @param type [Symbol] The type of listener. `:broadcast`, `:consumer` or `:command`
-        def initialize(exposition, channel, type: Verse::Event::Manager::MODE_CONSUMER, ack_type: :on_receive,  **opts)
+        def initialize(_exposition, _channel, type: Verse::Event::Manager::MODE_CONSUMER, ack_type: :on_receive, **opts)
+          super
+
           @type = type
           @opts = opts
 
@@ -63,8 +65,10 @@ module Verse
           end
 
           absolute_channels.each do |c|
-            Verse.event_manager.subscribe(c, @type) do |message, reply_to, subject|
-              Verse.logger.debug{ "Received event #{subject}"}
+            Verse.event_manager.subscribe(c, @type) do |message, _reply_to, subject|
+              Verse.logger.debug{ "Received event #{subject}" }
+
+              output = nil
 
               begin
                 safe_params = meta.process_input(message.content)
@@ -81,8 +85,8 @@ module Verse
                 method = @method
                 metablock = @metablock
 
-                exposition.run do
-                  output = metablock.process_output(
+                output = exposition.run do
+                  metablock.process_output(
                     method.bind(self).call
                   )
                 end
@@ -99,16 +103,14 @@ module Verse
                   subject, output, is_error: is_error
                 )
 
-                Verse.logger.debug{ "Reply to #{reply}"}
+                Verse.logger.debug{ "Reply to #{reply}" }
                 Verse.event_manager.publish(
                   reply, out
                 )
               end
-
             end
           end
         end
-
       end
     end
   end

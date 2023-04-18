@@ -50,9 +50,7 @@ RSpec.describe Verse::Auth::Context do
       expect(auth.can?(:read, :users)).to eq(:all)
       expect(auth.can?(:read, :posts)).to eq(false)
     end
-
   end
-
 
   it "rejects correctly" do
     # Zero rights.

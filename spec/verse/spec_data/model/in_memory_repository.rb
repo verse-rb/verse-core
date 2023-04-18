@@ -87,9 +87,7 @@ class InMemoryRepository < Verse::Model::Repository::Base
 
   def find_by_impl(
     filters,
-    scope: scoped(:read),
-    included: [],
-    record: self.class.model_class
+    scope: scoped(:read)
   )
     filters = encode_filters(filters)
     query = filtering.filter_by(scope, filters, self.class.custom_filters)
@@ -100,10 +98,8 @@ class InMemoryRepository < Verse::Model::Repository::Base
   def index_impl(
     filters,
     scope:,
-    included: [],
     page: 1, items_per_page: 1000,
     sort: nil,
-    record: self.class.model_class,
     query_count: true
   )
     query = filtering.filter_by(scope, filters, self.class.custom_filters)
@@ -142,7 +138,6 @@ class InMemoryRepository < Verse::Model::Repository::Base
     metadata[:count] = query.size if query_count
 
     [query, metadata]
-
   end
 
   def after_commit(&block)

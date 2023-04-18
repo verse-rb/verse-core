@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "./manager"
 
 module Verse
@@ -13,13 +15,17 @@ module Verse
         @subscriptions = {}
       end
 
-      def subscribe(channel, method = :jetstream, priority: nil, ack_type: nil, &block)
+      def subscribe(
+        channel,
+        _method = Verse::Event::Manager::MODE_CONSUMER,
+        priority: nil, # rubocop:disable Lint/UnusedMethodArgument
+        ack_type: nil, # rubocop:disable Lint/UnusedMethodArgument
+        &block
+      )
         return if @config&.fetch(:disable_subscription, nil)
 
         regexp = Regexp.new(
-          "^" +
-          channel.gsub(".", "\\.").gsub("?", "[^\.]+").gsub("*", ".*") +
-          "$"
+          "^#{channel.gsub(".", "\\.").gsub("?", "[^\.]+").gsub("*", ".*")}$"
         )
 
         add_to_subscription_list(regexp) do |message, subject|
@@ -32,7 +38,7 @@ module Verse
       end
 
       def request(channel, content, headers: {}, reply_to: nil, timeout: 0.05)
-        reply_to = "_reply.#{SecureRandom.hex}"
+        reply_to ||= "_reply.#{SecureRandom.hex}"
 
         out = nil
 
@@ -59,7 +65,13 @@ module Verse
         end
       end
 
-      def request_all(channel, body: {}, headers: {}, reply_to: nil, timeout: 0.5)
+      def request_all(
+        channel,
+        body: {},
+        headers: {},
+        reply_to: nil, # rubocop:disable Lint/UnusedMethodArgument
+        timeout: 0.5
+      )
         # Fake request all behavior
         begin
           out = []
@@ -100,7 +112,6 @@ module Verse
         @subscriptions[regexp] ||= []
         @subscriptions[regexp] << block
       end
-
     end
   end
 end

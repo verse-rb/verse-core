@@ -6,11 +6,10 @@ module Verse
     # It is useful to avoid blocking the current thread.
     # This is very close to the native thread interfaces.
     class Future
-
       def initialize(&block)
         @thread = Thread.new do
           block.call
-        rescue Exception => e
+        rescue Exception => e # rubocop:disable Lint/RescueException
           @error = e
           nil
         end
@@ -31,9 +30,7 @@ module Verse
         !!@error
       end
 
-      def error
-        @error
-      end
+      attr_reader :error
 
       def wait
         if done?
@@ -47,7 +44,7 @@ module Verse
             raise @error if @error
 
             @result
-          rescue Exception => e
+          rescue Exception => e # rubocop:disable Lint/RescueException
             @error = e
             raise
           ensure
@@ -59,7 +56,6 @@ module Verse
       def cancel
         @thread.raise Timeout::Error, "canceled by user"
       end
-
     end
   end
 end

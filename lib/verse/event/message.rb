@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Verse
   module Event
     class Message
@@ -12,6 +14,7 @@ module Verse
 
       def reply(content, headers: {})
         raise "cannot reply to: empty reply channel" unless @reply_to
+
         @manager.publish(@reply_to, content, headers: headers)
       end
 

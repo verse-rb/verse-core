@@ -86,5 +86,4 @@ RSpec.describe Verse::Exposition do
       SpecHook.trigger_exposition({ name: "John", mode: :unchecked })
     end.to raise_error(Verse::Error::Authorization)
   end
-
 end

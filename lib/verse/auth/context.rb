@@ -137,7 +137,6 @@ module Verse
           [resource_regexp, action_regexp, scope.to_sym]
         }
       end
-
     end
   end
 end

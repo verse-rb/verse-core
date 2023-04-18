@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 RSpec.describe Verse::Util::Future do
   describe "#wait" do
     it "can wait for future" do
-
       wait_time = 0.001
 
       future = Verse::Util::Future.new do
@@ -27,7 +28,11 @@ RSpec.describe Verse::Util::Future do
       future.cancel
 
       # Ensure cancel is dispatched.
-      future.wait rescue nil
+      begin
+        future.wait
+      rescue StandardError
+        nil
+      end
 
       expect(future.done?).to be true
       expect(future.error?).to be true

@@ -24,7 +24,6 @@ class SpecHook < Verse::Exposition::Hook::Base
     self.class.callback = proc do |input|
       params = @metablock.process_input(input)
 
-
       ctx = Verse::Auth::Context[:superuser]
 
       exposition = create_exposition(
@@ -41,7 +40,6 @@ class SpecHook < Verse::Exposition::Hook::Base
         output = method.bind(self).call
         metablock.process_output(output)
       end
-
     end
   end
 end

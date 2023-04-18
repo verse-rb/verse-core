@@ -264,14 +264,15 @@ RSpec.describe Verse::Model::Repository::Base do
 
     it "encode filters correctly" do
       accounts = @accounts.index({ email__in: [
-        "john@example.tld", "jane@example.tld"
-      ]})
+                                   "john@example.tld", "jane@example.tld"
+                                 ] })
+      expect(accounts.length).to eq(2)
     end
 
     it "convert fields to correct type" do
       account = @accounts.find_by({})
       expect(account.email).to eq("john@example.tld")
-   end
+    end
   end
 
   describe "chunked index" do
