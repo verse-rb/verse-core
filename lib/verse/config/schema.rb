@@ -27,6 +27,11 @@ module Verse
           optional(:file).filled(:string)
           optional(:show_full_error).filled(:bool)
         end
+
+        optional(:event_bus).hash do
+          required(:adapter).filled(:string)
+          optional(:config).hash
+        end
       end
 
       rule(:service_name) do

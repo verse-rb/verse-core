@@ -8,6 +8,21 @@ module Verse
     # it run locally (in the process) and cannot communicate with other services.
     class LocalEventManager < Verse::Event::Manager
       attr_reader :subscriptions
+      @sub_id = 0
+
+      class << self
+        attr_accessor :sub_id
+      end
+
+      Subscription = Struct.new(:manager, :id, :block) do
+        def unsubscribe
+          @manager.cancel_subscription(@id)
+        end
+
+        def call(message, channel)
+          block.call(message, channel)
+        end
+      end
 
       def initialize(service_name, config = nil, logger = Logger.new($stdout))
         super
@@ -106,11 +121,18 @@ module Verse
         end
       end
 
+      def cancel_subscription(id)
+        @subscriptions.each do |_, subscribers|
+          subscribers.reject! { |sub| sub.id == id }
+        end
+      end
+
       private
 
       def add_to_subscription_list(regexp, &block)
         @subscriptions[regexp] ||= []
-        @subscriptions[regexp] << block
+        @subscriptions[regexp] << \
+          Subscription.new(self, self.class.sub_id, block)
       end
     end
   end

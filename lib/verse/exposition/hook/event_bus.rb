@@ -37,7 +37,7 @@ module Verse
         # r command output to publish in the reply channel
         def create_output_message(topic, output, is_error:)
           if is_error
-            {
+            [{
               topic: topic,
               error: {
                 type: output.class.name,
@@ -45,12 +45,21 @@ module Verse
                 details: output.respond_to?(:details) ? output.details : nil,
                 source: output.respond_to?(:source) ? output.source : nil
               }
-            }
-          else
+            },
             {
-              topic: topic,
-              output: output
+              content: "reply:error"
             }
+            ]
+          else
+            [
+              {
+                topic: topic,
+                output: output
+              },
+              {
+                content: "reply:output"
+              }
+            ]
           end
         end
 
@@ -99,7 +108,7 @@ module Verse
               end
 
               if allow_reply? && !(reply.nil? || reply.blank?)
-                out = create_output_message(
+                out, headers = create_output_message(
                   subject, output, is_error: is_error
                 )
 
