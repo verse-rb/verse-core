@@ -7,13 +7,14 @@ class SampleExpositionEb < Verse::Exposition::Base
     attr_accessor :something_happened
   end
 
-  expose on_event "test" do
+  expose on_event "CHANNEL.spec.test" do
     input do
       required(:content).filled(:string)
     end
   end
   def on_test
-    raise "error" unless params[:content] == "hello"
+    binding.pry
+    SampleExpositionEb.something_happened = "on_test"
   end
 
   expose on_command "sum" do
@@ -25,7 +26,7 @@ class SampleExpositionEb < Verse::Exposition::Base
     params[:numbers].sum
   end
 
-  expose on_broadcast "something" do
+  expose on_broadcast "CHANNEL.spec.broadcast" do
   end
   def something
     self.class.something_happened = true

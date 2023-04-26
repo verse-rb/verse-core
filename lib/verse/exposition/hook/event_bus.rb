@@ -12,11 +12,19 @@ module Verse
         # @param exposition [Verse::Exposition::Base] The exposition instance
         # @param channels [Array<String>] The list of channels to listen to
         # @param type [Symbol] The type of listener. `:broadcast`, `:consumer` or `:command`
-        def initialize(_exposition, _channel, type: Verse::Event::Manager::MODE_CONSUMER, ack_type: :on_receive, **opts)
-          super
+        def initialize(exposition,
+          channels,
+          type: Verse::Event::Manager::MODE_CONSUMER,
+          root: nil,
+          ack: :on_receive,
+          **opts
+        )
+          super(exposition)
 
           @type = type
           @opts = opts
+
+          channels = [channels] if channels.is_a?(String)
 
           @channels = channels.map{ |c|
             [root, c].compact.reject(&:empty?).join(".")

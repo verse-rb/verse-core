@@ -15,14 +15,16 @@ module Verse
         @logger = logger
       end
 
+      # Start the event manager
       def start; end
 
+      # Stop the event manager
       def stop; end
 
       # Publish an event to a specific channel.
       def publish(channel, content, headers: {}, reply_to: nil)
         # :nocov:
-        raise NotImplementedError, "please implement request"
+        raise NotImplementedError, "please implement publish"
         # :nocov:
       end
 

@@ -43,6 +43,12 @@ module Verse
 
       lookup.each(&method(:inject_to_config))
 
+      validate_config_schema!
+
+      initialize_event_manager!
+    end
+
+    protected def validate_config_schema!
       result = Verse::Config::Schema.new.call(
         @config
       )

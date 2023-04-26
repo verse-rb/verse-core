@@ -124,11 +124,13 @@ module Verse
 
                     unless @disable_event
                       after_commit do
-                        Verse.publish(event_path, {
-                                        resource_id: result.to_s,
-                                        args: args,
-                                        metadata: metadata
-                                      })
+                        Verse.publish(
+                          event_path, {
+                            resource_id: result.to_s,
+                            args: args,
+                            metadata: metadata
+                          }
+                        )
                       end
                     end
 
@@ -141,11 +143,13 @@ module Verse
 
                     unless @disable_event
                       after_commit do
-                        Verse.publish(event_path, {
-                                        resource_id: id.to_s,
-                                        args: arg2,
-                                        metadata: metadata,
-                                      })
+                        Verse.publish(
+                          event_path, {
+                            resource_id: id.to_s,
+                            args: arg2,
+                            metadata: metadata,
+                          }
+                        )
                       end
                     end
 

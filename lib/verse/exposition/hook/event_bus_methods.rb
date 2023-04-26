@@ -21,9 +21,8 @@ module Verse
         def on_command(command_name, absolute: false, auth: :header, no_reply: false, **opts)
           EventBus.new(
             self,
-            channel,
+            command_name,
             type: Verse::Event::Manager::MODE_COMMAND,
-            ack_type: ack_type,
             **(opts.merge(no_reply: no_reply))
           )
         end
@@ -45,7 +44,7 @@ module Verse
 
       end
 
-      Verse::Exposition::Hook::ClassMethods.include(EventBusMethods)
+      Verse::Exposition::Base.extend(EventBusMethods)
     end
   end
 end
