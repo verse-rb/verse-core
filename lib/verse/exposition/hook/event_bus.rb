@@ -81,7 +81,7 @@ module Verse
             return false
           end
 
-          absolute_channels.each do |c|
+          channel_path.each do |c|
             Verse.event_manager.subscribe(c, @type) do |message, _reply_to, subject|
               Verse.logger.debug{ "Received event #{subject}" }
 
@@ -107,7 +107,7 @@ module Verse
                     method.bind(self).call
                   )
                 end
-              rescue e
+              rescue => e
                 Verse.logger.warn{ "Error while processing for method at #{block.source_location.join(":")}" }
                 Verse.logger.warn(e)
 

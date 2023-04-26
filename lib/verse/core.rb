@@ -25,9 +25,9 @@ module Verse
   end
 end
 
-require_relative "init"
-require_relative "version"
-require_relative "env"
+require_relative "./init"
+require_relative "./version"
+require_relative "./env"
 
 Dir["#{__dir__}/**/*.rb"].sort.each do |file|
   next if file[__dir__.size..] =~ %r{^/verse/(?:cli|spec)} # do not load CLI files unless told otherwise.

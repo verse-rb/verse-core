@@ -28,6 +28,8 @@ module Verse
       config_path: config_path
     )
 
+    initialize_event_manager!
+
     @started = true
     @on_boot_callbacks&.each(&:call)
     @on_boot_callbacks&.clear
@@ -35,6 +37,18 @@ module Verse
     Verse::I18n.load_i18n
 
     Verse::Plugin.start(mode)
+  end
+
+  def initialize_event_manager!
+    em = Config.config.fetch(:em)
+
+    return unless em
+
+    adapter = em.fetch(:adapter)
+
+    @event_manager = Verse::Event::Manager[adapter].new(
+      service_name, em.fetch(:config, {}), logger
+    )
   end
 
   def on_boot(&block)

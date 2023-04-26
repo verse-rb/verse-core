@@ -1,12 +1,12 @@
 require_relative "../spec_data/exposition/sample_exposition_eb"
 
 RSpec.describe Verse::Exposition do
-  before :suite do
-    Verse.start(:server, config_path: File.join(__dir__, "../spec_data/config.yml"))
-    SampleExpositionEb.register
-  end
-
   before :each do
+    Verse.start(:server,
+      config_path: File.join(__dir__, "../spec_data/config.yml")
+    )
+    SampleExpositionEb.register
+
     SampleExpositionEb.something_happened = nil
   end
 
