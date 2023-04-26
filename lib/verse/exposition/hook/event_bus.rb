@@ -108,7 +108,7 @@ module Verse
                   )
                 end
               rescue => e
-                Verse.logger.warn{ "Error while processing for method at #{block.source_location.join(":")}" }
+                Verse.logger.warn{ "Error while processing for method at #{@method.source_location.join(":")}" }
                 Verse.logger.warn(e)
 
                 is_error = true

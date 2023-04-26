@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe Verse::Event::LocalEventManager do
+RSpec.describe Verse::Event::Manager::Local do
   around(:each) do |example|
     Timeout.timeout(5) do
       example.run
@@ -10,7 +10,7 @@ RSpec.describe Verse::Event::LocalEventManager do
   end
 
   before(:each) do
-    @test_manager = Verse::Event::LocalEventManager.new("test_service", {})
+    @test_manager = Verse::Event::Manager::Local.new("test_service", {})
     @test_manager.start
   end
 

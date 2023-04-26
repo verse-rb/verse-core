@@ -40,7 +40,7 @@ module Verse
   end
 
   def initialize_event_manager!
-    em = Config.config.fetch(:em)
+    em = Config.config.fetch(:em, nil)
 
     return unless em
 

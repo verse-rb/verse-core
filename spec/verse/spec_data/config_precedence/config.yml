@@ -3,7 +3,7 @@ description: Configuration testing
 logger:
   level: warn
 em:
-  adapter: mock
+  adapter: local
 show_error_details: true
 a_key_getting_overriden: Not overriden
 general_key: 1
