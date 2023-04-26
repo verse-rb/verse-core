@@ -20,7 +20,11 @@ RSpec.describe Verse::Exposition do
   end
 
   it "exposes on command" do
-    expect(Verse.request("sum", { numbers: [1, 2, 3] })).to eq(6)
+    expect(
+      Verse.request(
+        "verse_spec.sum", { numbers: [1, 2, 3] }
+      ).content[:output]
+    ).to eq(6)
   end
 
   it "exposes on broadcast" do

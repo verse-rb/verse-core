@@ -7,7 +7,7 @@ module Verse
     # object describing authorizations
     class Context
       @roles = {
-        superuser: ["*.*.*"],
+        system: ["*.*.*"],
         anonymous: []
       }
 
@@ -92,6 +92,7 @@ module Verse
       # free access to a resource.
       def mark_as_checked!
         @checked = true
+        self
       end
 
       alias_method :no_authorization!, :mark_as_checked!

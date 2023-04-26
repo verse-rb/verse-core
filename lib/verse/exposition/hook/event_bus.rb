@@ -73,6 +73,10 @@ module Verse
           Verse::Event::Manager::MODE_COMMAND && !@opts[:no_reply]
         end
 
+        def auth_context_for(_message)
+          Verse::Auth::Context[:system]
+        end
+
         def register_impl
           if Verse.event_manager.nil?
             Verse.logger.warn{ "Your service doesn't have event manager setup. Exposition linked to events won't be registered." }
@@ -80,25 +84,25 @@ module Verse
           end
 
           channel_path.each do |c|
-            Verse.event_manager.subscribe(c, @type) do |message|
+            Verse.event_manager.subscribe(c, @type) do |message, subject|
               Verse.logger.debug{ "Received event #{subject}" }
 
               output = nil
 
               begin
-                safe_params = meta.process_input(message.content)
+                method = @method
+                metablock = @metablock
+
+                safe_params = metablock.process_input(message.content)
 
                 exposition = create_exposition(
                   auth_context_for(message),
                   message: message,
-                  reply: reply,
+                  reply_to: message.reply_to,
                   subject: subject,
                   params: safe_params,
                   metadata: {}
                 )
-
-                method = @method
-                metablock = @metablock
 
                 output = exposition.run do
                   metablock.process_output(
@@ -120,9 +124,12 @@ module Verse
 
                 Verse.logger.debug{ "Reply to #{message.reply_to}" }
                 message.reply(
-                  out, headers
+                  out, headers: headers
                 )
               end
+
+              raise output if is_error
+              output
             end
           end
         end

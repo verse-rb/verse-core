@@ -6,13 +6,22 @@ class SampleExpositionEb < Verse::Exposition::Base
     attr_accessor :something_happened
   end
 
+  class NoAuthCheckHandler < Verse::Exposition::Handler
+    def call
+      exposition.auth_context.mark_as_checked!
+      call_next
+    end
+  end
+
+  append_handler NoAuthCheckHandler
+
   expose on_event "CHANNEL.spec.test" do
     input do
       required(:content).filled(:string)
     end
   end
   def on_test
-    binding.pry
+    auth_context.mark_as_checked!
     SampleExpositionEb.something_happened = "on_test"
   end
 

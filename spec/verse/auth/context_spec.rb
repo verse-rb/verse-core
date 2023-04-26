@@ -32,7 +32,7 @@ RSpec.describe Verse::Auth::Context do
 
   context "roles" do
     it "has superadmin role" do
-      auth = Verse::Auth::Context[:superuser]
+      auth = Verse::Auth::Context[:system]
       expect(auth.can?(:read, :users)).to eq(:all)
       expect(auth.can?(:read, :posts)).to eq(:all)
     end

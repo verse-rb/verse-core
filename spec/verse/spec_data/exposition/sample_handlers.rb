@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Handlers
+module Handlers
   @calls = []
   class << self
     attr_reader :calls

@@ -21,7 +21,7 @@ RSpec.describe Verse::Model::Repository::Base do
     CommentRepository.id_sequence = 200
     AccountRepository.id_sequence = 300
 
-    @auth_context = Verse::Auth::Context[:superuser]
+    @auth_context = Verse::Auth::Context[:system]
 
     # create data
     @users = UserRepository.new(@auth_context)

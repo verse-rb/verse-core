@@ -6,7 +6,7 @@ RSpec.describe Verse::Service::Base do
   subject { TestService }
 
   let(:context) {
-    Verse::Auth::Context[:superuser]
+    Verse::Auth::Context[:system]
   }
 
   it "can be initialized" do
