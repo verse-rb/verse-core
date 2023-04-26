@@ -1,10 +1,11 @@
+# frozen_string_literal: true
+
 require_relative "../spec_data/exposition/sample_exposition_eb"
 
 RSpec.describe Verse::Exposition do
   before :each do
     Verse.start(:server,
-      config_path: File.join(__dir__, "../spec_data/config.yml")
-    )
+                config_path: File.join(__dir__, "../spec_data/config.yml"))
     SampleExpositionEb.register
 
     SampleExpositionEb.something_happened = nil
@@ -26,5 +27,4 @@ RSpec.describe Verse::Exposition do
     Verse.publish("CHANNEL.spec.broadcast", {})
     expect(SampleExpositionEb.something_happened).to eq(true)
   end
-
 end

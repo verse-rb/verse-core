@@ -2,7 +2,6 @@
 
 # Exposition to test event buss hooks.
 class SampleExpositionEb < Verse::Exposition::Base
-
   class << self
     attr_accessor :something_happened
   end
@@ -31,6 +30,4 @@ class SampleExpositionEb < Verse::Exposition::Base
   def something
     self.class.something_happened = true
   end
-
-
 end

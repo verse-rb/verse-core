@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Verse
   module Event
     module Manager
@@ -22,7 +24,6 @@ module Verse
       def add_event_manager_type(name, event_manager_class)
         @em_types[name.to_sym] = event_manager_class
       end
-
     end
   end
 end

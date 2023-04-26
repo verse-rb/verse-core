@@ -18,6 +18,10 @@ module Verse
         @manager.publish(@reply_to, content, headers: headers)
       end
 
+      def allow_reply?
+        @reply_to && @reply_to != ""
+      end
+
       def ack
         raise NotImplementedError, "only in inherited classes"
       end

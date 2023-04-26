@@ -13,12 +13,11 @@ module Verse
         # @param channels [Array<String>] The list of channels to listen to
         # @param type [Symbol] The type of listener. `:broadcast`, `:consumer` or `:command`
         def initialize(exposition,
-          channels,
-          type: Verse::Event::Manager::MODE_CONSUMER,
-          root: nil,
-          ack: :on_receive,
-          **opts
-        )
+                       channels,
+                       type: Verse::Event::Manager::MODE_CONSUMER,
+                       root: nil,
+                       ack: :on_receive,
+                       **opts)
           super(exposition)
 
           @type = type
@@ -54,10 +53,9 @@ module Verse
                 source: output.respond_to?(:source) ? output.source : nil
               }
             },
-            {
-              content: "reply:error"
-            }
-            ]
+             {
+               content: "reply:error"
+             }]
           else
             [
               {
@@ -82,7 +80,7 @@ module Verse
           end
 
           channel_path.each do |c|
-            Verse.event_manager.subscribe(c, @type) do |message, _reply_to, subject|
+            Verse.event_manager.subscribe(c, @type) do |message|
               Verse.logger.debug{ "Received event #{subject}" }
 
               output = nil
@@ -107,7 +105,7 @@ module Verse
                     method.bind(self).call
                   )
                 end
-              rescue => e
+              rescue StandardError => e
                 Verse.logger.warn{ "Error while processing for method at #{@method.source_location.join(":")}" }
                 Verse.logger.warn(e)
 
@@ -115,14 +113,14 @@ module Verse
                 output = e
               end
 
-              if allow_reply? && !(reply.nil? || reply.blank?)
+              if allow_reply? && message.allow_reply?
                 out, headers = create_output_message(
                   subject, output, is_error: is_error
                 )
 
-                Verse.logger.debug{ "Reply to #{reply}" }
-                Verse.event_manager.publish(
-                  reply, out
+                Verse.logger.debug{ "Reply to #{message.reply_to}" }
+                message.reply(
+                  out, headers
                 )
               end
             end

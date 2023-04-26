@@ -43,6 +43,4 @@ module Verse
       Verse.logger.debug{ "[no_em] request_all on #{channel} #{content.inspect}" }
     end
   end
-
-
 end

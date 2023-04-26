@@ -1,8 +1,9 @@
+# frozen_string_literal: true
+
 module Verse
   module Exposition
     module Hook
       module EventBusMethods
-
         # Subscribe to the event bus as a consumer.
         # As consumer, only one instance of the current service is going
         # to be triggered by an event.
@@ -23,7 +24,10 @@ module Verse
             self,
             command_name,
             type: Verse::Event::Manager::MODE_COMMAND,
-            **(opts.merge(no_reply: no_reply))
+            **opts.merge(
+              no_reply: no_reply,
+              auth: auth
+            )
           )
         end
 
@@ -41,7 +45,6 @@ module Verse
             **opts
           )
         end
-
       end
 
       Verse::Exposition::Base.extend(EventBusMethods)

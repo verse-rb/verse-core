@@ -4,7 +4,6 @@ module Verse
   module Event
     module Manager
       class Base
-
         attr_reader :service_name, :config, :logger
 
         def initialize(service_name, config = nil, logger = Logger.new($stdout))

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec::Matchers.define :receive_event do |channel|
   chain :with_content do |data|
     @content = data
@@ -26,4 +28,3 @@ RSpec::Matchers.define :receive_event do |channel|
     end
   end
 end
-

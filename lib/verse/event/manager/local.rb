@@ -9,6 +9,7 @@ module Verse
       # it run locally (in the process) and cannot communicate with other services.
       class Local < Base
         attr_reader :subscriptions
+
         @sub_id = 0
 
         Manager.add_event_manager_type(:local, self)
@@ -19,7 +20,7 @@ module Verse
 
         Subscription = Struct.new(:manager, :id, :block) do
           def unsubscribe
-            @manager.cancel_subscription(@id)
+            manager.cancel_subscription(id)
           end
 
           def call(message, channel)
@@ -60,8 +61,8 @@ module Verse
 
           out = nil
 
-          subscribe(reply_to) do |message|
-            @subscriptions.delete(reply_to) # Remove the subscription once a message is caught.
+          subscription = subscribe(reply_to) do |message|
+            subscription.unsubscribe  # Remove the subscription once a message is caught.
             out = message
           end
 
@@ -133,9 +134,10 @@ module Verse
         private
 
         def add_to_subscription_list(regexp, &block)
+          sub = Subscription.new(self, self.class.sub_id, block)
           @subscriptions[regexp] ||= []
-          @subscriptions[regexp] << \
-            Subscription.new(self, self.class.sub_id, block)
+          @subscriptions[regexp] << sub
+          sub
         end
       end
     end
