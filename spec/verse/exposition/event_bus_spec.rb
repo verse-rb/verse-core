@@ -11,6 +11,10 @@ RSpec.describe Verse::Exposition do
     SampleExpositionEb.something_happened = nil
   end
 
+  after :each do
+    Verse.stop
+  end
+
   it "exposes on event" do
     Verse.publish("CHANNEL.spec.test", { content: "John" })
 

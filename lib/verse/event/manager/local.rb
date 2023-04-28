@@ -52,6 +52,10 @@ module Verse
           end
         end
 
+        def start
+          puts "start?"
+        end
+
         def stop
           @subscriptions.clear
         end
@@ -73,6 +77,8 @@ module Verse
               next unless pattern.match?(channel)
 
               sub = subscribers.first
+
+              puts "found: #{sub.inspect}"
 
               if sub
                 sub.call(message, channel)

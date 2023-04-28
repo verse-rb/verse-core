@@ -20,7 +20,7 @@ module Verse
       end
 
       # Create helper method to use a specific service.
-      # @ example
+      # @example
       #  class MyExposition < Verse::Exposition::Base
       #     use_service user_service: UserService
       #
@@ -116,8 +116,6 @@ module Verse
         @endpoints&.each do |(method_name, exposition)|
           attach_exposition(method_name, exposition)
         end
-      ensure
-        @endpoints.clear
       end
 
       # Return all exposition handlers.
