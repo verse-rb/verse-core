@@ -22,7 +22,7 @@ module Verse
         channel,
         content,
         headers: headers,
-        reply_to: nil,
+        reply_to: reply_to,
         timeout: 0.5
       )
     else
@@ -36,7 +36,7 @@ module Verse
         channel,
         content,
         headers: headers,
-        reply_to: nil,
+        reply_to: reply_to,
         timeout: 0.5
       )
     else

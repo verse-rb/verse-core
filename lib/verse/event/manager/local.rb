@@ -66,7 +66,7 @@ module Verse
           out = nil
 
           subscription = subscribe(reply_to) do |message|
-            subscription.unsubscribe  # Remove the subscription once a message is caught.
+            subscription.unsubscribe # Remove the subscription once a message is caught.
             out = message
           end
 

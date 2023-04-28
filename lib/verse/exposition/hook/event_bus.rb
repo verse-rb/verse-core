@@ -2,6 +2,8 @@
 
 require_relative "./base"
 
+# rubocop: disable Lint/UnusedMethodArgument
+
 module Verse
   module Exposition
     module Hook
@@ -129,6 +131,7 @@ module Verse
               end
 
               raise output if is_error
+
               output
             end
           end
