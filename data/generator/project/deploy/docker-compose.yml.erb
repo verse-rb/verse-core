@@ -1,0 +1,15 @@
+<% # Template for docker-compose.yml file %>
+services:
+  <% services.each do |s| %>
+  <% s.name %>:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    working_dir: /var/app
+    environment:
+      GITHUB_API_KEY: <%= ENV.fetch("GITHUB_API_KEY") %>
+      APP_ENVIRONMENT: development
+    volumes:
+      - ../<% s.name %>:/var/app
+    depends_on: <% s.dependencies %>
+  <% end %>

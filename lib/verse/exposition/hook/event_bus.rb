@@ -2,8 +2,6 @@
 
 require_relative "./base"
 
-# rubocop: disable Lint/UnusedMethodArgument
-
 module Verse
   module Exposition
     module Hook
@@ -24,6 +22,7 @@ module Verse
 
           @type = type
           @opts = opts
+          @ack = ack
 
           channels = [channels] if channels.is_a?(String)
 

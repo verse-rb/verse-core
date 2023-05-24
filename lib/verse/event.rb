@@ -23,7 +23,7 @@ module Verse
         content,
         headers: headers,
         reply_to: reply_to,
-        timeout: 0.5
+        timeout: timeout
       )
     else
       Verse.logger.debug{ "[no_em] request on #{channel} #{content.inspect}" }
@@ -37,7 +37,7 @@ module Verse
         content,
         headers: headers,
         reply_to: reply_to,
-        timeout: 0.5
+        timeout: timeout
       )
     else
       Verse.logger.debug{ "[no_em] request_all on #{channel} #{content.inspect}" }

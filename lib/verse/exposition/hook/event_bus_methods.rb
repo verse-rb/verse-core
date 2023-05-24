@@ -26,7 +26,8 @@ module Verse
             type: Verse::Event::Manager::MODE_COMMAND,
             **opts.merge(
               no_reply: no_reply,
-              auth: auth
+              auth: auth,
+              absolute: absolute
             )
           )
         end
