@@ -1,10 +1,14 @@
 # frozen_string_literal: true
 
 module Verse
-  module_function
+  extend self
 
   def logger
     @logger
+  end
+
+  def inflector
+    @inflector ||= Verse::Util::Inflector.new
   end
 
   def environment

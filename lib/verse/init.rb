@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Verse
-  module_function
+  extend self
 
   def service_id
     @service_id
@@ -28,9 +28,35 @@ module Verse
       config_path: config_path
     )
 
+    initialize_event_manager!
+
+    @started = true
+    @on_boot_callbacks&.each(&:call)
+    @on_boot_callbacks&.clear
+
     Verse::I18n.load_i18n
 
     Verse::Plugin.start(mode)
+  end
+
+  def initialize_event_manager!
+    em = Config.config.fetch(:em, nil)
+
+    return unless em
+
+    adapter = em.fetch(:adapter)
+
+    @event_manager = Verse::Event::Manager[adapter].new(
+      service_name, em.fetch(:config, {}), logger
+    )
+  end
+
+  def on_boot(&block)
+    if @started
+      block.call
+    else
+      (@on_boot_callbacks ||= []) << block
+    end
   end
 
   protected
@@ -48,6 +74,11 @@ module Verse
     @logger       = logger
 
     Verse::Config.init(config_path)
+
+    Config.config.dig(:logging, :level)&.tap do |level|
+      @logger.level = level.to_sym
+    end
+
     Verse::I18n.init
 
     Verse::Plugin.load_configuration(Verse::Config.config)

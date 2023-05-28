@@ -3,7 +3,10 @@
 module Verse
   module Util
     # Inflector used to conjugate english verbs to and from the past tense
-    # this is used to generate events related to commands
+    # this is used to generate events related to commands.
+    #
+    # @example
+    #  Inflector.past_tense("create") # => "created"
     class Inflector
       # https://www.grammar.cl/Past/Irregular_Verbs_List.htm
       PAST_TENSE_EXCEPTIONS = {
@@ -136,6 +139,12 @@ module Verse
         @singular_exceptions = plural_exceptions.lazy.map(&:reverse).to_h.freeze
       end
 
+      # Inflect words to plural form.
+      #
+      # @example
+      # pluralize("child") # => "children"
+      # pluralize("person") # => "people"
+      # pluralize("user") # => "users"
       def pluralize(word, count = 2)
         return word if count <= 1
 
@@ -144,6 +153,11 @@ module Verse
         }
       end
 
+      # Inflect words to singular form.
+      # @example
+      # singularize("children") # => "child"
+      # singularize("people") # => "person"
+      # singularize("users") # => "user"
       def singularize(word)
         @singular_exceptions.fetch(word) {
           word.gsub(/s$/, "")
@@ -151,9 +165,13 @@ module Verse
       end
 
       # Inflect verbs to past tense.
-      # work => worked
-      # bite => bitten because in exception list
-      # create_object => object_created
+      #
+      # @example
+      # inflect_past("work") # => "worked"
+      # inflect_past("bite") # => "bitten"
+      # inflect_past("create_object") # => "object_created"
+      #
+      # @param verb [String] the verb to inflect
       def inflect_past(verb)
         words = verb.to_s.gsub(/[^a-zA-Z\ ]/, "_").split("_")
 

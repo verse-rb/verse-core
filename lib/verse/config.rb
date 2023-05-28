@@ -1,13 +1,17 @@
 # frozen_string_literal: true
 
 require_relative "util/hash_util"
+require_relative "error/base"
 
 module Verse
   module Config
-    module_function
+    extend self
 
     include Verse::Util
 
+    SchemaError = Class.new(Verse::Error::Base)
+
+    # @return [Hash] The current configuration hash.
     def config
       @config
     end
@@ -25,15 +29,31 @@ module Verse
     def init(config_path = "./config")
       @config = {}
 
-      [
+      lookup = [
         File.join(config_path, "config.yml"),
         File.join(config_path, "config.#{Verse.environment}.yml"),
         File.join(config_path),
       ].select do |file|
         File.exist?(file) && !File.directory?(file)
-      end.each do |file|
-        inject_to_config(file)
       end
+
+      if lookup.empty?
+        raise "No config file found (looked at #{config_path})"
+      end
+
+      lookup.each(&method(:inject_to_config))
+
+      validate_config_schema!
+    end
+
+    protected def validate_config_schema!
+      result = Verse::Config::Schema.new.call(
+        @config
+      )
+
+      return unless result.errors.any?
+
+      raise Verse::Config::SchemaError, "Config errors: #{result.errors.to_h}"
     end
 
     # :nodoc:

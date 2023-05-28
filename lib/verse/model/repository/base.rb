@@ -16,27 +16,52 @@ module Verse
         end
 
         def filtering
-          raise NotImplementedError, "please implement filtering algorithm"
+          # :nocov:
+          raise NotImplementedError, "please implement filtering algorithm" # :nocov:
+          # :nocov:
         end
 
         def transaction(&block)
-          raise NotImplementedError
+          # :nocov:
+          raise NotImplementedError, "please implement transaction"
+          # :nocov:
         end
 
         def after_commit(&block)
-          raise NotImplementedError
+          # :nocov:
+          raise NotImplementedError, "please implement after_commit"
+          # :nocov:
         end
 
-        def update(id, attributes, scope = scoped(:update))
+        event
+        def update(id, attributes, scope = scoped(:updated))
+          attributes = encode(attributes)
+          update_impl(id, attributes, scope)
+        end
+
+        protected def update_impl(id, attributes, scope)
+          # :nocov:
           raise NotImplementedError, "please implement update"
+          # :nocov:
         end
 
-        def create(attributes, scope = scoped(:create))
+        event("created", creation: true)
+        def create(attributes, _scope = scoped(:create))
+          attributes = encode(attributes)
+          create_impl(attributes)
+        end
+
+        protected def create_impl(attributes)
+          # :nocov:
           raise NotImplementedError, "please implement create"
+          # :nocov:
         end
 
+        event("deleted")
         def delete(id, scope = scoped(:delete))
+          # :nocov:
           raise NotImplementedError, "please implement delete"
+          # :nocov:
         end
 
         def find_by(
@@ -45,11 +70,69 @@ module Verse
           included: [],
           record: self.class.model_class
         )
-          raise NotImplementedError, "please implement find_by"
+          filter = encode_filters(filter)
+
+          result = find_by_impl(
+            filter,
+            scope: scope,
+          )
+
+          return if result.nil?
+
+          result = decode(result)
+
+          set = prepare_included(included, [result], record: record)
+
+          record.new(result, include_set: set)
         end
 
+        def find_by_impl(
+          filter,
+          scope: scoped(:read),
+          included: [],
+          record: self.class.model_class
+        )
+          # :nocov:
+          raise NotImplementedError, "please implement find_by"
+          # :nocov:
+        end
+
+        query
         def index(
-          filters: {},
+          filters,
+          scope: scoped(:read),
+          included: [],
+          page: 1,
+          items_per_page: 1_000,
+          sort: nil,
+          record: self.class.model_class,
+          query_count: true
+        )
+          filters = encode_filters(filters)
+
+          collection, metadata = index_impl(
+            filters,
+            scope: scope,
+            page: page,
+            items_per_page: items_per_page,
+            sort: sort,
+            query_count: query_count
+          )
+
+          set = prepare_included(included, collection, record: record)
+
+          Verse::Util::ArrayWithMetadata.new(
+            collection.map{ |elm|
+              record.new(
+                decode(elm), include_set: set
+              )
+            },
+            metadata: metadata
+          )
+        end
+
+        protected def index_impl(
+          filters,
           scope: scoped(:read),
           included: [],
           page: 1,
@@ -58,18 +141,16 @@ module Verse
           record: self.class.model_class,
           query_count: true
         )
+          # :nocov:
           raise NotImplementedError, "please implement index"
+          # :nocov:
         end
 
-        def find_by!(parameters, scope: scoped(:read), included: [], record: self.class.model_class)
-          record = find_by(
-            parameters,
-            included: included,
-            scope: scope,
-            record: record
-          )
+        ## === Selectors throwing exceptions ===
+        def find_by!(filters, **opts)
+          record = find_by(filters, **opts)
 
-          raise Verse::Error::RecordNotFound, parameters unless record
+          raise Verse::Error::RecordNotFound, filters.inspect unless record
 
           record
         end
@@ -79,6 +160,12 @@ module Verse
           raise Verse::Error::RecordNotFound, id unless output
         end
 
+        def delete!(id, scope = scoped(:delete))
+          output = delete(id, scope)
+          raise Verse::Error::RecordNotFound, id unless output
+        end
+        ## === ===
+
         def with_metadata(metadata)
           old_metadata = @metadata
           @metadata = @metadata.merge(metadata)
@@ -87,10 +174,15 @@ module Verse
           @metadata = old_metadata
         end
 
-        def chunked_index(filters: {}, scope: scoped(:read), included: [], page: 1, items_per_page: 50, sort: nil)
+        # Redefine if the adapter allow multiple connection for read or write.
+        def mode(_read_write)
+          yield
+        end
+
+        def chunked_index(filters, scope: scoped(:read), included: [], page: 1, items_per_page: 50, sort: nil)
           Verse::Util::Iterator.chunk_iterator page do |current_page|
             result = index(
-              filters: filters,
+              filters,
               scope: scope,
               included: included,
               page: current_page,
@@ -112,7 +204,7 @@ module Verse
         #
         def no_event
           @disable_event = true
-          yield
+          yield(self)
         ensure
           @disable_event = false
         end
@@ -157,13 +249,13 @@ module Verse
           dup = hash.dup
 
           dup.each do |key, value|
-            field = key.to_s.split("__").first
+            field, operator = key.to_s.split("__")
 
             encoder = self.class.encoders[field]
 
             next unless encoder
 
-            dup[key] = if field.is_a?(Array) && filtering.expect_array?(field)
+            dup[key] = if value.is_a?(Array) && filtering.expect_array?(operator)
                          value.map{ |x| encoder.encode(x) }
                        else
                          encoder.encode(value)
@@ -186,7 +278,9 @@ module Verse
         end
 
         def scoped(action)
+          # :nocov:
           raise NotImplementedError, "please redefine scoped on child repositories and use @auth_context to filter."
+          # :nocov:
         end
 
         def can_create?(auth_context, &block)

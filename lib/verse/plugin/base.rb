@@ -2,6 +2,8 @@
 
 module Verse
   module Plugin
+    # Base class for all plugins.
+    # @abstract
     class Base
       NO_DEPS = [].freeze
 
@@ -14,20 +16,6 @@ module Verse
         @logger     = logger
 
         init_dependencies
-      end
-
-      def check_dependencies!
-        dependencies.each do |dep|
-          send(dep)
-        rescue NotFoundError
-          dep_map = dep_config[dep]
-
-          if dep_map
-            raise DependencyError, DependencyError::ERROR_MSG_DEPENDS_MAP % [name, dep, dep_map]
-          end
-
-          raise DependencyError, DependencyError::ERROR_MSG_DEPENDS % [name, dep]
-        end
       end
 
       # list of dependencies used by the plugin
@@ -49,6 +37,22 @@ module Verse
 
       # This is the last step of the shutdown process.
       def on_finalize; end
+
+      # Check that dependencies are met.
+      # @raise [Verse::Plugin::DependencyError] if a dependency is not met
+      def check_dependencies!
+        dependencies.each do |dep|
+          send(dep)
+        rescue NotFoundError
+          dep_map = dep_config[dep]
+
+          if dep_map
+            raise DependencyError, DependencyError::ERROR_MSG_DEPENDS_MAP % [name, dep, dep_map]
+          end
+
+          raise DependencyError, DependencyError::ERROR_MSG_DEPENDS % [name, dep]
+        end
+      end
 
       protected
 

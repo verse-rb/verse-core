@@ -4,7 +4,7 @@ require_relative "util/assertion"
 
 module Verse
   module Plugin
-    module_function
+    extend self
 
     include Verse::Util
 
@@ -101,8 +101,6 @@ module Verse
       @plugins.clear
     end
 
-    protected
-
     # Load a specific plugin
     # @param plugin [Hash] the plugin configuration
     # @param logger [Logger] the logger to use when initializing the plugin
@@ -115,7 +113,7 @@ module Verse
 
       logger.debug{ "Plugin `#{name}`: Initializing plugin" }
 
-      plugin_class = Reflection.get(type)
+      plugin_class = Reflection.constantize(type)
       plugin = plugin_class.new(name.to_s, config, dependencies, logger)
 
       register_plugin(plugin)

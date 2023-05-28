@@ -1,0 +1,14 @@
+service_name: verse-spec
+description: used to test the plugin system.
+plugins:
+  - name: test
+    config:
+      a: true
+      foo: "bar"
+  - name: another_plugin_with_dependencies <plugin_with_dependencies>
+    dep:
+      dependent_plugin: dependent_plugin_2
+  - name: dependent_plugin # Bad linking.
+logging:
+  level: warn
+  show_full_error: true

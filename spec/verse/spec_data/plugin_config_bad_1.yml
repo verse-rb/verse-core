@@ -1,0 +1,12 @@
+service_name: verse-spec
+description: used to test the plugin system.
+plugins:
+  - name: test
+    config:
+      a: true
+      foo: "bar"
+  - name: plugin_with_dependencies
+    # Missing dependencies
+logging:
+  level: warn
+  show_full_error: true

@@ -10,11 +10,13 @@ require "dry/validation"
 require "json"
 
 require "dry-schema"
+require "dry/schema/messages/i18n"
+
 require "dry-types"
 require "dry-validation"
 
 module Verse
-  module_function
+  extend self
 
   GEM_PATH = File.expand_path("..", __dir__)
 
@@ -23,9 +25,9 @@ module Verse
   end
 end
 
-require_relative "init"
-require_relative "version"
-require_relative "env"
+require_relative "./init"
+require_relative "./version"
+require_relative "./env"
 
 Dir["#{__dir__}/**/*.rb"].sort.each do |file|
   next if file[__dir__.size..] =~ %r{^/verse/(?:cli|spec)} # do not load CLI files unless told otherwise.
