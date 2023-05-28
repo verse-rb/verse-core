@@ -25,7 +25,7 @@ RSpec.describe Verse::Plugin do
       start
 
       plugin = Verse::Plugin[:test]
-      expect(plugin).to be_a(Verse::Plugin::Test::Plugin)
+      expect(plugin).to be_a(Verse::Test::Plugin)
       expect(plugin.config).to eq({ a: true, foo: "bar" })
     end
 

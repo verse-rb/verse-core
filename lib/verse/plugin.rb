@@ -142,7 +142,7 @@ module Verse
       klass_name ||= name
 
       if klass_name !~ /[A-Z]/
-        klass_name = "Verse::Plugin::#{StringUtil.camelize(klass_name)}::Plugin"
+        klass_name = "Verse::#{StringUtil.camelize(klass_name)}::Plugin"
       end
 
       [name, klass_name]
