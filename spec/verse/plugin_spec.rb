@@ -7,21 +7,25 @@ require_relative "./spec_data/plugins_test"
 RSpec.describe Verse::Plugin do
   context "with a configuration file with some plugins" do
     let :start do
-      Verse.start(:server,
-                  config_path: File.join(__dir__, "spec_data", "plugin_config.yml"))
+      Verse.start(
+        :server,
+        config_path: File.join(
+          __dir__, "spec_data", "plugin_config.yml"
+        )
+      )
     end
 
     after do
       Verse.stop
     end
 
-    it "can list all plugins" do
+    it "lists all plugins" do
       start
 
       expect(Verse::Plugin.all.size).to eq(5)
     end
 
-    it "can retrieve a plugin and config is loaded" do
+    it "retrieves a plugin and config is loaded" do
       start
 
       plugin = Verse::Plugin[:test]
@@ -29,7 +33,7 @@ RSpec.describe Verse::Plugin do
       expect(plugin.config).to eq({ a: true, foo: "bar" })
     end
 
-    it "will apply all the lifecycle of the plugin" do
+    it "applies all the lifecycle of the plugin" do
       start
 
       plugin = Verse::Plugin[:test]
@@ -40,10 +44,13 @@ RSpec.describe Verse::Plugin do
       it "fails to load the plugin if the dependency is not met" do
         expect do
           Verse.start(:server,
-                      config_path: File.join(__dir__, "spec_data", "plugin_config_bad_1.yml"))
+                      config_path: File.join(
+                        __dir__, "spec_data", "plugin_config_bad_1.yml"))
         end.to raise_error(
           Verse::Plugin::DependencyError,
-          Verse::Plugin::DependencyError::ERROR_MSG_DEPENDS % ["plugin_with_dependencies", "dependent_plugin"]
+          Verse::Plugin::DependencyError::ERROR_MSG_DEPENDS % [
+            "plugin_with_dependencies", "dependent_plugin"
+          ]
         )
       end
 
@@ -53,7 +60,11 @@ RSpec.describe Verse::Plugin do
                       config_path: File.join(__dir__, "spec_data", "plugin_config_bad_2.yml"))
         end.to raise_error(
           Verse::Plugin::DependencyError,
-          Verse::Plugin::DependencyError::ERROR_MSG_DEPENDS_MAP % ["another_plugin_with_dependencies <plugin_with_dependencies>", "dependent_plugin", "dependent_plugin_2"]
+          Verse::Plugin::DependencyError::ERROR_MSG_DEPENDS_MAP % [
+            "another_plugin_with_dependencies <plugin_with_dependencies>",
+            "dependent_plugin",
+            "dependent_plugin_2"
+          ]
         )
       end
     end

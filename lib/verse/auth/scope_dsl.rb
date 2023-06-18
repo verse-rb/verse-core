@@ -30,11 +30,13 @@ module Verse
 
       # Is used with custom scopes.
       # @param scope [String] the scope to check
-      def custom?(&block)
+      def custom?(key = nil, &block)
+        key ||= @resource.to_sym
+
         return unless @scope == :custom
 
         @result = block.call(
-          @context[@resource]
+          @context[key]
         )
       end
 

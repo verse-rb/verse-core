@@ -52,7 +52,7 @@ module Verse
       # ```
       #   auth_context.can!(:read, :user) do |scope|
       #     scope.all?{ table }                               # Give access to all users
-      #     scope.any?{ |id| table.where(id: id) }            # Give access to a specific user
+      #     scope.custom?(:users){ |id| table.where(id: id) }  # Give access to a specific user
       #     scope.me?{ table.where(id: auth_context.user_id)} # Give access to the current user
       #     scope.else?(&:reject!) # Reject all other cases. This is the default behavior if a scope is not found.
       #   end
@@ -129,10 +129,6 @@ module Verse
 
           if scope == "custom"
             raise "custom scope `?` not allowed for wildcard resources" if resource == "*"
-
-            unless self[resource.to_sym]
-              raise "custom scope `?` found for resource `#{resource}` but no custom data was given"
-            end
           end
 
           [resource_regexp, action_regexp, scope.to_sym]

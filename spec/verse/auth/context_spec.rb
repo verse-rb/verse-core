@@ -50,6 +50,19 @@ RSpec.describe Verse::Auth::Context do
       expect(auth.can?(:read, :users)).to eq(:all)
       expect(auth.can?(:read, :posts)).to eq(false)
     end
+
+    it "can access custom scope" do
+      auth = Verse::Auth::Context.new(
+        ["users.read.?"],
+        custom_scopes: { optional: "1234" }
+      )
+
+      auth.can!(:read, :users) do |scope|
+        scope.custom?(:optional){ |user| expect(user).to eq("1234") }
+      end
+
+    end
+
   end
 
   it "rejects correctly" do
