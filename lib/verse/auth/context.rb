@@ -11,12 +11,16 @@ module Verse
         anonymous: []
       }
 
-      def self.[]=(name, rights)
-        @roles[name] = rights
-      end
+      class << self
+        attr_reader :roles
 
-      def self.[](name)
-        new(@roles.fetch(name))
+        def []=(name, rights)
+          @roles[name] = rights
+        end
+
+        def [](name)
+          new(@roles.fetch(name))
+        end
       end
 
       attr_reader :custom_scopes, :metadata
@@ -127,8 +131,8 @@ module Verse
           action_regexp = Regexp.new(action.gsub("*", ".*"))
           scope = scope.gsub("*", "all").gsub(/^\?$/, "custom")
 
-          if scope == "custom"
-            raise "custom scope `?` not allowed for wildcard resources" if resource == "*"
+          if scope == "custom" && (resource == "*")
+            raise "custom scope `?` not allowed for wildcard resources"
           end
 
           [resource_regexp, action_regexp, scope.to_sym]

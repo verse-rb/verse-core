@@ -45,7 +45,8 @@ RSpec.describe Verse::Plugin do
         expect do
           Verse.start(:server,
                       config_path: File.join(
-                        __dir__, "spec_data", "plugin_config_bad_1.yml"))
+                        __dir__, "spec_data", "plugin_config_bad_1.yml"
+                      ))
         end.to raise_error(
           Verse::Plugin::DependencyError,
           Verse::Plugin::DependencyError::ERROR_MSG_DEPENDS % [

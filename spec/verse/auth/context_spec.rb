@@ -60,9 +60,7 @@ RSpec.describe Verse::Auth::Context do
       auth.can!(:read, :users) do |scope|
         scope.custom?(:optional){ |user| expect(user).to eq("1234") }
       end
-
     end
-
   end
 
   it "rejects correctly" do
