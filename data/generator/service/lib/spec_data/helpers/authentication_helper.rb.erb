@@ -1,0 +1,84 @@
+# allow to call request into request example type of spec with
+# default headers for requests based on the user we want to test against.
+#
+# ```
+#  context "as bo_manager", as: :bo_manager do
+#     # ...
+#  end
+# ```
+#
+# add theses helpers:
+#
+# - current_token
+# - current_auth_context
+#
+module AuthenticationHelper
+  extend ActiveSupport::Concern
+
+  def current_auth_context=(auth_context)
+    @current_auth_context = auth_context
+  end
+
+  def current_token=(token)
+    self.current_auth_context = token&.context
+    @current_token = token
+  end
+
+  def current_token
+    @current_token
+  end
+
+  def current_auth_context
+    @current_auth_context
+  end
+
+  def load_auth_context(user)
+    file = YAML.load File.read(File.expand_path("roles/#{user}.yml", __dir__))
+
+    user_data = Ejar3::Iam::AuthContext::UserData.new(**file["user_data"].symbolize_keys)
+
+    Ejar3::Iam::AuthContext.from_data_object(
+      user_data: user_data,
+      role_name: file["role_name"],
+      custom_scopes: file["custom_scopes"],
+      role_id: file["role_id"],
+      flags: file["flags"]
+    )
+  end
+
+  def system_context
+    load_auth_context :_sysadmin
+  end
+
+  included do
+    %w[post patch put get delete head].each do |x|
+      define_method(:"ancestral_#{x}", instance_method(x))
+
+      define_method(x) do |url, **opts|
+        if @current_token
+          set_cookie "ejar_authorization=#{@current_token.to_jwt}"
+        end
+
+        send(:"ancestral_#{x}", url, **opts)
+      end
+    end
+
+    around :example, :as do |task|
+      users = task.metadata[:as]
+      users = [users] unless users.is_a?(Array)
+
+      users.each do |user|
+        auth_context = load_auth_context(user)
+
+        self.current_token = Ejar3::Iam::AuthToken.new(
+          auth_context,
+          lifetime: 30.minutes
+        )
+
+        task.run
+      ensure
+        self.current_token = nil
+      end
+    end
+  end
+end

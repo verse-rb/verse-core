@@ -1,0 +1,12 @@
+module EventHelper
+  extend self
+
+  def receive_event(event_name, fixture_name = :default)
+    stream, *event = event_name.split(/\./)
+    event = event.join(".")
+
+    event = fixture([stream, event].join("/"), fixture_name, namespace: "events")
+
+    EFrame.event_manager.publish(event_name, event)
+  end
+end

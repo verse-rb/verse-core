@@ -1,0 +1,4 @@
+task :environment do
+  require_relative "../config/boot"
+  EFrame.start(disable_subscription: true)
+end

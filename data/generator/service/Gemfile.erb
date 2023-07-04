@@ -1,0 +1,47 @@
+# frozen_string_literal: true
+ruby '3.1.0'
+
+source "https://rubygems.org"
+
+git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
+git_source(:oivan) { |repo|
+  ENV["CI_JOB_TOKEN"] ?
+  "https://gitlab-ci-token:#{ENV["CI_JOB_TOKEN"]}@gitlab.iwa.fi/#{repo}.git" :
+  "git@gitlab.iwa.fi:#{repo}.git"
+}
+
+gem 'dotenv'
+gem 'zeitwerk', require: false
+
+gem 'puma'
+
+gem 'ejar3-iam', oivan: "ejar3/ejar3-iam", branch: "master", require: "ejar3/iam"
+gem 'ejar3-services-base', oivan: "ejar3/ejar3-services-base", branch: "master", require: false
+
+<% if options.db == "mongo" %>gem "mongo"<% elsif options.db == "pg" %>gem "pg"
+gem "sequel"<% end %>
+
+gem "rake"
+
+gem "nokogiri"
+gem "aws-sdk-s3"
+
+group :test, :development do
+  gem 'pry'
+  gem 'rubocop'
+end
+
+group :test do
+  gem 'simplecov', "0.21.2", require: false
+  gem 'simplecov-cobertura', require: false
+
+  gem 'webmock', '~> 3.13.0' # Mock of 3rd party call
+
+  gem 'cucumber'
+
+  gem 'rspec'
+  gem 'rspec-core', '~> 3.10'
+  gem 'rspec_junit_formatter'
+
+  gem 'rack-test'
+end

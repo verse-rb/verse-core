@@ -1,0 +1,22 @@
+module App
+  module Expo
+    class HelloWorld < EFrame::Exposition::Base
+      use_service App::Services::HelloService
+
+      expose on_http(:get, "hello") do
+        desc "A simple Hello world output"
+      end
+      def hello
+        service.hello
+      end
+
+      expose on_event("<%= options.service_name %>.hello") do
+        desc "A simple Hello world output"
+      end
+      def hello
+        service.hello
+      end
+
+    end
+  end
+end

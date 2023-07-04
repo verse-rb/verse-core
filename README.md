@@ -108,16 +108,15 @@ With verse-core, you will get access to:
 
 Those plugins are maintained by the Verse development team.
 
-Name | Description |
----------|----------|
- verse-apm | ELK APM integration for Verse |
- verse-auth | JWT authorization implementation |
- verse-csv | A CSV renderer for verse-http using streaming capabilities |
- verse-discovery | Command between services |
- verse-execute | At runtime remote code execution |
- verse-http | Sinatra based HTTP server |
+Name | Description | Status
+---------|----------| ------ |
+ verse-apm | ELK APM integration for Verse | In progress |
+ verse-csv | A CSV renderer for verse-http using streaming capabilities | |
+ verse-discovery | Command between services | |
+ verse-execute | At runtime remote code execution | |
+ verse-http | Sinatra based HTTP server | Done |
  verse-instrument | instrumentation endpoints for your services |
- verse-jsonapi | JSON::Api renderer for your API |
+ verse-jsonapi | JSON::Api renderer for your API endpoints |
  verse-mongo | Repositories implementation for mongodb |
  verse-nats | Event Bus implementation using NATS as backend |
  verse-periodic | CRON and repeatable tasks |

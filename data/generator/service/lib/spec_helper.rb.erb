@@ -1,0 +1,96 @@
+ENV["APP_ENVIRONMENT"] = 'test'
+
+require "dotenv"
+Dotenv.load('.env', '.env.test')
+
+require "bundler"
+Bundler.require(:default, :test)
+
+require "webmock/rspec"
+
+require_relative "../config/boot"
+
+require "ejar3/services_spec_helpers"
+
+require_relative "./spec_data/helpers/authentication_helper"
+require_relative "./spec_data/helpers/fixtures_helper"
+require_relative "./spec_data/helpers/event_helper"
+
+RSpec.configure do |config|
+  whitelist = ['localhost', '127.0.0.1']
+  allowed_sites = lambda{|uri|
+    whitelist.any?{ |site| uri.host.include?(site) }
+  }
+  WebMock.disable_net_connect!(allow: whitelist)
+
+  config.include Rack::Test::Methods
+  config.include AuthenticationHelper
+  config.include FixturesHelper
+  config.include EventHelper
+
+  config.before(:suite) do
+    Ejar3::Api.auth_token_factory = -> { "fakegeneratedtoken" }
+    EFrame.start
+  end
+
+  # config.before(:all) do
+  #   Erad.db do |db|
+  #     truncated_tables = %w[events tests]
+  #     truncated_tables.each do |table|
+  #       db.execute <<-SQL
+  #       DO
+  #         $func$
+  #         BEGIN
+  #           -- dangerous, test before you execute!
+  #           -- RAISE NOTICE '%',  -- once confident, comment this line ...
+  #           EXECUTE         -- ... and uncomment this one
+  #           (SELECT 'TRUNCATE TABLE ' || string_agg(oid::regclass::text, ', ') || ' CASCADE'
+  #             FROM   pg_class
+  #             WHERE  relkind = 'r'  -- only tables
+  #             AND    relnamespace = 'public'::regnamespace
+  #           );
+  #         END
+  #         $func$;
+  #       SQL
+  #     end
+  #   end
+  # end
+
+  config.expect_with :rspec do |expectations|
+    expectations.include_chain_clauses_in_custom_matcher_descriptions = true
+    expectations.syntax = :expect
+  end
+
+  config.mock_with :rspec do |mocks|
+    mocks.verify_partial_doubles = true
+  end
+
+  config.filter_run :focus
+  config.run_all_when_everything_filtered = true
+  # config.warnings = true
+
+  # if config.files_to_run.one?
+  #   config.default_formatter = 'doc'
+  # end
+
+  # config.profile_examples = 10
+  # config.order = :random
+
+  # config.around(:each) do |example|
+  #   Erad.db do |database|
+  #     @db = database
+  #     database.transaction(rollback: :always, auto_savepoint: true){ example.run }
+  #   end
+  # end
+
+  Kernel.srand config.seed
+
+<% if options.db == 'mongo' %>
+  # specific config for mongo db_adapter
+  config.around(:each) do |spec|
+    EFrame.db_adapter.with_client do
+      spec.run
+    end
+  end
+<% end %>
+end

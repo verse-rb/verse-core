@@ -1,0 +1,7 @@
+spec App::Services::HelloService do
+  subject { App::Services::HelloService.new(system_context) }
+
+  it "says hello" do
+    expect(subject.hello).to match /Hello (.+) !/
+  end
+end

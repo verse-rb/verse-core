@@ -1,0 +1,36 @@
+module FixturesHelper
+  extend self
+
+  def fixture_set(filename)
+    @fixture_set = {}
+
+    return @fixture_set[filename] if @fixture_set[filename]
+
+    file = File.read(filename)
+    @fixture_set[filename] = YAML.safe_load(
+      file, permitted_classes: [Time, Date, DateTime, Symbol], permitted_symbols: [], aliases: true
+    ).transform_values(&:freeze) # disallow mutation. need to dup in test level.
+  end
+
+  def fixture(model_name, fixture_name = :default, namespace: "model")
+    fixtures(model_name, namespace: namespace).fetch(fixture_name.to_s)
+  end
+
+  def fixtures(model_name, namespace: "model")
+    fixture_set("lib/spec_data/fixtures/#{namespace}/#{model_name.to_s}.yml")
+  end
+
+  def fixture_file(file_name, mime_type = nil)
+    mime_type ||= \
+      case File.extname(file_name)
+      when ".png"
+        "image/png"
+      when ".jpeg", ".jpg"
+        "image/jpeg"
+      else
+        "application/octet-stream"
+      end
+
+    Rack::Test::UploadedFile.new(File.join("lib/spec_data/fixtures/files", file_name), mime_type)
+  end
+end

@@ -1,0 +1,7 @@
+service:
+  id: <%= options.service_name %>
+  description: <%= options.service_description %>
+  url_root: <%%= ENV.fetch("SERVICE_URL_ROOT") %>
+logger:
+  level: <%= render_logger_level %>
+<% plugin_hook :config %>

@@ -1,0 +1,9 @@
+module App
+  module Model
+    class ExampleSerializer < EFrame::Model::Serializer::Base
+      <% if options.db == "mongo" %>field :_id, primary: true<% else %>field :id, primary: true<% end %>
+
+      field :content
+    end
+  end
+end

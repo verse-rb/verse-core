@@ -1,0 +1,24 @@
+module App
+  module Model
+    class ExampleRepository < EFrame::Model::<%= options.db.capitalize %>::Repository
+      table "examples"
+      resource "example"
+
+      def scoped(action)
+        # Don't check for authorization in this example.
+        auth_context.mark_as_checked
+
+        table
+
+        # This is a better example of what would be needed in scoped method:
+        #
+        # out = auth_context.can!(action, self.class.iam_resource) do |scope|
+        #   scope.all? { table }
+        #   }
+        # end
+        #
+        # out
+      end
+    end
+  end
+end

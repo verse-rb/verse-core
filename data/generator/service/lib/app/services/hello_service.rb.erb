@@ -1,0 +1,10 @@
+module App
+  module Services
+    class HelloService < EFrame::Service::Base
+      def hello
+        auth_context.mark_as_checked # Anonymous access !
+        "Hello #{auth_context.user.username} !"
+      end
+    end
+  end
+end

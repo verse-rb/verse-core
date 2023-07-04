@@ -1,0 +1,14 @@
+spec App::Expo::HelloWorld, type: :exposition do
+  let(:app) { EFrame::Http::Server }
+
+  it "route GET / hello" do
+    expect_any_instance_of(App::Services::HelloService).to receive(:hello)
+    get "hello"
+  end
+
+  it "route event <%= options.service_name %>.hello" do
+    expect_any_instance_of(App::Services::HelloService).to receive(:hello)
+    receive_event("<%= options.service_name %>.hello")
+  end
+
+end

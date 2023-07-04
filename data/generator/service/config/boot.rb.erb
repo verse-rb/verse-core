@@ -1,0 +1,35 @@
+# frozen_string_literal: true
+
+# This file is used for booting the service.
+
+current_env = ENV.fetch("APP_ENVIRONMENT", "development")
+ENV["APP_ENVIRONMENT"] = current_env
+
+require 'dotenv'
+
+Dotenv.load('.env', ".env.#{current_env}")
+
+require "bundler"
+Bundler.require(:default, current_env)
+
+ENV["APP_PATH"] = File.expand_path("../..", __FILE__)
+
+require 'zeitwerk'
+
+loader = Zeitwerk::Loader.new
+loader.push_dir("#{ENV["APP_PATH"]}/lib")
+loader.setup
+
+require "verse/core"
+require_relative "./routes"
+
+Dir[File.join(__dir__, "initializers/**.rb")].each do |file|
+  load file
+end
+
+Verse.start(ENV.fetch("VERSE_RUN_MODE", "server").to_sym,
+  config_path: File.join(
+  __dir__, "spec_data", "plugin_config_bad_1.yml"
+))
+
+EFrame.start(File.expand_path("..", __dir__))
