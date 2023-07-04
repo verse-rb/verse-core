@@ -53,7 +53,6 @@ module Verse
         end
 
         def start
-          puts "start?"
         end
 
         def stop
@@ -77,8 +76,6 @@ module Verse
               next unless pattern.match?(channel)
 
               sub = subscribers.first
-
-              puts "found: #{sub.inspect}"
 
               if sub
                 sub.call(message, channel)
@@ -105,7 +102,7 @@ module Verse
               sleep
             end
           rescue Timeout::Error
-            # Do nothing, we always timeout; same behavior into NATS EM
+            # Do nothing, we always timeout
           end
 
           # Return array with one item only,
