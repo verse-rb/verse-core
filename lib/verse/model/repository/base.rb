@@ -46,7 +46,8 @@ module Verse
         end
 
         event("created", creation: true)
-        def create(attributes, _scope = scoped(:create))
+        def create(attributes)
+          scoped(:create)
           attributes = encode(attributes)
           create_impl(attributes)
         end
@@ -58,7 +59,13 @@ module Verse
         end
 
         event("deleted")
-        def delete(id, scope = scoped(:delete))
+        def delete(id)
+          id = find_by({ id: id }, scope: scoped(:delete))&.id
+          auth_context.reject! unless id
+          delete_impl(id)
+        end
+
+        protected def delete_impl(id)
           # :nocov:
           raise NotImplementedError, "please implement delete"
           # :nocov:
@@ -136,7 +143,7 @@ module Verse
           scope: scoped(:read),
           included: [],
           page: 1,
-          items_per_page: 50,
+          items_per_page: 1_000,
           sort: nil,
           record: self.class.model_class,
           query_count: true
@@ -312,10 +319,12 @@ module Verse
           tree = tree_from_include_list included_list
 
           tree.each do |key, _value|
+            regexp = /^#{key}($|\.)/.freeze
+
             sub_included = \
               included_list \
-              .filter{ |x| x =~ /^#{key}($|\.)/ } \
-              .map{ |x| x.gsub(/^#{key}($|\.)/, "") }
+              .filter{ |x| x =~ regexp } \
+              .map{ |x| x.gsub(regexp, "") }
               .reject(&:empty?)
 
             relation = record.relations.fetch(key.to_sym){ raise "Relation not found: #{key}" }
