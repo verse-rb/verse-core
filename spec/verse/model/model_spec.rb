@@ -254,6 +254,10 @@ RSpec.describe Verse::Model::Repository::Base do
     end
 
     it "can fetch included of type belongs_to" do
+      accounts = @accounts.index({}, included: ["user"])
+
+      expect(accounts.length).to eq(2)
+      expect(accounts.first.user).to be_a(UserRecord)
     end
 
     it "can index using include and filter" do
