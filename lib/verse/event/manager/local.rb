@@ -53,7 +53,7 @@ module Verse
         end
 
         def start
-          puts "start?"
+          logger.debug{ "Start with local event manager" }
         end
 
         def stop
@@ -77,8 +77,6 @@ module Verse
               next unless pattern.match?(channel)
 
               sub = subscribers.first
-
-              puts "found: #{sub.inspect}"
 
               if sub
                 sub.call(message, channel)
