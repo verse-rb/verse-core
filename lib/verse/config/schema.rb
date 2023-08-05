@@ -5,8 +5,8 @@ require_relative "../validation/contract"
 module Verse
   module Config
     class Schema < Verse::Validation::Contract
-      SERVICE_NAME = /[a-z0-9_-]+/.freeze
-      PLUGIN_NAME = /[a-z0-9_]+( <[a-zA-Z0-9:]+>)?/.freeze
+      SERVICE_NAME = /[a-z0-9_-]+/
+      PLUGIN_NAME = /[a-z0-9_]+( <[a-zA-Z0-9:]+>)?/
 
       params do
         required(:service_name).filled(:string)

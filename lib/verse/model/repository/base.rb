@@ -106,7 +106,7 @@ module Verse
 
         query
         def index(
-          filters,
+          filters = {},
           scope: scoped(:read),
           included: [],
           page: 1,
@@ -139,7 +139,7 @@ module Verse
         end
 
         protected def index_impl(
-          filters,
+          filters = {},
           scope: scoped(:read),
           included: [],
           page: 1,
@@ -154,7 +154,7 @@ module Verse
         end
 
         ## === Selectors throwing exceptions ===
-        def find_by!(filters, **opts)
+        def find_by!(filters = {}, **opts)
           record = find_by(filters, **opts)
 
           raise Verse::Error::RecordNotFound, filters.inspect unless record
@@ -182,11 +182,11 @@ module Verse
         end
 
         # Redefine if the adapter allow multiple connection for read or write.
-        def mode(_read_write)
+        def mode(_read_write, &_block)
           yield
         end
 
-        def chunked_index(filters, scope: scoped(:read), included: [], page: 1, items_per_page: 50, sort: nil)
+        def chunked_index(filters = {}, scope: scoped(:read), included: [], page: 1, items_per_page: 50, sort: nil)
           Verse::Util::Iterator.chunk_iterator page do |current_page|
             result = index(
               filters,
@@ -319,7 +319,7 @@ module Verse
           tree = tree_from_include_list included_list
 
           tree.each do |key, _value|
-            regexp = /^#{key}($|\.)/.freeze
+            regexp = /^#{key}($|\.)/
 
             sub_included = \
               included_list \
