@@ -182,7 +182,7 @@ module Verse
         end
 
         # Redefine if the adapter allow multiple connection for read or write.
-        def mode(_read_write, &block)
+        def mode(_read_write, &_block)
           yield
         end
 
@@ -319,7 +319,7 @@ module Verse
           tree = tree_from_include_list included_list
 
           tree.each do |key, _value|
-            regexp = /^#{key}($|\.)/.freeze
+            regexp = /^#{key}($|\.)/
 
             sub_included = \
               included_list \
