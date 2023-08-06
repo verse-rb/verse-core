@@ -61,7 +61,9 @@ module Verse
         event("deleted")
         def delete(id)
           id = find_by({ id: id }, scope: scoped(:delete))&.id
-          auth_context.reject! unless id
+
+          return false unless id
+
           delete_impl(id)
         end
 
