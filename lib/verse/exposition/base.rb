@@ -6,7 +6,8 @@ require_relative "../util/inject"
 module Verse
   module Exposition
     class Base
-      extend ClassMethods, Verse::Util::Inject
+      extend Verse::Util::Inject
+      extend ClassMethods
 
       attr_reader :auth_context, :current_action, :hook
 

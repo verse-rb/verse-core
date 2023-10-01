@@ -3,7 +3,6 @@
 module Verse
   module Util
     module Inject
-
       # Injects a module into the current object, this works like running
       # a macro on the current object, but has the ability to pass arguments
       # to the call.
