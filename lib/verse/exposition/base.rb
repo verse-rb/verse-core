@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
 require_relative "./class_methods"
+require_relative "../util/inject"
 
 module Verse
   module Exposition
     class Base
-      extend ClassMethods
+      extend ClassMethods, Verse::Util::Inject
 
       attr_reader :auth_context, :current_action, :hook
 
