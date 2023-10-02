@@ -38,9 +38,13 @@ module Verse
 
         def resource(name = nil)
           if name
+            if name =~ /\./
+              raise ArgumentError, "resource name cannot contain '.'"
+            end
+
             @resource = name
           else
-            @resource ||= [Verse.service_name, Verse.inflector.singularize(table)].join(".")
+            @resource ||= [Verse.service_name, Verse.inflector.singularize(table)].join(":")
           end
         end
 

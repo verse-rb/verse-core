@@ -99,10 +99,11 @@ module Verse
           query_count: true
         )
           query = filtering.filter_by(scope, filters, self.class.custom_filters)
-          query = query[items_per_page * (page - 1), items_per_page]
-          query ||= [] # in case we are out of bound, it returns nil :(
+          total_count = query.size
 
           if sort
+            sort = prepare_ordering(sort) if sort.is_a?(String)
+
             count = sort.size
 
             query = query.sort do |a, b|
@@ -110,28 +111,32 @@ module Verse
               sort.reduce(0) do |sum, (field, direction)|
                 field = field.to_sym
 
-                a = a[field.to_sym]
-                b = b[field.to_sym]
+                field_a = a[field.to_sym]
+                field_b = b[field.to_sym]
 
                 result = \
-                  if a.nil?
+                  if field_a.nil?
                     1
-                  elsif b.nil?
+                  elsif field_b.nil?
                     -1
                   else
-                    a <=> b
+                    field_a <=> field_b
                   end
 
                 result *= (1 << (count - x))
                 result = -result if direction == :desc
 
+                x+=1
                 sum + result
               end
             end
           end
 
+          query = query[items_per_page * (page - 1), items_per_page]
+          query ||= [] # in case we are out of bound, it returns nil :(
+
           metadata = {}
-          metadata[:count] = query.size if query_count
+          metadata[:count] = total_count if query_count
 
           [query, metadata]
         end
@@ -159,6 +164,23 @@ module Verse
             scope.custom? { |id| self.class.data.select{ |h| h[pkey] == id } }
           end
         end
+
+        def prepare_ordering(sort)
+          if !sort.is_a?(String)
+            # :nocov:
+            raise ArgumentError, "incorrect ordering parameter type (must be string)"
+            # :nocov:
+          end
+
+          sort.split(",").map do |x|
+            if x[0] == "-"
+              [x[1..], :desc]
+            else
+              [x, :asc]
+            end
+          end
+        end
+
       end
     end
   end
