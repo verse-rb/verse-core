@@ -3,8 +3,8 @@
 module Spec
   module Inject
     module BarFeature
-      def call(name:)
-        define_singleton_method(name) do
+      def call(obj, name:)
+        obj.define_singleton_method(name) do
           "bar"
         end
       end
