@@ -13,8 +13,8 @@ module Verse
       # @example
       #
       #   module BarFeature
-      #     def call(name:)
-      #       define_singleton_method(name) do
+      #     def call(module, name:)
+      #       module.define_singleton_method(name) do
       #         "bar" # define a new method on the receiver of the injection
       #       end
       #     end
@@ -33,7 +33,7 @@ module Verse
       # @param opts [Hash] the arguments to pass to the module's `call` method
       #
       def inject(mod, **opts)
-        mod.instance_method(:call).bind(self).call(**opts)
+        mod.instance_method(:call).bind(mod).call(self, **opts)
       end
     end
   end
