@@ -7,7 +7,8 @@ module Verse
     # Base class for your application services
     # @abstract
     class Base
-      extend ClassMethods, Verse::Util::Inject
+      extend Verse::Util::Inject
+      extend ClassMethods
 
       attr_reader :auth_context, :metadata
 

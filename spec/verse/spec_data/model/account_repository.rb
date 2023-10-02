@@ -31,7 +31,7 @@ module EmailEncoder
   end
 end
 
-class AccountRepository < InMemoryRepository
+class AccountRepository < Verse::Model::InMemory::Repository
   # Use custom primary key
   primary_key :user_id
 
