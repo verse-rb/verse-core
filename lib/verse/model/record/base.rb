@@ -67,8 +67,26 @@ module Verse
 
         # Return the fields to json
         # @return [String] The json string.
-        def to_json(*_args)
-          to_h.to_json
+        def to_json(*args)
+          h = {}
+
+          self.class.fields.each do |key, value|
+            name = value[:name] || key
+            next unless value[:visible]
+
+            h[name] = @fields[key.to_sym]
+          end
+
+          included.each do |x|
+            value = send(x.to_sym)
+
+            if !value && self.class.relations[x.to_sym].opts[:array]
+              value = []
+            end
+            h[x] = value
+          end
+
+          h.to_json(*args)
         end
 
         # Get the id of the record. `id` of the record is the primary key.
