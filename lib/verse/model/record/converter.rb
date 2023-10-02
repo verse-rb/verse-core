@@ -20,9 +20,14 @@ module Verse
         end
 
         add_converter(:any){ |obj| obj }
+
         add_converter(:string, &:to_s)
+        add_converter(String, &:to_s)
+
         add_converter(:uuid,   &:to_s)
+
         add_converter(:int,    &:to_i)
+        add_converter(Integer,    &:to_i)
 
         add_converter :json do |obj|
           case obj
