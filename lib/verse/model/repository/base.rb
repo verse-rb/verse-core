@@ -130,7 +130,7 @@ module Verse
 
           set = prepare_included(included, collection, record: record)
 
-          out = Verse::Util::ArrayWithMetadata.new(
+          Verse::Util::ArrayWithMetadata.new(
             collection.map{ |elm|
               record.new(
                 decode(elm), include_set: set
@@ -138,8 +138,6 @@ module Verse
             },
             metadata: metadata
           )
-
-          out
         end
 
         protected def index_impl(

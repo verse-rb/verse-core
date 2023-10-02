@@ -126,7 +126,7 @@ module Verse
                 result *= (1 << (count - x))
                 result = -result if direction == :desc
 
-                x+=1
+                x += 1
                 sum + result
               end
             end
@@ -180,7 +180,6 @@ module Verse
             end
           end
         end
-
       end
     end
   end
