@@ -27,7 +27,7 @@ module Verse
         add_converter(:uuid,   &:to_s)
 
         add_converter(:int,    &:to_i)
-        add_converter(Integer,    &:to_i)
+        add_converter(Integer, &:to_i)
 
         add_converter :json do |obj|
           case obj

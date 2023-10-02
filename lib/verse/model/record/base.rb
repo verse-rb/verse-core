@@ -77,8 +77,8 @@ module Verse
             h[name] = @fields[key.to_sym]
           end
 
-          self.included.each do |x|
-            value = self.send(x.to_sym)
+          included.each do |x|
+            value = send(x.to_sym)
 
             if !value && self.class.relations[x.to_sym].opts[:array]
               value = []
