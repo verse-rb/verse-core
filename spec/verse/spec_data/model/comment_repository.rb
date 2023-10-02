@@ -2,5 +2,5 @@
 
 require_relative "comment_record"
 
-class CommentRepository < InMemoryRepository
+class CommentRepository < Verse::Model::InMemory::Repository
 end
