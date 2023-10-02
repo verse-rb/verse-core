@@ -31,6 +31,13 @@ module Verse
         @delegated.send(method, *args, &block)
       end
 
+      def to_json(*opts)
+        {
+          data: @delegated,
+          metadata: @metadata
+        }.to_json(*opts)
+      end
+
       # delegate equality to delegated array
       def ==(other)
         @delegated == other || super

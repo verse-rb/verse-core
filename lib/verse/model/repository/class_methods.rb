@@ -38,9 +38,13 @@ module Verse
 
         def resource(name = nil)
           if name
+            if name =~ /\./
+              raise ArgumentError, "resource name cannot contain '.'"
+            end
+
             @resource = name
           else
-            @resource ||= [Verse.service_name, Verse.inflector.singularize(table)].join(".")
+            @resource ||= [Verse.service_name, Verse.inflector.singularize(table)].join(":")
           end
         end
 
@@ -90,7 +94,7 @@ module Verse
             mode(:rw) do
               name ||= Verse.inflector.inflect_past(method_name)
 
-              event_path = [self.class.resource, name].join(".")
+              event_path = [self.class.resource, name].join(":")
 
               transaction do
                 result = nil
