@@ -94,7 +94,7 @@ module Verse
             mode(:rw) do
               name ||= Verse.inflector.inflect_past(method_name)
 
-              event_path = [self.class.resource, name].join(".")
+              event_path = [self.class.resource, name].join(":")
 
               transaction do
                 result = nil

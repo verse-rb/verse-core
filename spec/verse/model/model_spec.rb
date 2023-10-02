@@ -95,7 +95,7 @@ RSpec.describe Verse::Model::Repository::Base do
 
     it "emits events on create" do
       expect(Verse).to receive(:publish).with(
-        "verse_spec.user.created",
+        "verse_spec:user:created",
         { args: [name: "Joe"], metadata: {}, resource_id: "103" }
       )
 
@@ -104,7 +104,7 @@ RSpec.describe Verse::Model::Repository::Base do
 
     it "emit events on update" do
       expect(Verse).to receive(:publish).with(
-        "verse_spec.user.updated",
+        "verse_spec:user:updated",
         { args: [{ name: "John Doe" }], metadata: {}, resource_id: "101" }
       )
 
