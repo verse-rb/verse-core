@@ -4,7 +4,7 @@ module Verse
   module Model
     module Repository
       module ClassMethods
-        attr_writer :model_class
+        attr_writer :model_class, :table
         attr_accessor :custom_filters, :encoders
 
         include Verse::Util
@@ -29,9 +29,8 @@ module Verse
         end
 
         # Set a custom name for the table/namespace used by this repository.
-        def table(name = nil)
-          @table = name if name
-          @table || Verse.inflector.pluralize(
+        def table
+          @table ||= Verse.inflector.pluralize(
             StringUtil.underscore(self.name).gsub(/_repository$/, "")
           )
         end

@@ -79,7 +79,7 @@ RSpec.describe Verse::Model::Repository::Base do
     end
 
     it "can be overriden" do
-      UserRepository.table "custom_users"
+      UserRepository.table = "custom_users"
       expect(UserRepository.table).to eq("custom_users")
     end
   end
