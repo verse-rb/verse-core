@@ -1,0 +1,10 @@
+# TypeProf 0.21.1
+
+# Classes
+module Verse
+  module Util
+    module Inject
+      def inject: (Module mod, **any kvargs) -> void
+    end
+  end
+end

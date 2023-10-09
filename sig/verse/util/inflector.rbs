@@ -1,0 +1,20 @@
+# TypeProf 0.21.1
+
+# Classes
+module Verse
+  module Util
+    class Inflector
+      PAST_TENSE_EXCEPTIONS: Hash[String, String]
+      PLURAL_EXCEPTIONS: Hash[String, String]
+
+      @verb_exceptions: Hash[String, String]
+      @plural_exceptions: Hash[String, String]
+      @singular_exceptions: Hash[String, String]
+
+      def initialize: (?Hash[String, String] verb_exceptions, ?Hash[String, String] plural_exceptions) -> void
+      def pluralize: (String word, ?Integer count) -> String
+      def singularize: (String word) -> String
+      def inflect_past: (String verb) -> String
+    end
+  end
+end

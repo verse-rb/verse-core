@@ -1,0 +1,22 @@
+# TypeProf 0.21.1
+
+# Classes
+module Verse
+  module Util
+    class Future[T]
+      @thread: Thread
+      @result: T?
+      @done: bool
+
+      def initialize: () { () -> T } -> void
+      def success?: -> bool
+      def done?: -> bool
+      def error?: -> bool
+
+      attr_reader error: ?RuntimeError
+
+      def wait: -> ?T
+      def cancel: -> void
+    end
+  end
+end

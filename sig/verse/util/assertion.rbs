@@ -1,0 +1,12 @@
+# TypeProf 0.21.1
+
+# Classes
+module Verse
+  module Util
+    module Assertion
+      extend Assertion
+
+      def assert: (bool test, ?nil message, ?singleton(RuntimeError) klass) -> nil
+    end
+  end
+end

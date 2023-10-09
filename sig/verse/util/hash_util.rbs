@@ -1,0 +1,12 @@
+# TypeProf 0.21.1
+
+# Classes
+module Verse
+  module Util
+    module HashUtil
+      extend HashUtil
+
+      def deep_symbolize_keys: (Hash[any, any] value) -> Hash[Symbol, any]
+    end
+  end
+end
