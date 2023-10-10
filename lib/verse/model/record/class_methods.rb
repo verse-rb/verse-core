@@ -238,8 +238,8 @@ module Verse
         # @param name [Symbol] the name (method) of the field
         # @param type [Symbol] the type of the field (optional, any by default)
         # @param key [Symbol] the key of the field. key map to a column name (optional, name by default)
-        # @param primary [Boolean] if the field is the primary key
-        # @param visible [Boolean] if the field is visible in the record
+        # @param primary [Boolean] whether the field is the primary key of the record
+        # @param visible [Boolean] whether the field should be exported in serialization
         #
         # @param block [Proc] optional block to call as getter for the field.
         # @example
