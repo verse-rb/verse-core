@@ -31,7 +31,7 @@ module Verse
         # Set a custom name for the table/namespace used by this repository.
         def table
           @table ||= Verse.inflector.pluralize(
-            StringUtil.underscore(self.name).gsub(/_repository$/, "")
+            StringUtil.underscore(name).gsub(/_repository$/, "")
           )
         end
 

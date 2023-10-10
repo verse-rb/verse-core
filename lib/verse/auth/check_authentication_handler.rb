@@ -6,7 +6,6 @@ module Verse
   module Auth
     # Check if the authorization context has been checked.
     class CheckAuthenticationHandler < Verse::Exposition::Handler
-
       def disabled
         disabled = @disabled
         @disabled = true
