@@ -6,10 +6,19 @@ module Verse
   module Auth
     # Check if the authorization context has been checked.
     class CheckAuthenticationHandler < Verse::Exposition::Handler
+
+      def disabled
+        disabled = @disabled
+        @disabled = true
+        yield
+      ensure
+        @disabled = disabled
+      end
+
       def call
         output = call_next
 
-        return output if exposition.auth_context.checked?
+        return output if @disabled || exposition.auth_context.checked?
 
         raise Error::Authorization,
               "The authorization context " \

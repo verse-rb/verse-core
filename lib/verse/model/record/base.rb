@@ -12,8 +12,8 @@ module Verse
       #   end
       # @abstract
       class Base
-        @record_root_path       = "App::Model"
-        @repositories_root_path = "App::Model"
+        @record_root_path       = "Model"
+        @repositories_root_path = "Model"
 
         attr_reader :relations, :fields, :included
 
