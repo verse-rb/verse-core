@@ -28,8 +28,8 @@ module Verse
 
           @fields = {}
 
-          self.class.fields.each_key do |key|
-            @fields[key.to_sym] = fields[key.to_sym]
+          self.class.fields.each_value do |value|
+            @fields[value[:key].to_sym] = fields[value[:key].to_sym]
           end
           @fields.freeze
 

@@ -257,7 +257,7 @@ module Verse
         #  end
         def field(name, type: :any, key: nil, primary: false, visible: true, &block)
           key ||= name.to_sym
-          @fields[key] = { name: name, type: type, visible: visible }
+          @fields[key] = { name: name, key: key, type: type, visible: visible }
 
           if primary
             raise "field: primary key already defined: #{@primary_key}" if @primary_key
