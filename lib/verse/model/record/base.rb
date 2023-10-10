@@ -28,7 +28,7 @@ module Verse
 
           @fields = {}
 
-          self.class.fields.keys.each do |key|
+          self.class.fields.each_key do |key|
             @fields[key.to_sym] = fields[key.to_sym]
           end
           @fields.freeze
