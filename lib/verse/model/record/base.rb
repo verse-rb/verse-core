@@ -25,7 +25,14 @@ module Verse
         def initialize(fields, include_set: nil)
           @relations  = {}
           @included   = include_set&.included || []
-          @fields = fields.slice(*self.class.fields.keys.map(&:to_sym)).freeze
+
+          @fields = {}
+
+          self.class.fields.each_value do |value|
+            value = value[:key].to_sym
+            @fields[value] = fields[value]
+          end
+          @fields.freeze
 
           return unless include_set
 
