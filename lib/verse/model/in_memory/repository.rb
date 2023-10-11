@@ -60,11 +60,17 @@ module Verse
         end
 
         def create_impl(attributes)
+          attributes = attributes.transform_keys(&:to_sym)
           self.class.id_sequence += 1
 
           id_sequence = self.class.id_sequence
 
-          row = { self.class.primary_key => id_sequence }.merge(attributes)
+          row = { self.class.primary_key.to_sym => id_sequence }.merge(attributes)
+          pkey = row[self.class.primary_key.to_sym]
+
+          if self.class.data.any?{ |h| h[self.class.primary_key] == pkey }
+            raise "duplicate id: #{row[self.class.primary_key.to_sym]}"
+          end
 
           self.class.data << row
 
