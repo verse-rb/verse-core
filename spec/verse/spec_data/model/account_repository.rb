@@ -33,7 +33,7 @@ end
 
 class AccountRepository < Verse::Model::InMemory::Repository
   # Use custom primary key
-  primary_key :user_id
+  self.primary_key = :user_id
 
   encoder :email, EmailEncoder
 end

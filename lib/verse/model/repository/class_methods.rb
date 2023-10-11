@@ -4,7 +4,7 @@ module Verse
   module Model
     module Repository
       module ClassMethods
-        attr_writer :model_class, :table
+        attr_writer :model_class, :table, :primary_key
         attr_accessor :custom_filters, :encoders
 
         include Verse::Util
@@ -186,11 +186,7 @@ module Verse
           @next_method_mode = nil
         end
 
-        def primary_key(value = nil)
-          if value
-            @primary_key = value
-          end
-
+        def primary_key
           @primary_key ||= :id
         end
       end
