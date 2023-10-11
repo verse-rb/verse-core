@@ -69,15 +69,13 @@ module Verse
         # Get the raw fields of the record.
         # @return [Hash] The fields of the record.
         def to_h(only_visible=false)
-          h = @fields.dup
-
           if only_visible
-            h = h.select do |key, _value|
+            @fields.select do |key, _value|
               self.class.fields[key][:visible]
             end
+          else
+            @fields.dup
           end
-
-          h
         end
 
         # Return the fields to json

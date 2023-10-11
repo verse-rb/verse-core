@@ -11,6 +11,8 @@ class PostRecord < Verse::Model::Record::Base
   field :title, type: :string
   field :content, type: :string
 
+  field :secret_field, type: :string, visible: false
+
   belongs_to :user
   has_many :comments
 end
