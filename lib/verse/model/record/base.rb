@@ -68,7 +68,8 @@ module Verse
 
         # Get the raw fields of the record.
         # @return [Hash] The fields of the record.
-        def to_h(only_visible=false)
+        # rubocop:disable Style/OptionalBooleanParameter
+        def to_h(only_visible = false)
           if only_visible
             @fields.select do |key, _value|
               self.class.fields[key][:visible]
@@ -77,6 +78,7 @@ module Verse
             @fields.dup
           end
         end
+        # rubocop:enable Style/OptionalBooleanParameter
 
         # Return the fields to json
         # @return [String] The json string.
