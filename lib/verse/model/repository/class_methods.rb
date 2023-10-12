@@ -145,6 +145,10 @@ module Verse
                     result = method.bind(self).call(*args)
 
                     unless @disable_event
+                      event_path = [self.class.resource, name].join(":")
+
+                      @event_cause = event_path
+
                       after_commit do
                         Verse.publish(
                           event_path, {
