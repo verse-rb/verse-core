@@ -75,7 +75,7 @@ module Verse
         #     belongs_to :author, repository: "UserRepository", if: ->(author) { author[:type] != "bot" }
         #   end
         #
-        def belongs_to(relation_name, primary_key: nil, foreign_key: nil, repository: nil, record: nil, **opts)
+        def belongs_to(relation_name, primary_key: nil, foreign_key: nil, repository: nil, record: nil, filters: {}, **opts)
           foreign_key ||= "#{relation_name}_id"
 
           root = name.split(/::[^:]+$/).first
@@ -99,7 +99,8 @@ module Verse
                   pkey_info = record.fields.fetch(primary_key){ raise "primary key name not found: `#{primary_key}`" }
 
                   Verse::Model::Record::Converter.convert(x[foreign_key.to_sym], pkey_info[:type])
-                }.compact
+                }.compact,
+                **filters
               },
               included: sub_included,
               record: record
@@ -138,7 +139,7 @@ module Verse
         #     has_many :published_posts, foreign_key: :author_id, if: ->(x) { x[:status] == "published" }
         #   end
         #
-        def has_many(relation_name, primary_key: nil, foreign_key: nil, repository: nil, record: nil, **opts) # rubocop:disable Naming/PredicateName
+        def has_many(relation_name, primary_key: nil, foreign_key: nil, repository: nil, record: nil, filters: {}, **opts) # rubocop:disable Naming/PredicateName
           foreign_key ||= "#{Verse.inflector.singularize(type)}_id"
 
           root = name.split(/::[^:]+$/).first
@@ -165,7 +166,8 @@ module Verse
                     x[primary_key.to_sym],
                     pkey_info[:type]
                   )
-                }.compact
+                }.compact,
+                **filters
               },
               included: sub_included,
               record: record
@@ -187,7 +189,7 @@ module Verse
           end
         end
 
-        def has_one(relation_name, primary_key: nil, foreign_key: nil, repository: nil, **opts) # rubocop:disable Naming/PredicateName
+        def has_one(relation_name, primary_key: nil, foreign_key: nil, repository: nil, filters: {}, **opts) # rubocop:disable Naming/PredicateName
           foreign_key ||= "#{Verse.inflector.singularize(type)}_id".to_sym
           primary_key ||= self.primary_key.to_sym
 
@@ -212,7 +214,8 @@ module Verse
                     x[primary_key],
                     pkey_info[:type]
                   )
-                }.compact
+                }.compact,
+                **filters
               },
               included: sub_included
             )
