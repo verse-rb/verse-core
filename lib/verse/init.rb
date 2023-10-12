@@ -27,16 +27,21 @@ module Verse
       logger: logger,
       config_path: config_path
     )
+    logger.info{ "init sequence... `#{mode}` mode" }
 
     initialize_event_manager!
 
     @started = true
+
+    logger.info{ "running post-init callbacks" }
     @on_boot_callbacks&.each(&:call)
     @on_boot_callbacks&.clear
 
     Verse::I18n.load_i18n
 
+    logger.info{ "notifying plugins start" }
     Verse::Plugin.start(mode)
+    logger.info{ "verse startup sequence completed" }
   end
 
   def initialize_event_manager!

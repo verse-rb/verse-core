@@ -111,14 +111,14 @@ module Verse
 
       dependencies = plugin.fetch(:dep, {})
 
-      logger.debug{ "Plugin `#{name}`: Initializing plugin" }
+      logger.debug{ "Plugin `#{name}`: init plugin" }
 
       plugin_class = Reflection.constantize(type)
       plugin = plugin_class.new(name.to_s, config, dependencies, logger)
 
       register_plugin(plugin)
 
-      logger.debug{ "Plugin `#{name}`: Initializing done" }
+      logger.debug{ "Plugin `#{name}`: init sequence completed" }
     rescue StandardError => e
       logger.fatal(e)
       exit(-1)

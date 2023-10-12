@@ -93,8 +93,6 @@ module Verse
             mode(:rw) do
               name ||= Verse.inflector.inflect_past(method_name)
 
-              event_path = [self.class.resource, name].join(":")
-
               transaction do
                 result = nil
 
@@ -115,8 +113,6 @@ module Verse
                   metadata = @metadata.dup # duplicate because we might change metadata before commit.
                   metadata.merge!(cause: @event_cause) if @event_cause
 
-                  @event_cause = event_path
-
                   if creation
                     result = method.bind(self).call(*args)
 
@@ -126,6 +122,10 @@ module Verse
                     end
 
                     unless @disable_event
+                      event_path = [self.class.resource, name].join(":")
+
+                      @event_cause = event_path
+
                       after_commit do
                         Verse.publish(
                           event_path, {
@@ -145,6 +145,10 @@ module Verse
                     result = method.bind(self).call(*args)
 
                     unless @disable_event
+                      event_path = [self.class.resource, name].join(":")
+
+                      @event_cause = event_path
+
                       after_commit do
                         Verse.publish(
                           event_path, {
