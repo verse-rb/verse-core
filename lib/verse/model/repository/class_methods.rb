@@ -113,7 +113,6 @@ module Verse
                   metadata = @metadata.dup # duplicate because we might change metadata before commit.
                   metadata.merge!(cause: @event_cause) if @event_cause
 
-
                   if creation
                     result = method.bind(self).call(*args)
 
