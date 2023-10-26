@@ -24,7 +24,10 @@ module Verse
         if value
           @http_code = value
         else
-          @http_code || 500
+          return @http_code  if @http_code
+
+          inherited_code = ancestors.lazy.select{ |x| x!=self }.find{ |x| x.respond_to?(:http_code) }&.http_code
+          return inherited_code || 500
         end
       end
 
@@ -32,7 +35,10 @@ module Verse
         if message
           @message = message
         else
-          @message || "verse.errors.server_error"
+          return @message if @message
+
+          inherited_message = ancestors.lazy.select{ |x| x!=self }.find{ |x| x.respond_to?(:message) }&.message
+          return inherited_message || "verse.errors.server_error"
         end
       end
     end
