@@ -35,7 +35,7 @@ RSpec.describe Verse::Model::Repository::Base do
     @users.no_event{ |r|
       id_john = r.create(name: "John")
       id_jane = r.create(name: "Jane")
-      id_toto = r.create(name: "Toto")
+      r.create(name: "Toto")
     }
 
     @accounts.no_event{ |r|
