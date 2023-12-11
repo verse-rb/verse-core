@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
   DESC
 
   spec.homepage = "https://github.com/verse.rb/core"
-  spec.required_ruby_version = ">= 3.0.0"
+  spec.required_ruby_version = ">= 2.7.1"
 
   spec.metadata["allowed_push_host"] = ""
 
@@ -45,7 +45,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "dry-logic", "~> 1.3.0"
 
-  spec.add_dependency "thor", "~> 1.2.1"
+  spec.add_dependency "thor", ">= 1.2.1"
 
-  spec.add_dependency "i18n", "~> 1.10.0"
+  spec.add_dependency "i18n", ">= 0.7", "< 2"
 end
