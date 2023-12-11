@@ -19,6 +19,10 @@ module Verse
           @converters[type] = block
         end
 
+        def has_converter?(type)
+          @converters.key?(type)
+        end
+
         add_converter(:any){ |obj| obj }
 
         add_converter(:string, &:to_s)

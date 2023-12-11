@@ -260,6 +260,9 @@ module Verse
         #  end
         def field(name, type: :any, key: nil, primary: false, visible: true, &block)
           key ||= name.to_sym
+
+          raise "type unknown: #{type}" unless Converter.has_converter?(type)
+
           @fields[key] = { name: name, key: key, type: type, visible: visible }
 
           if primary
