@@ -335,7 +335,7 @@ module Verse
             # ->(included) { included[primary_key.to_s] },      # The index where to store in the set
             # ->(record, set) { set[record[foreign_key.to_s]] } # the method to reconnect the set
             list, index_callback, record_callback = relation.call(
-              collection, auth_context, sub_included
+              collection, Auth::Context[:system], sub_included
             )
 
             set.set_lookup_method([record, key], &record_callback)
