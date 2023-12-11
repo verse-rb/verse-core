@@ -35,6 +35,7 @@ RSpec.describe Verse::Model::Repository::Base do
     @users.no_event{ |r|
       id_john = r.create(name: "John")
       id_jane = r.create(name: "Jane")
+      r.create(name: "Toto")
     }
 
     @accounts.no_event{ |r|
@@ -96,7 +97,7 @@ RSpec.describe Verse::Model::Repository::Base do
     it "emits events on create" do
       expect(Verse).to receive(:publish).with(
         "verse_spec:user:created",
-        { args: [name: "Joe"], metadata: {}, resource_id: "103" }
+        { args: [name: "Joe"], metadata: {}, resource_id: "104" }
       )
 
       @users.create(name: "Joe")
@@ -212,7 +213,7 @@ RSpec.describe Verse::Model::Repository::Base do
       users = @users.index({})
 
       expect(users).to be_a(Verse::Util::ArrayWithMetadata)
-      expect(users.size).to eq(2)
+      expect(users.size).to eq(3)
       expect(users.first).to be_a(UserRecord)
     end
 
@@ -232,14 +233,14 @@ RSpec.describe Verse::Model::Repository::Base do
     it "can index using sort" do
       users = @users.index({}, sort: { name: :asc })
 
-      expect(users.length).to eq(2)
+      expect(users.length).to eq(3)
       expect(users.first.id).to eq(102)
     end
 
     it "can index using include" do
       users = @users.index({}, included: ["account"])
 
-      expect(users.length).to eq(2)
+      expect(users.length).to eq(3)
       expect(users.first.account).to be_a(AccountRecord)
     end
 
@@ -251,6 +252,12 @@ RSpec.describe Verse::Model::Repository::Base do
       expect(posts.first.comments).to be_a(Array)
       expect(posts.first.user.account).to be_a(AccountRecord)
       expect(posts.first.user.account.active?).to be true
+    end
+
+    it "can index using nested includes + has_many/has_one (empty relations)" do
+      toto_posts = @users.find_by({ name: "Toto" }, included: ["posts.comments"])
+      expect(toto_posts.posts).to be_a(Array)
+      expect(toto_posts.posts.length).to eq(0)
     end
 
     it "can fetch included of type belongs_to" do
@@ -295,7 +302,7 @@ RSpec.describe Verse::Model::Repository::Base do
 
       # It's a very quick test, as we already test the
       # chunked iterator in the util spec folder.
-      expect(@users.chunked_index({}).to_a.size).to eq 102
+      expect(@users.chunked_index({}).to_a.size).to eq 103
     end
   end
 end

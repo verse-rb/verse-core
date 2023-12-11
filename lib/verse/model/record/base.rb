@@ -36,16 +36,22 @@ module Verse
 
           return unless include_set
 
-          self.class.relations.each do |name, _relation|
+          self.class.relations.each do |name, relation|
             lookup_method = include_set.get_lookup_method([self.class, name.to_s])
 
             next unless lookup_method
 
             idx = lookup_method.call(self)
 
-            @relations[name] = include_set.get(
+            model = include_set.get(
               [self.class, name.to_s], idx
             )
+
+            if model.nil?
+              model = relation.opts[:array] ? [] : nil
+            end
+
+            @relations[name] = model
           end
 
           @relations.freeze

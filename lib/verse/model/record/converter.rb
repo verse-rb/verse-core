@@ -19,6 +19,12 @@ module Verse
           @converters[type] = block
         end
 
+        # rubocop:disable Naming/PredicateName
+        def has_converter?(type)
+          @converters.key?(type)
+        end
+        # rubocop:enable Naming/PredicateName
+
         add_converter(:any){ |obj| obj }
 
         add_converter(:string, &:to_s)
