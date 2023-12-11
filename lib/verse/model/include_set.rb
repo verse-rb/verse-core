@@ -6,7 +6,7 @@ module Verse
     # Included data are records related to the current model via
     # belongs_to, has_one or has_many associations.
     class IncludeSet
-      attr_reader :included
+      attr_reader :included, :object_table, :lookup_method_table
 
       def initialize(included)
         @included = included
@@ -25,6 +25,15 @@ module Verse
 
         @object_table[key] ||= []
         @object_table[key] << data
+
+        self
+      end
+
+      def add_collection(namespace, id, array)
+        key = [namespace, id]
+
+        @object_table[key] ||= []
+        @object_table[key] += array
 
         self
       end
