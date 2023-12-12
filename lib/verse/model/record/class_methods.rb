@@ -174,7 +174,6 @@ module Verse
               record: record
             )
 
-
             [
               included,
               lambda do |inc_record|
@@ -223,7 +222,6 @@ module Verse
               included: sub_included,
               record: record
             )
-
 
             [
               included,
