@@ -36,6 +36,8 @@ module Verse
           @relations[name] = Relation.new(name, array: array, &block)
 
           define_method(name) do
+            raise "relation `#{name}` is not loaded" unless @local_included.include?(name.to_s)
+
             if array
               @relations[name.to_sym]
             else

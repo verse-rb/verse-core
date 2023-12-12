@@ -15,7 +15,7 @@ module Verse
         @record_root_path       = "Model"
         @repositories_root_path = "Model"
 
-        attr_reader :relations, :fields, :included
+        attr_reader :relations, :fields, :included, :local_included
 
         # Initialize a new record. Include set is used to append the relations to
         # the record.
@@ -25,6 +25,7 @@ module Verse
         def initialize(fields, include_set: nil)
           @relations  = {}
           @included   = include_set&.included || []
+          @local_included = @included.map{ |x| x.split(".").first }.uniq
 
           @fields = {}
 
@@ -47,9 +48,7 @@ module Verse
               [self.class, name.to_s], idx
             )
 
-            if model.nil?
-              model = relation.opts[:array] ? [] : nil
-            end
+            model ||= relation.opts[:array] ? [] : nil
 
             @relations[name] = model
           end
@@ -100,10 +99,6 @@ module Verse
 
           included.each do |x|
             value = send(x.to_sym)
-
-            if !value && self.class.relations[x.to_sym].opts[:array]
-              value = []
-            end
             h[x] = value
           end
 
