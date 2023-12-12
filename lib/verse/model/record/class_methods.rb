@@ -78,8 +78,6 @@ module Verse
         #   end
         #
         def belongs_to(relation_name, primary_key: nil, foreign_key: nil, repository: nil, record: nil, filters: {}, **opts)
-          foreign_key ||= "#{relation_name}_id"
-
           root = name.split(/::[^:]+$/).first
           repository ||= "#{root}::#{StringUtil.camelize(relation_name.to_s)}Repository"
 
@@ -87,7 +85,9 @@ module Verse
             repository = Reflection.constantize(repository) if repository.is_a?(String)
             record ||= repository.model_class
             record = Reflection.constantize(record) if record.is_a?(String)
+
             primary_key ||= record.primary_key
+            foreign_key ||= "#{relation_name}_#{repository.primary_key}"
 
             included = repository.new(
               auth_context
@@ -115,7 +115,7 @@ module Verse
                   raise "[belongs_to #{name}:#{relation_name}] primary key not found: #{primary_key}"
                 end.to_s
               end, # Create index key
-              lambda do |inc_record| # Acces index key
+              lambda do |inc_record| # Access index key
                 inc_record.fetch(foreign_key.to_s) do
                   raise "[belongs_to #{name}:#{relation_name}] foreign key not found: #{foreign_key}"
                 end.to_s
@@ -142,8 +142,6 @@ module Verse
         #   end
         #
         def has_many(relation_name, primary_key: nil, foreign_key: nil, repository: nil, record: nil, filters: {}, **opts) # rubocop:disable Naming/PredicateName
-          foreign_key ||= "#{Verse.inflector.singularize(type)}_id"
-
           root = name.split(/::[^:]+$/).first
           repository ||= "#{root}::#{StringUtil.camelize(Verse.inflector.singularize(relation_name.to_s))}Repository"
 
@@ -151,7 +149,8 @@ module Verse
             repository = Reflection.constantize(repository) if repository.is_a?(String)
             record ||= repository.model_class
             record = Reflection.constantize(record) if record.is_a?(String)
-            primary_key ||= record.primary_key
+            primary_key ||= self.primary_key
+            foreign_key ||= [Verse.inflector.singularize(type), self.primary_key].join("_")
 
             included = repository.new(
               auth_context
@@ -162,7 +161,7 @@ module Verse
                   next if condition && !condition.call(x)
 
                   # check key_type using model structure
-                  pkey_info = record.fields[primary_key]
+                  pkey_info = record.fields[foreign_key.to_sym]
 
                   Verse::Model::Record::Converter.convert(
                     x[primary_key.to_sym],
@@ -175,16 +174,17 @@ module Verse
               record: record
             )
 
+
             [
               included,
               lambda do |inc_record|
                 inc_record.fetch(foreign_key.to_s) do
-                  raise "[belongs_to #{name}:#{relation_name}] primary key not found: #{foreign_key}"
+                  raise "[has_many #{name}:#{relation_name}] primary key not found: #{foreign_key}"
                 end.to_s
               end, # Create index key
-              lambda do |inc_record| # Acces index key
+              lambda do |inc_record| # Access index key
                 inc_record.fetch(primary_key.to_s) do
-                  raise "[belongs_to #{name}:#{relation_name}] foreign key not found: #{primary_key}"
+                  raise "[has_many #{name}:#{relation_name}] foreign key not found: #{primary_key}"
                 end.to_s
               end
             ]
@@ -192,15 +192,15 @@ module Verse
         end
 
         def has_one(relation_name, primary_key: nil, foreign_key: nil, repository: nil, filters: {}, **opts) # rubocop:disable Naming/PredicateName
-          foreign_key ||= "#{Verse.inflector.singularize(type)}_id".to_sym
-          primary_key ||= self.primary_key.to_sym
-
           root = name.split(/::[^:]+$/).first
-
-          repository ||= "#{root}::#{StringUtil.camelize(relation_name.to_s)}Repository"
+          repository ||= "#{root}::#{StringUtil.camelize(Verse.inflector.singularize(relation_name.to_s))}Repository"
 
           relation relation_name, array: false do |collection, auth_context, sub_included|
             repository = Reflection.constantize(repository) if repository.is_a?(String)
+            record ||= repository.model_class
+            record = Reflection.constantize(record) if record.is_a?(String)
+            primary_key ||= self.primary_key
+            foreign_key ||= [Verse.inflector.singularize(type), self.primary_key].join("_")
 
             included = repository.new(
               auth_context
@@ -210,28 +210,31 @@ module Verse
                   condition = opts[:if]
                   next if condition && !condition.call(x)
 
-                  pkey_info = fields[primary_key]
+                  # check key_type using model structure
+                  pkey_info = record.fields[foreign_key.to_sym]
 
                   Verse::Model::Record::Converter.convert(
-                    x[primary_key],
+                    x[primary_key.to_sym],
                     pkey_info[:type]
                   )
                 }.compact,
                 **filters
               },
-              included: sub_included
+              included: sub_included,
+              record: record
             )
+
 
             [
               included,
               lambda do |inc_record|
                 inc_record.fetch(foreign_key.to_s) do
-                  raise "[belongs_to #{name}:#{relation_name}] primary key not found: #{foreign_key}"
+                  raise "[has_one #{name}:#{relation_name}] primary key not found: #{foreign_key}"
                 end.to_s
               end, # Create index key
-              lambda do |record| # Acces index key
-                record.fetch(primary_key.to_s) do
-                  raise "[belongs_to #{name}:#{relation_name}] foreign key not found: #{primary_key}"
+              lambda do |inc_record| # Access index key
+                inc_record.fetch(primary_key.to_s) do
+                  raise "[has_one #{name}:#{relation_name}] foreign key not found: #{primary_key}"
                 end.to_s
               end
             ]

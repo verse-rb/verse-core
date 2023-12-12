@@ -69,7 +69,7 @@ module Verse
           pkey = row[self.class.primary_key.to_sym]
 
           if self.class.data.any?{ |h| h[self.class.primary_key] == pkey }
-            raise "duplicate id: #{row[self.class.primary_key.to_sym]}"
+            raise "duplicate id: #{row[self.class.primary_key.to_sym]} (#{pkey})"
           end
 
           self.class.data << row

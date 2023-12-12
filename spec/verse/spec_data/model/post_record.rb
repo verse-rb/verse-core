@@ -7,6 +7,7 @@ class PostRecord < Verse::Model::Record::Base
   field :id, primary: true, type: :int
 
   field :user_id
+  field :category_name
 
   field :title, type: :string
   field :content, type: :string
@@ -14,5 +15,7 @@ class PostRecord < Verse::Model::Record::Base
   field :secret_field, type: :string, visible: false
 
   belongs_to :user
+  belongs_to :category
+
   has_many :comments
 end
