@@ -47,7 +47,8 @@ RSpec.describe Verse::Model::Record::Base do
         user_id: 1,
         title: "Hello",
         content: "World",
-        secret_field: "Foo Bar"
+        secret_field: "Foo Bar",
+        category_name: nil
       }
     )
 
@@ -56,7 +57,8 @@ RSpec.describe Verse::Model::Record::Base do
         id: 1,
         user_id: 1,
         title: "Hello",
-        content: "World"
+        content: "World",
+        category_name: nil,
       }
     )
   end
@@ -89,8 +91,9 @@ RSpec.describe Verse::Model::Record::Base do
     expect(record.to_json).to eq({
       id: 1,
       user_id: 1,
+      category_name: nil,
       title: "Hello",
-      content: "World"
+      content: "World",
     }.to_json)
   end
 end

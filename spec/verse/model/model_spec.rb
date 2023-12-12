@@ -4,6 +4,7 @@ require_relative "../spec_data/model/post_repository"
 require_relative "../spec_data/model/user_repository"
 require_relative "../spec_data/model/comment_repository"
 require_relative "../spec_data/model/account_repository"
+require_relative "../spec_data/model/category_repository"
 require_relative "../spec_data/dummy_event_manager"
 
 # Test both repositories and records
@@ -15,11 +16,13 @@ RSpec.describe Verse::Model::Repository::Base do
     UserRepository.clear
     CommentRepository.clear
     AccountRepository.clear
+    CategoryRepository.clear
 
     PostRepository.id_sequence = 0
     UserRepository.id_sequence = 100
     CommentRepository.id_sequence = 200
     AccountRepository.id_sequence = 300
+    CategoryRepository.id_sequence = 400
 
     @auth_context = Verse::Auth::Context[:system]
 
@@ -28,6 +31,7 @@ RSpec.describe Verse::Model::Repository::Base do
     @posts = PostRepository.new(@auth_context)
     @accounts = AccountRepository.new(@auth_context)
     @comments = CommentRepository.new(@auth_context)
+    @categories = CategoryRepository.new(@auth_context)
 
     id_john = nil
     id_jane = nil
@@ -36,6 +40,11 @@ RSpec.describe Verse::Model::Repository::Base do
       id_john = r.create(name: "John")
       id_jane = r.create(name: "Jane")
       r.create(name: "Toto")
+    }
+
+    @categories.no_event{ |r|
+      r.create(name: "Ruby")
+      r.create(name: "Rails")
     }
 
     @accounts.no_event{ |r|
@@ -56,8 +65,8 @@ RSpec.describe Verse::Model::Repository::Base do
     id_post2 = nil
 
     @posts.no_event{ |_r|
-      id_post1 = @posts.create(title: "Hello", user_id: id_john)
-      id_post2 = @posts.create(title: "World", user_id: id_jane)
+      id_post1 = @posts.create(title: "Hello", user_id: id_john, category_name: "Ruby")
+      id_post2 = @posts.create(title: "World", user_id: id_jane, category_name: "Rails")
     }
 
     @comments.no_event{ |r|
@@ -258,6 +267,20 @@ RSpec.describe Verse::Model::Repository::Base do
       toto_posts = @users.find_by({ name: "Toto" }, included: ["posts.comments"])
       expect(toto_posts.posts).to be_a(Array)
       expect(toto_posts.posts.length).to eq(0)
+    end
+
+    it "can fetch belongs_to relations using non-id primary key" do
+      posts = @posts.index({}, included: ["category"])
+
+      expect(posts.length).to eq(2)
+      expect(posts.first.category).to be_a(CategoryRecord)
+    end
+
+    it "can fetch has_many relations using non-id primary key" do
+      categories = @categories.index({}, included: ["posts"])
+
+      expect(categories.length).to eq(2)
+      expect(categories.first.posts).to be_a(Array)
     end
 
     it "can fetch included of type belongs_to" do
