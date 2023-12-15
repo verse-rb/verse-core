@@ -25,7 +25,7 @@ module Verse
         def initialize(fields, include_set: nil)
           @relations  = {}
           @included   = include_set&.included || []
-          @local_included = @included.map{ |x| x.split(".").first }.uniq
+          @local_included = @included.map{ |x| x.to_s.split(".").first }.uniq
 
           @fields = {}
 
