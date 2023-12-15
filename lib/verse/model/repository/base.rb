@@ -73,6 +73,10 @@ module Verse
           # :nocov:
         end
 
+        def find(id, scope: scoped(:read), included: [], record: self.class.model_class)
+          find_by({ primary_key => id }, scope: scope, included: included, record: record)
+        end
+
         def find_by(
           filter,
           scope: scoped(:read),
