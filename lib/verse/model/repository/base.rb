@@ -142,7 +142,6 @@ module Verse
         protected def index_impl(
           filters,
           scope:,
-          included: ,
           page:,
           items_per_page:,
           sort:,
