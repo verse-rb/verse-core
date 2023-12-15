@@ -97,9 +97,8 @@ module Verse
 
         def find_by_impl(
           filter,
-          scope: scoped(:read),
-          included: [],
-          record: self.class.model_class
+          scope:,
+          included: []
         )
           # :nocov:
           raise NotImplementedError, "please implement find_by"
@@ -141,14 +140,13 @@ module Verse
         end
 
         protected def index_impl(
-          filters = {},
-          scope: scoped(:read),
-          included: [],
-          page: 1,
-          items_per_page: 1_000,
-          sort: nil,
-          record: self.class.model_class,
-          query_count: true
+          filters,
+          scope:,
+          included: ,
+          page:,
+          items_per_page:,
+          sort:,
+          query_count:
         )
           # :nocov:
           raise NotImplementedError, "please implement index"
