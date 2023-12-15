@@ -43,7 +43,7 @@ module Verse
 
             @resource = name
           else
-            @resource ||= [Verse.service_name, Verse.inflector.singularize(table)].join(":")
+            @resource ||= [Verse.service_name, Verse.inflector.pluralize(table)].join(":")
           end
         end
 
