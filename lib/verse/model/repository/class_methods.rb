@@ -4,7 +4,7 @@ module Verse
   module Model
     module Repository
       module ClassMethods
-        attr_writer :model_class, :table, :primary_key
+        attr_writer :model_class, :table, :primary_key, :resource
         attr_accessor :custom_filters, :encoders
 
         include Verse::Util
@@ -36,15 +36,7 @@ module Verse
         end
 
         def resource(name = nil)
-          if name
-            if name =~ /\./
-              raise ArgumentError, "resource name cannot contain '.'"
-            end
-
-            @resource = name
-          else
-            @resource ||= [Verse.service_name, Verse.inflector.pluralize(table)].join(":")
-          end
+          @resource ||= [Verse.service_name, Verse.inflector.pluralize(table)].join(":")
         end
 
         # Flag the next defined method as an event method.
