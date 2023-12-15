@@ -81,13 +81,28 @@ module Verse
           root = name.split(/::[^:]+$/).first
           repository ||= "#{root}::#{StringUtil.camelize(relation_name.to_s)}Repository"
 
+          unless foreign_key
+            begin
+              repository = Reflection.constantize(repository) if repository.is_a?(String)
+            rescue NameError => e
+              raise "#{self.name} reference a repository which doesn't exists yet (#{repository}).\n" \
+                    "Please setup manually the foreign_key option for the relation `#{relation_name}`."
+            end
+
+            foreign_key ||= "#{relation_name}_#{repository.primary_key}"
+          end
+
+          # define the foreign key field if not defined
+          if @fields[foreign_key.to_sym].nil?
+            field foreign_key, type: :any, visible: false
+          end
+
           relation relation_name, array: false do |collection, auth_context, sub_included|
             repository = Reflection.constantize(repository) if repository.is_a?(String)
             record ||= repository.model_class
             record = Reflection.constantize(record) if record.is_a?(String)
 
             primary_key ||= record.primary_key
-            foreign_key ||= "#{relation_name}_#{repository.primary_key}"
 
             included = repository.new(
               auth_context

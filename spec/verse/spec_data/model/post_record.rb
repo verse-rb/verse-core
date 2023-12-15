@@ -15,7 +15,7 @@ class PostRecord < Verse::Model::Record::Base
   field :secret_field, type: :string, visible: false
 
   belongs_to :user
-  belongs_to :category
+  belongs_to :category, foreign_key: :category_name
 
   has_many :comments
 end
