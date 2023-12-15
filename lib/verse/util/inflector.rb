@@ -132,6 +132,23 @@ module Verse
         "woman" => "women"
       }.freeze
 
+      PLURAL_RULES = [
+        [/^(.*)us$/, '\1i'],       # Singular to plural (e.g., "focus" to "foci")
+        [/^(.*)is$/, '\1es'],      # Singular to plural (e.g., "thesis" to "theses")
+        [/^(.*[aeiou])y$/, '\1ys'],# Singular to plural (e.g., "stay" to "stays")
+        [/^(.*)y$/, '\1ies'],      # Singular to plural (e.g., "city" to "cities")
+        [/^(.*)o$/, '\1oes'],      # Singular to plural (e.g., "tomato" to "tomatoes")
+        [/^(.*)s$/, '\1s'],        # If already plural
+      ].freeze
+
+      SINGULAR_RULES = [
+        [/^(.*)i$/, '\1us'],       # Plural to singular (e.g., "foci" to "focus")
+        [/^(.*)ies$/, '\1y'],      # Plural to singular (e.g., "cities" to "city")
+        [/^(.*)oes$/, '\1o'],      # Plural to singular (e.g., "tomatoes" to "tomato")
+        [/^(.*)es$/, '\1is'],      # Plural to singular (e.g., "theses" to "thesis")
+        [/^(.*)s$/, '\1'],         # Default rule (remove "s")
+      ].freeze
+
       def initialize(verb_exceptions = PAST_TENSE_EXCEPTIONS, plural_exceptions = PLURAL_EXCEPTIONS)
         @verb_exceptions = verb_exceptions
 
@@ -148,18 +165,12 @@ module Verse
       def pluralize(word, count = 2)
         return word if count <= 1
 
-        @plural_exceptions.fetch(word) {
-          next word if word.end_with?("s")
-
-          case word[-1]
-          when "s"
-            word
-          when "y"
-            "#{word[0..-2]}ies"
-          else
-            "#{word}s"
+        @plural_exceptions.fetch(word) do
+          PLURAL_RULES.each do |(rule, replacement)|
+            return word.gsub(rule, replacement) if word =~ rule
           end
-        }
+          return "#{word}s"
+        end
       end
 
       # Inflect words to singular form.
@@ -168,15 +179,12 @@ module Verse
       # singularize("people") # => "person"
       # singularize("users") # => "user"
       def singularize(word)
-        @singular_exceptions.fetch(word) {
-          if word.end_with?("ies")
-            "#{word[0..-4]}y"
-          elsif word.end_with?("s")
-            word[0..-2]
-          else
-            word
+        @singular_exceptions.fetch(word) do
+          SINGULAR_RULES.each do |(rule, replacement)|
+            return word.gsub(rule, replacement) if word =~ rule
           end
-        }
+          return word
+        end
       end
 
       # Inflect verbs to past tense.
