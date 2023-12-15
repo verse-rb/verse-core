@@ -77,7 +77,7 @@ module Verse
 
         result = ScopeDSL.new(self, action, resource, &block).result
 
-        reject! if result.nil?
+        reject!("`#{action}` on `#{resource}` is unauthorized") if result.nil?
 
         result
       end
@@ -108,8 +108,8 @@ module Verse
 
       # Raise an error if the security context is not met
       # @raise [Verse::Auth::Context::UnauthorizedError]
-      def reject!
-        raise Verse::Error::Unauthorized, "unauthorized"
+      def reject!(message = "unauthorized")
+        raise Verse::Error::Unauthorized, message
       end
 
       # Check custom scope for a specific resource
