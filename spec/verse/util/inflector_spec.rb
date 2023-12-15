@@ -11,6 +11,9 @@ RSpec.describe Verse::Util::Inflector do
     # exceptions:
     expect(subject.pluralize("person")).to eq("people")
     expect(subject.pluralize("person", 1)).to eq("person")
+
+    # special ending:
+    expect(subject.pluralize("category")).to eq("categories")
   end
 
   it "singularizes correctly" do

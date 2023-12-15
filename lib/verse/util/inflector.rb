@@ -148,10 +148,17 @@ module Verse
       def pluralize(word, count = 2)
         return word if count <= 1
 
-        return word if word.end_with?("s")
-
         @plural_exceptions.fetch(word) {
-          "#{word}s"
+          next word if word.end_with?("s")
+
+          case word[-1]
+          when "s"
+            word
+          when "y"
+            "#{word[0..-2]}ies"
+          else
+            "#{word}s"
+          end
         }
       end
 
@@ -162,7 +169,13 @@ module Verse
       # singularize("users") # => "user"
       def singularize(word)
         @singular_exceptions.fetch(word) {
-          word.gsub(/s$/, "")
+          if word.end_with?("ies")
+            "#{word[0..-4]}y"
+          elsif word.end_with?("s")
+            word[0..-2]
+          else
+            word
+          end
         }
       end
 
