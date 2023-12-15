@@ -148,6 +148,8 @@ module Verse
       def pluralize(word, count = 2)
         return word if count <= 1
 
+        return word if word.end_with?("s")
+
         @plural_exceptions.fetch(word) {
           "#{word}s"
         }
