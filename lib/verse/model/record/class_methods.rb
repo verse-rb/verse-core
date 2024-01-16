@@ -32,13 +32,13 @@ module Verse
           @primary_key
         end
 
-        def relation(name, array: false, &block)
-          @relations[name] = Relation.new(name, array: array, &block)
+        def relation(name, **opts, &block)
+          @relations[name] = Relation.new(name, **opts, &block)
 
           define_method(name) do
             raise "relation `#{name}` is not loaded" unless @local_included.include?(name.to_s)
 
-            if array
+            if opts[:array]
               @relations[name.to_sym]
             else
               @relations[name.to_sym]&.first
@@ -100,7 +100,7 @@ module Verse
             field foreign_key, type: :any, visible: false
           end
 
-          relation relation_name, array: false do |collection, auth_context, sub_included|
+          relation relation_name, array: false, type: "belongs_to" do |collection, auth_context, sub_included|
             repository = Reflection.constantize(repository) if repository.is_a?(String)
             record ||= repository.model_class
             record = Reflection.constantize(record) if record.is_a?(String)
@@ -163,7 +163,7 @@ module Verse
           root = name.split(/::[^:]+$/).first
           repository ||= "#{root}::#{StringUtil.camelize(Verse.inflector.singularize(relation_name.to_s))}Repository"
 
-          relation relation_name, array: true do |collection, auth_context, sub_included|
+          relation relation_name, array: true, type: "has_many" do |collection, auth_context, sub_included|
             repository = Reflection.constantize(repository) if repository.is_a?(String)
             record ||= repository.model_class
             record = Reflection.constantize(record) if record.is_a?(String)
@@ -213,7 +213,7 @@ module Verse
           root = name.split(/::[^:]+$/).first
           repository ||= "#{root}::#{StringUtil.camelize(Verse.inflector.singularize(relation_name.to_s))}Repository"
 
-          relation relation_name, array: false do |collection, auth_context, sub_included|
+          relation relation_name, array: false, type: "has_one" do |collection, auth_context, sub_included|
             repository = Reflection.constantize(repository) if repository.is_a?(String)
             record ||= repository.model_class
             record = Reflection.constantize(record) if record.is_a?(String)
