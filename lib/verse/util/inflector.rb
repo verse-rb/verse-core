@@ -135,7 +135,7 @@ module Verse
       PLURAL_RULES = [
         [/^(.*)us$/, '\1i'],       # Singular to plural (e.g., "focus" to "foci")
         [/^(.*)is$/, '\1es'],      # Singular to plural (e.g., "thesis" to "theses")
-        [/^(.*[aeiou])y$/, '\1ys'],# Singular to plural (e.g., "stay" to "stays")
+        [/^(.*[aeiou])y$/, '\1ys'], # Singular to plural (e.g., "stay" to "stays")
         [/^(.*)y$/, '\1ies'],      # Singular to plural (e.g., "city" to "cities")
         [/^(.*)o$/, '\1oes'],      # Singular to plural (e.g., "tomato" to "tomatoes")
         [/^(.*)s$/, '\1s'],        # If already plural

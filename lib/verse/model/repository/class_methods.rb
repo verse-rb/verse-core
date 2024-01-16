@@ -35,7 +35,7 @@ module Verse
           )
         end
 
-        def resource(name = nil)
+        def resource(_name = nil)
           @resource ||= [Verse.service_name, Verse.inflector.pluralize(table)].join(":")
         end
 

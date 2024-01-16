@@ -84,11 +84,11 @@ module Verse
           unless foreign_key
             begin
               repository = Reflection.constantize(repository) if repository.is_a?(String)
-            rescue NameError => e
+            rescue NameError
               # This is a bit annoying but we might find ourselves in a circular reference loop
               # and we can't infer the primary key name of the foreign record.
               # raise instead of guessing default `id` column should be easier to fix.
-              raise "#{self.name} reference a repository which doesn't exists yet (#{repository}).\n" \
+              raise "#{name} reference a repository which doesn't exists yet (#{repository}).\n" \
                     "Please setup manually the foreign_key option for the relation `#{relation_name}`."
             end
 
@@ -180,7 +180,6 @@ module Verse
 
                   # check key_type using model structure
                   pkey_info = record.fields[foreign_key.to_sym]
-                  binding.pry if pkey_info.nil?
 
                   Verse::Model::Record::Converter.convert(
                     x[primary_key.to_sym],
