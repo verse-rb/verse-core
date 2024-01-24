@@ -79,13 +79,13 @@ RSpec.describe Verse::Util::AutovalidatedEndpoint do
     end
 
     it "raises an error if both schema and block are given" do
-      schema = Dry::Schema.Params do
-        required(:name).filled
+      schema = Verse::Schema.define do
+        field(:name, String)
       end
 
       expect{
         subject.output(schema) do
-          required(:name).filled
+          field(:name, String)
         end
       }.to raise_error(ArgumentError)
     end
@@ -98,7 +98,7 @@ RSpec.describe Verse::Util::AutovalidatedEndpoint do
 
     it "raise validation error if the schema is incorrect" do
       subject.output do
-        required(:name).filled
+        field(:name, Object).filled
       end
 
       expect{

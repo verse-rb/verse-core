@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require "dry-logic"
-require "dry-validation"
-
 module Verse
   module Util
     # Auto validated endpoint gives metadata for any endpoints,
@@ -62,7 +59,7 @@ module Verse
         else
           raise ArgumentError, "You must provide a block" unless block_given?
 
-          @input_schema = Dry::Schema.Params(&block)
+          @input_schema = Verse::Schema.define(&block)
         end
       end
 
@@ -78,7 +75,7 @@ module Verse
         else
           raise ArgumentError, "You must provide a block" unless block_given?
 
-          @output_schema = Dry::Schema.Params(&block)
+          @output_schema = Verse::Schema.define(&block)
         end
       end
     end

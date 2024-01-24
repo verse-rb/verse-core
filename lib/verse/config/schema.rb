@@ -1,47 +1,32 @@
 # frozen_string_literal: true
 
-require_relative "../validation/contract"
 
 module Verse
   module Config
-    class Schema < Verse::Validation::Contract
-      SERVICE_NAME = /[a-z0-9_-]+/
-      PLUGIN_NAME = /[a-z0-9_]+( <[a-zA-Z0-9:]+>)?/
+    SERVICE_NAME = /[a-z0-9_-]+/
+    PLUGIN_NAME = /[a-z0-9_]+( <[a-zA-Z0-9:]+>)?/
 
-      params do
-        required(:service_name).filled(:string)
+    Schema = Verse::Schema.define do
+      field(:service_name, String).filled.rule("bad_format"){ hash[:service_name] =~ SERVICE_NAME }
+      field(:description, String).optional
 
-        optional(:description).filled(:string)
-        optional(:version).filled(:string)
+      field(:version, String).filled
 
-        optional(:plugins).array do
-          hash do
-            required(:name).filled(:string)
-            optional(:config).filled(:hash)
-            optional(:dep).filled(:hash)
-          end
-        end
-
-        optional(:logging).hash do
-          required(:level).filled(:string)
-          optional(:file).filled(:string)
-          optional(:show_full_error).filled(:bool)
-        end
-
-        optional(:event_bus).hash do
-          required(:adapter).filled(:string)
-          optional(:config).hash
-        end
+      field?(:plugins, Array) do
+        field(:name, String).filled.rule("bad_format") { |value| value =~ PLUGIN_NAME }
+        field(:config, Hash).optional
+        field(:dep, Hash).optional
       end
 
-      rule(:service_name) do
-        key.failure(:bad_format) unless value =~ SERVICE_NAME
+      field?(:logging, Hash) do
+        field(:level, String).filled
+        field(:file, String).optional.filled
+        field(:show_full_error, TrueClass).optional.filled
       end
 
-      rule(:plugins).each do |index:|
-        next if value[:name] =~ PLUGIN_NAME
-
-        key([:plugin, :name, index]).failure(:bad_format)
+      field?(:event_bus, Hash) do
+        field(:adapter, String).filled
+        field(:config, Hash).optional
       end
     end
   end
