@@ -7,10 +7,10 @@ module Verse
     PLUGIN_NAME = /[a-z0-9_]+( <[a-zA-Z0-9:]+>)?/
 
     Schema = Verse::Schema.define do
-      field(:service_name, String).filled.rule("bad_format"){ hash[:service_name] =~ SERVICE_NAME }
+      field(:service_name, String).filled.rule("bad_format"){ |value| value =~ SERVICE_NAME }
       field(:description, String).optional
 
-      field(:version, String).filled
+      field(:version, String).optional
 
       field?(:plugins, Array) do
         field(:name, String).filled.rule("bad_format") { |value| value =~ PLUGIN_NAME }

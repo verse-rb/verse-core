@@ -47,7 +47,7 @@ module Verse
     end
 
     protected def validate_config_schema!
-      result = Verse::Config::Schema.new.call(
+      result = Verse::Config::Schema.validate(
         @config
       )
 

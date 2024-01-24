@@ -18,7 +18,7 @@ class SampleExposition < Verse::Exposition::Base
 
     input do
       field(:name, String).filled
-      field(:mode, Symbol).filled
+      field(:mode, Symbol).optional
     end
 
     output do
