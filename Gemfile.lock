@@ -80,7 +80,7 @@ PLATFORMS
 DEPENDENCIES
   bootsnap (~> 1.17)
   pry
-  racc
+  racc (~> 1.7)
   rake (~> 13.0)
   rspec (~> 3.0)
   rubocop (~> 1.21)

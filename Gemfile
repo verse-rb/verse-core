@@ -19,5 +19,5 @@ gem "pry"
 
 gem "simplecov"
 
-gem 'racc'
 gem "bootsnap", "~> 1.17"
+gem "racc", "~> 1.7"
