@@ -7,10 +7,10 @@ module Verse
     class ValidationFailed < Base
       attr_reader :contract
 
-      def initialize(contract = nil)
+      def initialize(result = nil)
         super("verse.errors.validation_failed")
 
-        @contract = contract
+        @result = result
 
         @source =
           if contract
@@ -20,8 +20,13 @@ module Verse
           end
       end
 
+      def message
+        return "validation failed" unless @result
+
+        @result.errors.to_s
+      end
+
       http_code 422
-      message "verse.errors.validation_failed"
 
       private
 

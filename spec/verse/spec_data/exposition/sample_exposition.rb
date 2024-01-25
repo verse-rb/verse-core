@@ -17,14 +17,14 @@ class SampleExposition < Verse::Exposition::Base
     desc "Does something"
 
     input do
-      required(:name).filled(:string)
-      optional(:mode).filled(:symbol)
+      field(:name, String).filled
+      field(:mode, Symbol).optional
     end
 
     output do
-      required(:name).filled(:string)
-      required(:context).filled(:string)
-      required(:some_data).filled(:hash)
+      field(:name, String).filled
+      field(:context, String).filled
+      field(:some_data, Hash)
     end
   end
   def do_something

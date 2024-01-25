@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require "dry-logic"
-require "dry-validation"
-
 module Verse
   module Util
     # Auto validated endpoint gives metadata for any endpoints,
@@ -29,11 +26,11 @@ module Verse
       def process_input(input)
         return input if input_schema.nil?
 
-        result = input_schema.call(input)
+        result = input_schema.validate(input)
 
         raise Verse::Error::ValidationFailed, result unless result.success?
 
-        result.output.to_h
+        result.value
       end
 
       # Process the output, clean and validate output.
@@ -43,11 +40,11 @@ module Verse
       def process_output(output)
         return output if output_schema.nil?
 
-        result = output_schema.call(output)
+        result = output_schema.validate(output)
 
         raise Verse::Error::ValidationFailed, result unless result.success?
 
-        result.output.to_h
+        result.value
       end
 
       # Define the input schema for this endpoint.
@@ -62,7 +59,7 @@ module Verse
         else
           raise ArgumentError, "You must provide a block" unless block_given?
 
-          @input_schema = Dry::Schema.Params(&block)
+          @input_schema = Verse::Schema.define(&block)
         end
       end
 
@@ -78,7 +75,7 @@ module Verse
         else
           raise ArgumentError, "You must provide a block" unless block_given?
 
-          @output_schema = Dry::Schema.Params(&block)
+          @output_schema = Verse::Schema.define(&block)
         end
       end
     end

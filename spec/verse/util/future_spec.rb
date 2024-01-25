@@ -43,7 +43,6 @@ RSpec.describe Verse::Util::Future do
   describe "#error" do
     it "can raise error" do
       future = Verse::Util::Future.new do
-        puts "we raise?"
         raise "test"
       end
 

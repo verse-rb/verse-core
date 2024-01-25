@@ -13,8 +13,8 @@ RSpec.describe Verse::Util::AutovalidatedEndpoint do
 
   context "#input" do
     it "can process input (passing a schema)" do
-      schema = Dry::Schema.Params do
-        required(:name).filled
+      schema = Verse::Schema.define do
+        field(:name, String).filled
       end
 
       subject.input(schema)
@@ -24,20 +24,20 @@ RSpec.describe Verse::Util::AutovalidatedEndpoint do
 
     it "can process input (passing a block)" do
       subject.input do
-        required(:name).filled
+        field(:name, String).filled
       end
 
       expect(subject.process_input(name: "John")).to eq({ name: "John" })
     end
 
     it "raises an error if both schema and block are given" do
-      schema = Dry::Schema.Params do
-        required(:name).filled
+      schema = Verse::Schema.define do
+        field(:name, String).filled
       end
 
       expect{
         subject.input(schema) do
-          required(:name).filled
+          required(:name, String).filled
         end
       }.to raise_error(ArgumentError)
     end
@@ -50,7 +50,7 @@ RSpec.describe Verse::Util::AutovalidatedEndpoint do
 
     it "raise validation error if the schema is incorrect" do
       subject.input do
-        required(:name).filled
+        field(:name, String).filled
       end
 
       expect{
@@ -61,8 +61,8 @@ RSpec.describe Verse::Util::AutovalidatedEndpoint do
 
   context "#output" do
     it "can process output (passing a schema)" do
-      schema = Dry::Schema.Params do
-        required(:name).filled
+      schema = Verse::Schema.define do
+        field(:name, String).filled
       end
 
       subject.output(schema)
@@ -72,20 +72,20 @@ RSpec.describe Verse::Util::AutovalidatedEndpoint do
 
     it "can process output (passing a block)" do
       subject.output do
-        required(:name).filled
+        field(:name, String).filled
       end
 
       expect(subject.process_output(name: "John")).to eq({ name: "John" })
     end
 
     it "raises an error if both schema and block are given" do
-      schema = Dry::Schema.Params do
-        required(:name).filled
+      schema = Verse::Schema.define do
+        field(:name, String)
       end
 
       expect{
         subject.output(schema) do
-          required(:name).filled
+          field(:name, String)
         end
       }.to raise_error(ArgumentError)
     end
@@ -98,7 +98,7 @@ RSpec.describe Verse::Util::AutovalidatedEndpoint do
 
     it "raise validation error if the schema is incorrect" do
       subject.output do
-        required(:name).filled
+        field(:name, Object).filled
       end
 
       expect{

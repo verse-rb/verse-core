@@ -39,11 +39,7 @@ Gem::Specification.new do |spec|
   spec.executables   = ["verse"]
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "dry-schema", "~> 1.9.1"
-  spec.add_dependency "dry-types", "~> 1.5.0"
-  spec.add_dependency "dry-validation", "~> 1.8.1"
-
-  spec.add_dependency "dry-logic", "~> 1.3.0"
+  spec.add_dependency "verse-schema", "~> 0.1.0"
 
   spec.add_dependency "thor", "~> 1.2.1"
 

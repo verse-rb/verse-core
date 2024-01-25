@@ -17,7 +17,7 @@ class SampleExpositionEb < Verse::Exposition::Base
 
   expose on_event "CHANNEL.spec.test" do
     input do
-      required(:content).filled(:string)
+      field(:content, String)
     end
   end
   def on_test
@@ -27,7 +27,7 @@ class SampleExpositionEb < Verse::Exposition::Base
 
   expose on_command "sum" do
     input do
-      required(:numbers).array(:number?)
+      field(:numbers, Array, of: Numeric)
     end
   end
   def sum

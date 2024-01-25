@@ -1,19 +1,7 @@
 # frozen_string_literal: true
 
-require "dry/logic"
-require "dry/logic/predicates"
-
-require "dry/schema"
-require "dry/types"
-require "dry/validation"
-
+require "verse/schema"
 require "json"
-
-require "dry-schema"
-require "dry/schema/messages/i18n"
-
-require "dry-types"
-require "dry-validation"
 
 module Verse
   extend self
