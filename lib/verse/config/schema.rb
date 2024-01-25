@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-
 module Verse
   module Config
     SERVICE_NAME = /[a-z0-9_-]+/

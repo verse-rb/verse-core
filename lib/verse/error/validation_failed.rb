@@ -22,7 +22,8 @@ module Verse
 
       def message
         return "validation failed" unless @result
-        return @result.errors.to_s
+
+        @result.errors.to_s
       end
 
       http_code 422
