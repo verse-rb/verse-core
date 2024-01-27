@@ -3,13 +3,10 @@
 require_relative "util/inflector"
 
 module Verse
-  extend self
-
-  attr_accessor :logger, :inflector
-
   @inflector = Verse::Util::Inflector.new
+  class << self
+    attr_accessor :logger, :inflector
+    attr_reader :environment
 
-  def environment
-    @environment
   end
 end

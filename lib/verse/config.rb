@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "yaml"
+
 require_relative "util/hash_util"
 require_relative "error/base"
 
