@@ -7,6 +7,5 @@ module Verse
   class << self
     attr_accessor :logger, :inflector
     attr_reader :environment
-
   end
 end
