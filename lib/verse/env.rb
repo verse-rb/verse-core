@@ -1,15 +1,13 @@
 # frozen_string_literal: true
 
+require_relative "util/inflector"
+
 module Verse
   extend self
 
-  def logger
-    @logger
-  end
+  attr_accessor :logger, :inflector
 
-  def inflector
-    @inflector ||= Verse::Util::Inflector.new
-  end
+  @inflector = Verse::Util::Inflector.new
 
   def environment
     @environment
