@@ -5,8 +5,6 @@ require_relative "./base"
 module Verse
   module Error
     class ValidationFailed < Base
-      attr_reader :result
-
       def initialize(result = nil)
         super("verse.errors.validation_failed")
 
