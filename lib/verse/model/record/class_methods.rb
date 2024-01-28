@@ -105,7 +105,7 @@ module Verse
             type: :belongs_to,
             foreign_key: foreign_key,
             primary_key: primary_key,
-            reposity: repository,
+            repository: repository,
             record: record,
             filters: filters
           })
