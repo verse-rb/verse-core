@@ -115,6 +115,13 @@ module Verse
           self.class.type
         end
 
+        def ==(other)
+          return false unless other.is_a?(self.class)
+          id == other.id
+        end
+
+        alias_method :eql?, :==
+
         # :nodoc:
         def self.inherited(subklass)
           super
