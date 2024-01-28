@@ -77,6 +77,10 @@ module Verse
           find_by({ self.class.primary_key => id }, scope: scope, included: included, record: record)
         end
 
+        def find!(id, scope: scoped(:read), included: [], record: self.class.model_class)
+          find_by!({ self.class.primary_key => id }, scope: scope, included: included, record: record)
+        end
+
         def find_by(
           filter,
           scope: scoped(:read),
