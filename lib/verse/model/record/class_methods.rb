@@ -100,7 +100,17 @@ module Verse
             field foreign_key, type: :any, visible: false
           end
 
-          relation relation_name, array: false, type: "belongs_to" do |collection, auth_context, sub_included|
+          opts = opts.merge({
+            array: false,
+            type: :belongs_to,
+            foreign_key: foreign_key,
+            primary_key: primary_key,
+            reposity: repository,
+            record: record,
+            filters: filters
+          })
+
+          relation relation_name, **opts do |collection, auth_context, sub_included|
             repository = Reflection.constantize(repository) if repository.is_a?(String)
             record ||= repository.model_class
             record = Reflection.constantize(record) if record.is_a?(String)
@@ -163,7 +173,17 @@ module Verse
           root = name.split(/::[^:]+$/).first
           repository ||= "#{root}::#{StringUtil.camelize(Verse.inflector.singularize(relation_name.to_s))}Repository"
 
-          relation relation_name, array: true, type: "has_many" do |collection, auth_context, sub_included|
+          opts = opts.merge({
+            array: true,
+            type: :has_many,
+            foreign_key: foreign_key,
+            primary_key: primary_key,
+            record: record,
+            repository: repository,
+            filters: filters
+          })
+
+          relation relation_name, **opts do |collection, auth_context, sub_included|
             repository = Reflection.constantize(repository) if repository.is_a?(String)
             record ||= repository.model_class
             record = Reflection.constantize(record) if record.is_a?(String)
@@ -208,11 +228,21 @@ module Verse
           end
         end
 
-        def has_one(relation_name, primary_key: nil, foreign_key: nil, repository: nil, filters: {}, **opts) # rubocop:disable Naming/PredicateName
+        def has_one(relation_name, primary_key: nil, foreign_key: nil, repository: nil, record: nil, filters: {}, **opts) # rubocop:disable Naming/PredicateName
           root = name.split(/::[^:]+$/).first
           repository ||= "#{root}::#{StringUtil.camelize(Verse.inflector.singularize(relation_name.to_s))}Repository"
 
-          relation relation_name, array: false, type: "has_one" do |collection, auth_context, sub_included|
+          opts = opts.merge({
+            array: false,
+            type: :has_one,
+            foreign_key: foreign_key,
+            primary_key: primary_key,
+            record: record,
+            repository: repository,
+            filters: filters
+          })
+
+          relation relation_name, **opts do |collection, auth_context, sub_included|
             repository = Reflection.constantize(repository) if repository.is_a?(String)
             record ||= repository.model_class
             record = Reflection.constantize(record) if record.is_a?(String)
@@ -269,9 +299,9 @@ module Verse
         # @example
         #
         #  class UserRecord < Verse::Model::Record::Base
-        #     field :id, type: :integer, primary: true
-        #     field :first_name, type: :string
-        #     field :last_name, type: :string
+        #     field :id, type: Integer, primary: true
+        #     field :first_name, type: String
+        #     field :last_name, type: String
         #
         #     field :password_digest, visible: false # tell renderer not to export it.
         #
