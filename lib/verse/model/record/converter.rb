@@ -35,6 +35,12 @@ module Verse
         add_converter(:int,    &:to_i)
         add_converter(Integer, &:to_i)
 
+        add_converter(Hash, &:to_h)
+        add_converter(Array, &:to_a)
+
+        add_converter(Date) { |obj| Date.parse(obj) }
+        add_converter(Time) { |obj| Time.parse(obj) }
+
         add_converter :json do |obj|
           case obj
           when Hash
