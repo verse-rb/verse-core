@@ -41,6 +41,8 @@ module Verse
         add_converter(Date) { |obj| Date.parse(obj) }
         add_converter(Time) { |obj| Time.parse(obj) }
 
+        add_converter(TrueClass){ |obj| !!obj }
+
         add_converter :json do |obj|
           case obj
           when Hash
