@@ -117,7 +117,7 @@ module Verse
         # @param body [Hash] The payload of the message
         # @param headers [Hash] The headers of the message (if any)
         # @param reply_to [String] The reply_to of the message (if any)
-        def publish(channel, content, headers: {}, reply_to: nil)
+        def publish_event(resource:, event:, payload:, headers: {}, reply_to: nil, key: nil)
           message = Message.new(self, content, headers: headers, reply_to: reply_to)
 
           @subscriptions.each do |pattern, subscribers|

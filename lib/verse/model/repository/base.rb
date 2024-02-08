@@ -297,18 +297,6 @@ module Verse
           # :nocov:
         end
 
-        def can_create?(auth_context, &block)
-          auth_context.can!(:create, aggregate_name) do |scope|
-            scope.all?(&block)
-          end
-        end
-
-        def can_update?(auth_context, &block)
-          auth_context.can!(:update, aggregate_name) do |scope|
-            scope.all?(&block)
-          end
-        end
-
         # return a hash tree from the include list:
         # ["a.b.c", "c.d"] => { a: {b: {c: {}}}, c: {d: {}} }
         def tree_from_include_list(include, root = {})
