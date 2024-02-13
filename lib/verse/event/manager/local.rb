@@ -35,21 +35,17 @@ module Verse
         end
 
         def subscribe(
-          channel,
-          _method = Manager::MODE_CONSUMER,
-          priority: nil, # rubocop:disable Lint/UnusedMethodArgument
-          ack_type: nil, # rubocop:disable Lint/UnusedMethodArgument
+          topic,
+          mode: Manager::MODE_CONSUMER, # rubocop:disable Lint/UnusedMethodArgument
           &block
         )
           return if @config&.fetch(:disable_subscription, nil)
 
-          regexp = Regexp.new(
-            "^#{channel.gsub(".", "\\.").gsub("?", "[^\.]+").gsub("*", ".*")}$"
-          )
+          add_to_subscription_list(topic, &block)
+        end
 
-          add_to_subscription_list(regexp) do |message, subject|
-            block.call(message, subject)
-          end
+        def subscribe_resource_event(resource_type:, event:, mode: Manager::MODE_CONSUMER, &block)
+          subscribe(topic: [resource_type, event], mode:, &block)
         end
 
         def start
@@ -117,17 +113,23 @@ module Verse
         # @param body [Hash] The payload of the message
         # @param headers [Hash] The headers of the message (if any)
         # @param reply_to [String] The reply_to of the message (if any)
-        def publish_event(resource:, event:, payload:, headers: {}, reply_to: nil, key: nil)
-          message = Message.new(self, content, headers: headers, reply_to: reply_to)
+        def publish(channel, payload, headers: {}, reply_to: nil)
+          message = Message.new(self, payload, headers: headers, reply_to: reply_to)
 
-          @subscriptions.each do |pattern, subscribers|
-            next unless pattern.match?(channel)
-
-            subscribers.each do |s|
-              s.call(message, channel)
-            end
+          @subscriptions.lazy.select{|chan, _| channel==chan }.map(&:last).each do |sub|
+            sub.each{ |s| s.call(message, channel) }
           end
         end
+
+        def publish_resource_event(resource_type:, resource_id:, event:, payload:, headers: {}, reply_to: nil)
+          message = Message.new(self, payload, headers: headers, reply_to: reply_to)
+          channel = [resource_type, resource_id]
+
+          @subscriptions.lazy.select{|chan, _| channel==chan }.map(&:last).each do |sub|
+            sub.each{ |s| s.call(message, channel) }
+          end
+        end
+
 
         def cancel_subscription(id)
           @subscriptions.each do |_, subscribers|
@@ -137,10 +139,10 @@ module Verse
 
         private
 
-        def add_to_subscription_list(regexp, &block)
+        def add_to_subscription_list(channel, &block)
           sub = Subscription.new(self, self.class.sub_id, block)
-          @subscriptions[regexp] ||= []
-          @subscriptions[regexp] << sub
+          @subscriptions[channel] ||= []
+          @subscriptions[channel] << sub
           sub
         end
       end

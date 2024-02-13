@@ -104,25 +104,29 @@ RSpec.describe Verse::Model::Repository::Base do
     end
 
     it "emits events on create" do
-      expect(Verse).to receive(:publish).with(
-        "verse_spec:users:created",
-        { args: [name: "Joe"], metadata: {}, resource_id: "104" }
+      expect(Verse).to receive(:publish_resource_event).with(
+        resource_type: "verse_spec:users",
+        resource_id: "104",
+        event: "created",
+        payload: { args: [name: "Joe"], metadata: {} }
       )
 
       @users.create(name: "Joe")
     end
 
     it "emit events on update" do
-      expect(Verse).to receive(:publish).with(
-        "verse_spec:users:updated",
-        { args: [{ name: "John Doe" }], metadata: {}, resource_id: "101" }
+      expect(Verse).to receive(:publish_resource_event).with(
+        resource_type: "verse_spec:users",
+        resource_id: "101",
+        event: "updated",
+        payload: { args: [name: "John Doe"], metadata: {} }
       )
 
       @users.update(101, { name: "John Doe" })
     end
 
     it "doesn't emit event with block no_event" do
-      expect(Verse).not_to receive(:publish)
+      expect(Verse).not_to receive(:publish_resource_event)
       @users.no_event{ |r| r.create(name: "Luis") }
     end
   end

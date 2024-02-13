@@ -85,7 +85,7 @@ module Verse
           end
 
           channel_path.each do |c|
-            Verse.event_manager.subscribe(c, @type) do |message, subject|
+            Verse.event_manager.subscribe(c, mode: @type) do |message, subject|
               Verse.logger.debug{ "Received event #{subject}" }
 
               output = nil

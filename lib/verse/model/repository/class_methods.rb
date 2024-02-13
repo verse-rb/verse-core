@@ -42,8 +42,8 @@ module Verse
         end
 
         # Flag the next defined method as an event method.
-        def event(name = nil, **opts)
-          @next_method_mode = [:w, name, opts]
+        def event(name: nil, creation: false, key: 0, metadata: {})
+          @next_method_mode = [:w, name, creation, key, metadata]
         end
 
         def query
@@ -74,14 +74,8 @@ module Verse
           end
         end
 
-        def define_event_method(method, method_name, _options = {})
-          _, name, opts = @next_method_mode
-
-          if opts[:creation]
-            creation = true
-          else
-            index = opts.fetch(:key, 0)
-          end
+        def define_event_method(method, method_name)
+          _, name, creation, key, metadata = @next_method_mode
 
           define_method(method_name) do |*args|
             mode(:rw) do
@@ -116,14 +110,14 @@ module Verse
                     end
 
                     unless @disable_event
-                      event_path = [self.class.resource, name].join(":")
-
-                      @event_cause = event_path
+                      @event_cause = [self.class.resource, name]
 
                       after_commit do
-                        Verse.publish(
-                          event_path, {
-                            resource_id: result.to_s,
+                        Verse.publish_resource_event(
+                          resource_type: self.class.resource,
+                          resource_id: result.to_s,
+                          event: name,
+                          payload: {
                             args: args,
                             metadata: metadata
                           }
@@ -132,24 +126,24 @@ module Verse
                     end
 
                   else
-                    id = args[index]
+                    id = args[key]
                     arg2 = args.dup
-                    arg2.slice!(index)
+                    arg2.slice!(key)
 
                     result = method.bind(self).call(*args)
 
                     unless @disable_event
-                      event_path = [self.class.resource, name].join(":")
-
-                      @event_cause = event_path
+                      @event_cause = [self.class.resource, name]
 
                       after_commit do
-                        Verse.publish(
-                          event_path, {
-                            resource_id: id.to_s,
+                        Verse.publish_resource_event(
+                          resource_type: self.class.resource,
+                          resource_id: id.to_s,
+                          event: name,
+                          payload: {
                             args: arg2,
-                            metadata: metadata,
-                          }
+                            metadata: metadata
+                          },
                         )
                       end
                     end

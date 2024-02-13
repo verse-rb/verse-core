@@ -45,7 +45,7 @@ module Verse
           # :nocov:
         end
 
-        event("created", creation: true)
+        event(creation: true)
         def create(attributes)
           scoped(:create)
           attributes = encode(attributes)
@@ -58,7 +58,7 @@ module Verse
           # :nocov:
         end
 
-        event("deleted")
+        event
         def delete(id)
           id = find_by({ id: id }, scope: scoped(:delete))&.id
 

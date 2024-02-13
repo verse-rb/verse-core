@@ -21,15 +21,10 @@ RSpec.describe Verse::Event::Manager::Local do
   it "can subscribe to events" do
     @queue = Queue.new
 
-    @test_manager.subscribe("test_event.?") do |_message, subject|
-      expect(subject).to match(/^test_event\./)
-      @queue.push 0 # 2 times
-    end
-
-    # Double the subscription to ensure multi-subscribe on same subject works.
-    @test_manager.subscribe("test_event.?") do |_message, subject|
-      expect(subject).to match(/^test_event\./)
-      @queue.push 0 # 2 times
+    @test_manager.subscribe("test_event.example") do |message, subject|
+      expect(subject).to eq("test_event.example")
+      expect(message.content).to eq("example")
+      @queue.push 0 # 1 time
     end
 
     @test_manager.subscribe("test_event.another_thread") do |message, subject|
@@ -38,14 +33,16 @@ RSpec.describe Verse::Event::Manager::Local do
       @queue.push 0 # 1 time
     end
 
-    @test_manager.subscribe("*") do
-      @queue.push 0 # 3 times
+    @test_manager.subscribe("another_subject.example") do |message, subject|
+      expect(subject).to eq("another_subject.example")
+      expect(message.content).to eq("example3")
+      @queue.push 0 # 1 time
     end
 
     @test_manager.publish("test_event.example", "example")
     @test_manager.publish("test_event.another_thread", "example2")
     @test_manager.publish("another_subject.example", "example3")
-    8.times{ @queue.pop } # First subscription will be called twice x2.
+    3.times{ @queue.pop } # First subscription will be called twice x2.
     expect(@queue.size).to eq(0)
   end
 

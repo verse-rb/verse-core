@@ -21,14 +21,15 @@ module Verse
         # Publish an event which happened to a specific resource.
         # @param resource [String] The resource related to the event.
         # This is useful to ensure ordering of events.
-        # @param resource_type [String] The resource type
+        # @param resource_type [String] The resource type/class
+        # @param resource_id [String] The resource id
         # @param event [String] The event type
         # @param payload [Hash] The payload content of the event
         # @param headers [Hash] The headers of the message (if any)
         # @param reply_to [String] The channel to send the response to if any
-        def publish_resource_event(resource_type:, event:, payload:, headers: {}, reply_to: nil)
+        def publish_resource_event(resource_type:, resource_id:, event:, payload:, headers: {}, reply_to: nil)
           # :nocov:
-          raise NotImplementedError, "please implement publish_event"
+          raise NotImplementedError, "please implement publish_resource_event"
           # :nocov:
         end
 
@@ -37,7 +38,7 @@ module Verse
         # @param payload [Hash] The payload of the message
         # @param headers [Hash] The headers of the message (if any)
         # @param reply_to [String] The channel to send the response to
-        def publish(channel, payload, headers: {}, reply_to: nil)
+        def publish(topic, payload, headers: {}, reply_to: nil)
           # :nocov:
           raise NotImplementedError, "please implement publish"
           # :nocov:
@@ -75,13 +76,14 @@ module Verse
         # @param mode [Symbol] The mode of the subscription
         # @param block [Proc] The block to execute when a message is received
         # @return [Verse::Event::Subscription] The subscription object
-        def subscribe(topic, mode = Manager::MODE_CONSUMER, &block)
+        def subscribe(topic, mode: Manager::MODE_CONSUMER, &block)
           # :nocov:
           raise NotImplementedError, "please implement subscribe"
           # :nocov:
         end
 
-        def subscribe_resource_event(resource_type, event, &block)
+        #
+        def subscribe_resource_event(resource_type:, event:, mode: Manager::MODE_CONSUMER, &block)
           # :nocov:
           raise NotImplementedError, "please implement subscribe_event"
           # :nocov:

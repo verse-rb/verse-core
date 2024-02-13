@@ -3,16 +3,24 @@
 module Verse
   attr_accessor :event_manager
 
-  def publish(channel, content, headers: {}, reply_to: nil)
+  def publish(topic, payload, headers: {}, reply_to: nil)
     if manager = Verse.event_manager
       manager.publish(
-        channel,
-        content,
+        topic,
+        payload,
         headers: headers,
         reply_to: reply_to
       )
     else
-      Verse.logger.debug{ "[no_em] publish on #{channel} #{content.inspect}" }
+      Verse.logger.debug{ "[no_em] publish on #{topic} #{content.inspect}" }
+    end
+  end
+
+  def publish_resource_event(resource_type:, resource_id:, event:, payload:, headers: {}, reply_to: nil)
+    if manager = Verse.event_manager
+      manager.publish_resource_event(resource_type:, resource_id:, event:, payload:, headers:, reply_to:)
+    else
+      Verse.logger.debug{ "[no_em] publish_event on #{resource}##{event} #{content.inspect}" }
     end
   end
 
