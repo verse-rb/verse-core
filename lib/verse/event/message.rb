@@ -3,18 +3,18 @@
 module Verse
   module Event
     class Message
-      attr_reader :headers, :content, :reply_to, :manager, :key
+      attr_reader :headers, :content, :reply_to, :manager
 
-      def initialize(manager, content, headers: {}, key: nil, reply_to: nil)
+      def initialize(manager, content, headers: {}, reply_to: nil)
+        @manager = manager
+
         @content = content
         @headers = headers
         @reply_to = reply_to
-        @manager = manager
-        @key = key
       end
 
       def reply(content, headers: {})
-        raise "cannot reply to: empty reply channel" unless @reply_to
+        raise "cannot reply to: empty reply channel" unless allow_reply?
 
         @manager.publish(@reply_to, content, headers: headers)
       end

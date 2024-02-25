@@ -25,9 +25,9 @@ module Verse
     config_path: "./config"
   )
     init(
-      root_path: root_path,
-      logger: logger,
-      config_path: config_path
+      root_path:,
+      logger:,
+      config_path:
     )
     logger.info{ "init sequence... `#{mode}` mode" }
 
@@ -43,7 +43,9 @@ module Verse
 
     logger.info{ "notifying plugins start" }
     Verse::Plugin.start(mode)
-    logger.info{ "verse startup sequence completed" }
+    logger.info{ "starting event manager" }
+    @event_manager&.start
+    logger.info{ "Verse startup sequence completed" }
   end
 
   def initialize_event_manager!

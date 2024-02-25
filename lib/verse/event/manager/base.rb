@@ -27,7 +27,7 @@ module Verse
         # @param payload [Hash] The payload content of the event
         # @param headers [Hash] The headers of the message (if any)
         # @param reply_to [String] The channel to send the response to if any
-        def publish_resource_event(resource_type:, resource_id:, event:, payload:, headers: {}, reply_to: nil)
+        def publish_resource_event(resource_type:, resource_id:, event:, payload:, headers: {})
           # :nocov:
           raise NotImplementedError, "please implement publish_resource_event"
           # :nocov:
@@ -75,7 +75,6 @@ module Verse
         # @param topic [String] The topic to subscribe to
         # @param mode [Symbol] The mode of the subscription
         # @param block [Proc] The block to execute when a message is received
-        # @return [Verse::Event::Subscription] The subscription object
         def subscribe(topic, mode: Manager::MODE_CONSUMER, &block)
           # :nocov:
           raise NotImplementedError, "please implement subscribe"

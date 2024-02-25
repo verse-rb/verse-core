@@ -16,7 +16,6 @@ module Verse
           EventBus.new(self, channel, type: Verse::Event::Manager::MODE_CONSUMER, ack_type: ack_type, **opts)
         end
 
-
         def on_resource_event(resource, event, ack_type: :auto, **opts)
           EventBus.new(self, channel, type: Verse::Event::Manager::MODE_CONSUMER, ack_type: ack_type, **opts)
         end

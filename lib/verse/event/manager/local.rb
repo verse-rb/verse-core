@@ -121,8 +121,8 @@ module Verse
           end
         end
 
-        def publish_resource_event(resource_type:, resource_id:, event:, payload:, headers: {}, reply_to: nil)
-          message = Message.new(self, payload, headers: headers, reply_to: reply_to)
+        def publish_resource_event(resource_type:, resource_id:, event:, payload:, headers: {})
+          message = Message.new(self, payload, headers: headers)
           channel = [resource_type, resource_id]
 
           @subscriptions.lazy.select{|chan, _| channel==chan }.map(&:last).each do |sub|

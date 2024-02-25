@@ -16,9 +16,9 @@ module Verse
     end
   end
 
-  def publish_resource_event(resource_type:, resource_id:, event:, payload:, headers: {}, reply_to: nil)
+  def publish_resource_event(resource_type:, resource_id:, event:, payload:, headers: {})
     if manager = Verse.event_manager
-      manager.publish_resource_event(resource_type:, resource_id:, event:, payload:, headers:, reply_to:)
+      manager.publish_resource_event(resource_type:, resource_id:, event:, payload:, headers:)
     else
       Verse.logger.debug{ "[no_em] publish_event on #{resource}##{event} #{content.inspect}" }
     end
