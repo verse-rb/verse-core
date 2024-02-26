@@ -14,6 +14,7 @@ module Verse
   end
 
   def stop
+    Verse.event_manager&.stop
     Verse::Plugin.stop
     Verse::Plugin.finalize
   end
@@ -56,7 +57,7 @@ module Verse
     adapter = em.fetch(:adapter)
 
     @event_manager = Verse::Event::Manager[adapter].new(
-      service_name, em.fetch(:config, {}), logger
+      service_name:, service_id:, config: em.fetch(:config, {}), logger:
     )
   end
 

@@ -28,7 +28,7 @@ module Verse
           end
         end
 
-        def initialize(service_name, config = nil, logger = Logger.new($stdout))
+        def initialize(service_name:, service_id:, config: nil, logger: Logger.new($stdout))
           super
 
           @subscriptions = {}

@@ -10,7 +10,7 @@ RSpec.describe Verse::Event::Manager::Local do
   end
 
   before(:each) do
-    @test_manager = Verse::Event::Manager::Local.new("test_service", {})
+    @test_manager = Verse::Event::Manager::Local.new(service_name: "test_service", service_id: "1")
     @test_manager.start
   end
 

@@ -38,6 +38,8 @@ module Verse
       # by only one instance of a same service.
       MODE_COMMAND   = :command
 
+      ALL_MODES = [MODE_BROADCAST, MODE_CONSUMER, MODE_COMMAND].freeze
+
       @em_types = {}
 
       def self.em_types

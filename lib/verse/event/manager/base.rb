@@ -6,8 +6,9 @@ module Verse
       class Base
         attr_reader :service_name, :config, :logger
 
-        def initialize(service_name, config = nil, logger = Logger.new($stdout))
+        def initialize(service_name:, service_id:, config: nil, logger: Logger.new($stdout))
           @service_name = service_name
+          @service_id = service_id
           @config = config
           @logger = logger
         end
