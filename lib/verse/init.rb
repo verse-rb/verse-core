@@ -16,9 +16,12 @@ module Verse
   def stop
     @on_stop_callbacks&.each(&:call)
     @on_stop_callbacks&.clear
+
     Verse.event_manager&.stop
     Verse::Plugin.stop
     Verse::Plugin.finalize
+
+    @started = false
   end
 
   def start(

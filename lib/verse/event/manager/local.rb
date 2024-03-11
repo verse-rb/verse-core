@@ -67,7 +67,7 @@ module Verse
           end
 
           Timeout.timeout(timeout) do
-            message = Message.new(self, content, headers: headers, reply_to: reply_to)
+            message = Message.new(content, manager: self, headers: headers, reply_to: reply_to)
 
             @subscriptions.each do |pattern, subscribers|
               next unless pattern.match?(channel)
@@ -114,7 +114,7 @@ module Verse
         # @param headers [Hash] The headers of the message (if any)
         # @param reply_to [String] The reply_to of the message (if any)
         def publish(channel, payload, headers: {}, reply_to: nil)
-          message = Message.new(self, payload, headers: headers, reply_to: reply_to)
+          message = Message.new(payload, manager: self, headers: headers, reply_to: reply_to)
 
           @subscriptions.lazy.select{|chan, _| channel==chan }.map(&:last).each do |sub|
             sub.each{ |s| s.call(message, channel) }
@@ -122,7 +122,7 @@ module Verse
         end
 
         def publish_resource_event(resource_type:, resource_id:, event:, payload:, headers: {})
-          message = Message.new(self, payload, headers: headers)
+          message = Message.new(payload, manager: self, headers: headers)
           channel = [resource_type, resource_id]
 
           @subscriptions.lazy.select{|chan, _| channel==chan }.map(&:last).each do |sub|

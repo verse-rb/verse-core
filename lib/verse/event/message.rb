@@ -5,7 +5,7 @@ module Verse
     class Message
       attr_reader :headers, :content, :reply_to, :manager
 
-      def initialize(manager, content, headers: {}, reply_to: nil)
+      def initialize(content, manager: nil, headers: {}, reply_to: nil)
         @manager = manager
 
         @content = content
@@ -14,13 +14,13 @@ module Verse
       end
 
       def reply(content, headers: {})
-        raise "cannot reply to: empty reply channel" unless allow_reply?
+        raise "cannot reply to: empty reply channel or no manager" unless allow_reply?
 
         @manager.publish(@reply_to, content, headers: headers)
       end
 
       def allow_reply?
-        @reply_to && @reply_to != ""
+        @reply_to && @reply_to != "" && @manager
       end
 
       def ack
