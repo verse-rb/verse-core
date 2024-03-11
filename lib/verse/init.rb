@@ -14,6 +14,8 @@ module Verse
   end
 
   def stop
+    @on_stop_callbacks&.each(&:call)
+    @on_stop_callbacks&.clear
     Verse.event_manager&.stop
     Verse::Plugin.stop
     Verse::Plugin.finalize
@@ -66,6 +68,14 @@ module Verse
       block.call
     else
       (@on_boot_callbacks ||= []) << block
+    end
+  end
+
+  def on_stop(&block)
+    if !@started
+      block.call
+    else
+      (@on_stop_callbacks ||= []) << block
     end
   end
 
