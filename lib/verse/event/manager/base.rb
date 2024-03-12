@@ -85,7 +85,7 @@ module Verse
         #
         def subscribe_resource_event(resource_type:, event:, mode: Manager::MODE_CONSUMER, &block)
           # :nocov:
-          raise NotImplementedError, "please implement subscribe_event"
+          raise NotImplementedError, "please implement subscribe_resource_event"
           # :nocov:
         end
       end

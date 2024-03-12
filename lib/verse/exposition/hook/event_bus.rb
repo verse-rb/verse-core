@@ -7,13 +7,14 @@ module Verse
     module Hook
       # This type of exposition listen to the event bus
       class EventBus < Base
-        attr_reader :method, :channels, :type
+        attr_reader :method, :channels, :resource_channels, :type
 
         # @param exposition [Verse::Exposition::Base] The exposition instance
         # @param channels [Array<String>] The list of channels to listen to
         # @param type [Symbol] The type of listener. `:broadcast`, `:consumer` or `:command`
         def initialize(exposition,
-                       channels,
+                       channels: [],
+                       resource_channels: [],
                        type: Verse::Event::Manager::MODE_CONSUMER,
                        root: nil,
                        ack: :on_receive,
@@ -29,6 +30,9 @@ module Verse
           @channels = channels.map{ |c|
             [root, c].compact.reject(&:empty?).join(".")
           }.freeze
+
+          resource_channels = [resource_channels] if resource_channels.is_a?(String)
+          @resource_channels = resource_channels
         end
 
         # @return [Array<String>] The list of channels to listen to,
@@ -84,55 +88,65 @@ module Verse
             return false
           end
 
-          channel_path.each do |c|
-            Verse.event_manager.subscribe(c, mode: @type) do |message, subject|
-              Verse.logger.debug{ "Received event #{subject}" }
+          code = -> (message, subject) do
+            Verse.logger.debug{ "Received event #{subject}" }
 
-              output = nil
+            output = nil
 
-              begin
-                method = @method
-                metablock = @metablock
+            begin
+              method = @method
+              metablock = @metablock
 
-                safe_params = metablock.process_input(message.content)
+              safe_params = metablock.process_input(message.content)
 
-                exposition = create_exposition(
-                  auth_context_for(message),
-                  message: message,
-                  reply_to: message.reply_to,
-                  subject: subject,
-                  params: safe_params,
-                  metadata: {}
-                )
+              exposition = create_exposition(
+                auth_context_for(message),
+                message: message,
+                reply_to: message.reply_to,
+                subject: subject,
+                params: safe_params,
+                metadata: {}
+              )
 
-                output = exposition.run do
-                  metablock.process_output(
-                    method.bind(self).call
-                  )
-                end
-              rescue StandardError => e
-                Verse.logger.warn{ "Error while processing for method at #{@method.source_location.join(":")}" }
-                Verse.logger.warn(e)
-
-                is_error = true
-                output = e
-              end
-
-              if allow_reply? && message.allow_reply?
-                out, headers = create_output_message(
-                  subject, output, is_error: is_error
-                )
-
-                Verse.logger.debug{ "Reply to #{message.reply_to}" }
-                message.reply(
-                  out, headers: headers
+              output = exposition.run do
+                metablock.process_output(
+                  method.bind(self).call
                 )
               end
+            rescue StandardError => e
+              Verse.logger.warn{ "Error while processing for method at #{@method.source_location.join(":")}" }
+              Verse.logger.warn(e)
 
-              raise output if is_error
-
-              output
+              is_error = true
+              output = e
             end
+
+            if allow_reply? && message.allow_reply?
+              out, headers = create_output_message(
+                subject, output, is_error: is_error
+              )
+
+              Verse.logger.debug{ "Reply to #{message.reply_to}" }
+              message.reply(
+                out, headers: headers
+              )
+            end
+
+            raise output if is_error
+
+            output
+          end
+
+          channel_path.each do |c|
+            Verse.event_manager.subscribe(c, mode: @type, &code)
+          end
+
+          resource_channels.each do |(resource_type, event)|
+            Verse.event_manager.subscribe_resource_event(
+              resource_type:,
+              event:,
+              mode: @type, &code
+            )
           end
         end
       end

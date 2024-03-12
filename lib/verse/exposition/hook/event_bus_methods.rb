@@ -13,11 +13,11 @@ module Verse
         #                          By default, will acknowledge the message
         #                          automatically on reception.
         def on_event(channel, ack_type: :auto, **opts)
-          EventBus.new(self, channel, type: Verse::Event::Manager::MODE_CONSUMER, ack_type: ack_type, **opts)
+          EventBus.new(self, channels: channel, type: Verse::Event::Manager::MODE_CONSUMER, ack_type: ack_type, **opts)
         end
 
         def on_resource_event(resource, event, ack_type: :auto, **opts)
-          EventBus.new(self, channel, type: Verse::Event::Manager::MODE_CONSUMER, ack_type: ack_type, **opts)
+          EventBus.new(self, resource_channels: [resource, event], type: Verse::Event::Manager::MODE_CONSUMER, ack_type: ack_type, **opts)
         end
 
         # Subscribe to the event bus as a command.
@@ -26,7 +26,7 @@ module Verse
         def on_command(command_name, absolute: false, auth: :header, no_reply: false, **opts)
           EventBus.new(
             self,
-            command_name,
+            channels: command_name,
             type: Verse::Event::Manager::MODE_COMMAND,
             **opts.merge(
               no_reply: no_reply,
@@ -45,7 +45,7 @@ module Verse
         def on_broadcast(channel, **opts)
           EventBus.new(
             self,
-            channel,
+            channels: channel,
             type: Verse::Event::Manager::MODE_BROADCAST,
             **opts
           )
