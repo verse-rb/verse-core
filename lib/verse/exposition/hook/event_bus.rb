@@ -7,14 +7,14 @@ module Verse
     module Hook
       # This type of exposition listen to the event bus
       class EventBus < Base
-        attr_reader :method, :channels, :resource_channels, :type
+        attr_reader :method, :channel, :resource_channel, :type
 
         # @param exposition [Verse::Exposition::Base] The exposition instance
         # @param channels [Array<String>] The list of channels to listen to
         # @param type [Symbol] The type of listener. `:broadcast`, `:consumer` or `:command`
         def initialize(exposition,
-                       channels: [],
-                       resource_channels: [],
+                       channel: nil,
+                       resource_channel: nil,
                        type: Verse::Event::Manager::MODE_CONSUMER,
                        root: nil,
                        ack: :on_receive,
@@ -25,25 +25,19 @@ module Verse
           @opts = opts
           @ack = ack
 
-          channels = [channels] if channels.is_a?(String)
-
-          @channels = channels.map{ |c|
-            [root, c].compact.reject(&:empty?).join(".")
-          }.freeze
-
-          resource_channels = [resource_channels] if resource_channels.is_a?(String)
-          @resource_channels = resource_channels
+          @channel = channel
+          @resource_channel = resource_channel
         end
 
         # @return [Array<String>] The list of channels to listen to,
         #   with the service name prepended when the type is command
         #   unless absolute_path is set to true
         def channel_path
-          if type != Verse::Event::Manager::MODE_COMMAND || @opts[:absolute_path]
-            return @channels
+          if !@channel || type != Verse::Event::Manager::MODE_COMMAND || @opts[:absolute_path]
+            return @channel
           end
 
-          @channels.map{ |c| [Verse.service_name, c].join(".") }
+          [Verse.service_name, @channel].join(".")
         end
 
         # r command output to publish in the reply channel
@@ -137,14 +131,17 @@ module Verse
             output
           end
 
-          channel_path.each do |c|
-            Verse.event_manager.subscribe(c, mode: @type, &code)
+
+          cp = channel_path
+
+          if cp
+            Verse.event_manager.subscribe(channel_path, mode: @type, &code)
           end
 
-          resource_channels.each do |(resource_type, event)|
+          if resource_channel
             Verse.event_manager.subscribe_resource_event(
-              resource_type:,
-              event:,
+              resource_type: resource_channel[0],
+              event: resource_channel[1],
               mode: @type, &code
             )
           end
