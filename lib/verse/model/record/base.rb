@@ -117,6 +117,7 @@ module Verse
 
         def ==(other)
           return false unless other.is_a?(self.class)
+
           id == other.id
         end
 

@@ -8,8 +8,8 @@ module Verse
       manager.publish(
         topic,
         payload,
-        headers: headers,
-        reply_to: reply_to
+        headers:,
+        reply_to:
       )
     else
       Verse.logger.debug{ "[no_em] publish on #{topic} #{content.inspect}" }
@@ -29,9 +29,9 @@ module Verse
       manager.request(
         channel,
         content,
-        headers: headers,
-        reply_to: reply_to,
-        timeout: timeout
+        headers:,
+        reply_to:,
+        timeout:
       )
     else
       Verse.logger.debug{ "[no_em] request on #{channel} #{content.inspect}" }
@@ -43,9 +43,9 @@ module Verse
       manager.request_all(
         channel,
         content,
-        headers: headers,
-        reply_to: reply_to,
-        timeout: timeout
+        headers:,
+        reply_to:,
+        timeout:
       )
     else
       Verse.logger.debug{ "[no_em] request_all on #{channel} #{content.inspect}" }

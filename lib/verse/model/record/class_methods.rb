@@ -101,14 +101,14 @@ module Verse
           end
 
           opts = opts.merge({
-            array: false,
-            type: :belongs_to,
-            foreign_key: foreign_key,
-            primary_key: primary_key,
-            repository: repository,
-            record: record,
-            filters: filters
-          })
+                              array: false,
+                              type: :belongs_to,
+                              foreign_key:,
+                              primary_key:,
+                              repository:,
+                              record:,
+                              filters:
+                            })
 
           relation relation_name, **opts do |collection, auth_context, sub_included|
             repository = Reflection.constantize(repository) if repository.is_a?(String)
@@ -133,7 +133,7 @@ module Verse
                 **filters
               },
               included: sub_included,
-              record: record
+              record:
             )
 
             [
@@ -174,14 +174,14 @@ module Verse
           repository ||= "#{root}::#{StringUtil.camelize(Verse.inflector.singularize(relation_name.to_s))}Repository"
 
           opts = opts.merge({
-            array: true,
-            type: :has_many,
-            foreign_key: foreign_key,
-            primary_key: primary_key,
-            record: record,
-            repository: repository,
-            filters: filters
-          })
+                              array: true,
+                              type: :has_many,
+                              foreign_key:,
+                              primary_key:,
+                              record:,
+                              repository:,
+                              filters:
+                            })
 
           relation relation_name, **opts do |collection, auth_context, sub_included|
             repository = Reflection.constantize(repository) if repository.is_a?(String)
@@ -209,7 +209,7 @@ module Verse
                 **filters
               },
               included: sub_included,
-              record: record
+              record:
             )
 
             [
@@ -233,14 +233,14 @@ module Verse
           repository ||= "#{root}::#{StringUtil.camelize(Verse.inflector.singularize(relation_name.to_s))}Repository"
 
           opts = opts.merge({
-            array: false,
-            type: :has_one,
-            foreign_key: foreign_key,
-            primary_key: primary_key,
-            record: record,
-            repository: repository,
-            filters: filters
-          })
+                              array: false,
+                              type: :has_one,
+                              foreign_key:,
+                              primary_key:,
+                              record:,
+                              repository:,
+                              filters:
+                            })
 
           relation relation_name, **opts do |collection, auth_context, sub_included|
             repository = Reflection.constantize(repository) if repository.is_a?(String)
@@ -268,7 +268,7 @@ module Verse
                 **filters
               },
               included: sub_included,
-              record: record
+              record:
             )
 
             [
@@ -314,7 +314,7 @@ module Verse
 
           raise "type unknown: #{type}" unless Converter.has_converter?(type)
 
-          @fields[key] = { name: name, key: key, type: type, visible: visible }
+          @fields[key] = { name:, key:, type:, visible: }
 
           if primary
             raise "field: primary key already defined: #{@primary_key}" if @primary_key

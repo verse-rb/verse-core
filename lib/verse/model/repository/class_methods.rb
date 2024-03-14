@@ -118,8 +118,8 @@ module Verse
                           resource_id: result.to_s,
                           event: name,
                           payload: {
-                            args: args,
-                            metadata: metadata
+                            args:,
+                            metadata:
                           }
                         )
                       end
@@ -142,7 +142,7 @@ module Verse
                           event: name,
                           payload: {
                             args: arg2,
-                            metadata: metadata
+                            metadata:
                           },
                         )
                       end

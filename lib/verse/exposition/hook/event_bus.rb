@@ -16,7 +16,6 @@ module Verse
                        channel: nil,
                        resource_channel: nil,
                        type: Verse::Event::Manager::MODE_CONSUMER,
-                       root: nil,
                        ack: :on_receive,
                        **opts)
           super(exposition)
@@ -44,7 +43,7 @@ module Verse
         def create_output_message(topic, output, is_error:)
           if is_error
             [{
-              topic: topic,
+              topic:,
               error: {
                 type: output.class.name,
                 message: output.message,
@@ -58,8 +57,8 @@ module Verse
           else
             [
               {
-                topic: topic,
-                output: output
+                topic:,
+                output:
               },
               {
                 content: "reply:output"
@@ -82,7 +81,7 @@ module Verse
             return false
           end
 
-          code = -> (message, subject) do
+          code = ->(message, subject) do
             Verse.logger.debug{ "received event from #{subject}" }
 
             output = nil
@@ -95,9 +94,9 @@ module Verse
 
               exposition = create_exposition(
                 auth_context_for(message),
-                message: message,
+                message:,
                 reply_to: message.reply_to,
-                subject: subject,
+                subject:,
                 params: safe_params,
                 metadata: {}
               )
@@ -117,12 +116,12 @@ module Verse
 
             if allow_reply? && message.allow_reply?
               out, headers = create_output_message(
-                subject, output, is_error: is_error
+                subject, output, is_error:
               )
 
               Verse.logger.debug{ "Reply to #{message.reply_to}" }
               message.reply(
-                out, headers: headers
+                out, headers:
               )
             end
 
@@ -131,20 +130,19 @@ module Verse
             output
           end
 
-
           cp = channel_path
 
           if cp
             Verse.event_manager.subscribe(channel_path, mode: @type, &code)
           end
 
-          if resource_channel
-            Verse.event_manager.subscribe_resource_event(
-              resource_type: resource_channel[0],
-              event: resource_channel[1],
-              mode: @type, &code
-            )
-          end
+          return unless resource_channel
+
+          Verse.event_manager.subscribe_resource_event(
+            resource_type: resource_channel[0],
+            event: resource_channel[1],
+            mode: @type, &code
+          )
         end
       end
     end

@@ -34,7 +34,7 @@ RSpec.describe Verse::Util::Iterator do
         end
 
         result = iterator.each_with_index.map do |_, n|
-          { n_each_called: n + 1, block_call_count: block_call_count }
+          { n_each_called: n + 1, block_call_count: }
         end
 
         expect(result).to eq(expectation)

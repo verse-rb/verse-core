@@ -30,7 +30,7 @@ class SpecHook < Verse::Exposition::Hook::Base
         ctx,
         context: "This is some contextual information",
         some_data: @some_data,
-        params: params
+        params:
       )
 
       method = @method

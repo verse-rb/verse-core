@@ -16,7 +16,7 @@ module Verse
       def reply(content, headers: {})
         raise "cannot reply to: empty reply channel or no manager" unless allow_reply?
 
-        @manager.publish(@reply_to, content, headers: headers)
+        @manager.publish(@reply_to, content, headers:)
       end
 
       def allow_reply?

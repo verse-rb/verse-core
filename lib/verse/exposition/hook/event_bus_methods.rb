@@ -14,7 +14,7 @@ module Verse
         def on_event(channel, ack_type: :auto, **opts)
           EventBus.new(
             self,
-            channel: channel,
+            channel:,
             type: Verse::Event::Manager::MODE_CONSUMER,
             ack_type:,
             **opts
@@ -40,9 +40,9 @@ module Verse
             channel: command_name,
             type: Verse::Event::Manager::MODE_COMMAND,
             **opts.merge(
-              no_reply: no_reply,
-              auth: auth,
-              absolute: absolute
+              no_reply:,
+              auth:,
+              absolute:
             )
           )
         end
@@ -56,7 +56,7 @@ module Verse
         def on_broadcast(channel, **opts)
           EventBus.new(
             self,
-            channel: channel,
+            channel:,
             type: Verse::Event::Manager::MODE_BROADCAST,
             **opts
           )
