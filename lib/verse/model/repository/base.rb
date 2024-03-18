@@ -45,7 +45,7 @@ module Verse
           # :nocov:
         end
 
-        event("created", creation: true)
+        event(creation: true)
         def create(attributes)
           scoped(:create)
           attributes = encode(attributes)
@@ -58,9 +58,9 @@ module Verse
           # :nocov:
         end
 
-        event("deleted")
+        event
         def delete(id)
-          id = find_by({ id: id }, scope: scoped(:delete))&.id
+          id = find_by({ id: }, scope: scoped(:delete))&.id
 
           return false unless id
 
@@ -74,11 +74,11 @@ module Verse
         end
 
         def find(id, scope: scoped(:read), included: [], record: self.class.model_class)
-          find_by({ self.class.primary_key => id }, scope: scope, included: included, record: record)
+          find_by({ self.class.primary_key => id }, scope:, included:, record:)
         end
 
         def find!(id, scope: scoped(:read), included: [], record: self.class.model_class)
-          find_by!({ self.class.primary_key => id }, scope: scope, included: included, record: record)
+          find_by!({ self.class.primary_key => id }, scope:, included:, record:)
         end
 
         def find_by(
@@ -91,14 +91,14 @@ module Verse
 
           result = find_by_impl(
             filter,
-            scope: scope,
+            scope:,
           )
 
           return if result.nil?
 
           result = decode(result)
 
-          set = prepare_included(included, [result], record: record)
+          set = prepare_included(included, [result], record:)
 
           record.new(result, include_set: set)
         end
@@ -128,14 +128,14 @@ module Verse
 
           collection, metadata = index_impl(
             filters,
-            scope: scope,
-            page: page,
-            items_per_page: items_per_page,
-            sort: sort,
-            query_count: query_count
+            scope:,
+            page:,
+            items_per_page:,
+            sort:,
+            query_count:
           )
 
-          set = prepare_included(included, collection, record: record)
+          set = prepare_included(included, collection, record:)
 
           Verse::Util::ArrayWithMetadata.new(
             collection.map{ |elm|
@@ -143,7 +143,7 @@ module Verse
                 decode(elm), include_set: set
               )
             },
-            metadata: metadata
+            metadata:
           )
         end
 
@@ -197,11 +197,11 @@ module Verse
           Verse::Util::Iterator.chunk_iterator page do |current_page|
             result = index(
               filters,
-              scope: scope,
-              included: included,
+              scope:,
+              included:,
               page: current_page,
-              items_per_page: items_per_page,
-              sort: sort,
+              items_per_page:,
+              sort:,
               query_count: false
             )
 
@@ -295,18 +295,6 @@ module Verse
           # :nocov:
           raise NotImplementedError, "please redefine scoped on child repositories and use @auth_context to filter."
           # :nocov:
-        end
-
-        def can_create?(auth_context, &block)
-          auth_context.can!(:create, aggregate_name) do |scope|
-            scope.all?(&block)
-          end
-        end
-
-        def can_update?(auth_context, &block)
-          auth_context.can!(:update, aggregate_name) do |scope|
-            scope.all?(&block)
-          end
         end
 
         # return a hash tree from the include list:

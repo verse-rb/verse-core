@@ -28,28 +28,24 @@ module Verse
           end
         end
 
-        def initialize(service_name, config = nil, logger = Logger.new($stdout))
+        def initialize(service_name:, service_id:, config: nil, logger: Logger.new($stdout))
           super
 
           @subscriptions = {}
         end
 
         def subscribe(
-          channel,
-          _method = Manager::MODE_CONSUMER,
-          priority: nil, # rubocop:disable Lint/UnusedMethodArgument
-          ack_type: nil, # rubocop:disable Lint/UnusedMethodArgument
+          topic,
+          mode: Manager::MODE_CONSUMER, # rubocop:disable Lint/UnusedMethodArgument
           &block
         )
           return if @config&.fetch(:disable_subscription, nil)
 
-          regexp = Regexp.new(
-            "^#{channel.gsub(".", "\\.").gsub("?", "[^\.]+").gsub("*", ".*")}$"
-          )
+          add_to_subscription_list(topic, &block)
+        end
 
-          add_to_subscription_list(regexp) do |message, subject|
-            block.call(message, subject)
-          end
+        def subscribe_resource_event(resource_type:, event:, mode: Manager::MODE_CONSUMER, &block)
+          subscribe(topic: [resource_type, event], mode:, &block)
         end
 
         def start
@@ -60,6 +56,7 @@ module Verse
           @subscriptions.clear
         end
 
+        # @overload request(channel, content, headers: {}, reply_to: nil, timeout: 0.05)
         def request(channel, content, headers: {}, reply_to: nil, timeout: 0.05)
           reply_to ||= "_reply.#{SecureRandom.hex}"
 
@@ -71,7 +68,7 @@ module Verse
           end
 
           Timeout.timeout(timeout) do
-            message = Message.new(self, content, headers: headers, reply_to: reply_to)
+            message = Message.new(content, manager: self, headers:, reply_to:)
 
             @subscriptions.each do |pattern, subscribers|
               next unless pattern.match?(channel)
@@ -90,7 +87,7 @@ module Verse
 
         def request_all(
           channel,
-          body: {},
+          content,
           headers: {},
           reply_to: nil, # rubocop:disable Lint/UnusedMethodArgument
           timeout: 0.5
@@ -99,7 +96,7 @@ module Verse
           begin
             out = []
             Timeout.timeout(timeout) do
-              out << request(channel, body: body, headers: headers, timeout: timeout)
+              out << request(channel, content, headers:, timeout:)
               sleep
             end
           rescue Timeout::Error
@@ -117,15 +114,21 @@ module Verse
         # @param body [Hash] The payload of the message
         # @param headers [Hash] The headers of the message (if any)
         # @param reply_to [String] The reply_to of the message (if any)
-        def publish(channel, content, headers: {}, reply_to: nil)
-          message = Message.new(self, content, headers: headers, reply_to: reply_to)
+        def publish(channel, payload, headers: {}, reply_to: nil)
+          message = Message.new(payload, manager: self, headers:, reply_to:)
 
-          @subscriptions.each do |pattern, subscribers|
-            next unless pattern.match?(channel)
+          @subscriptions.lazy.select{ |chan, _| channel == chan }.map(&:last).each do |sub|
+            sub.each{ |s| s.call(message, channel) }
+          end
+        end
 
-            subscribers.each do |s|
-              s.call(message, channel)
-            end
+        def publish_resource_event(resource_type:, resource_id:, event:, payload:, headers: {})
+          headers = headers.merge(event:)
+          message = Message.new(payload, manager: self, headers:)
+          channel = [resource_type, resource_id]
+
+          @subscriptions.lazy.select{ |chan, _| channel == chan }.map(&:last).each do |sub|
+            sub.each{ |s| s.call(message, channel) }
           end
         end
 
@@ -137,10 +140,10 @@ module Verse
 
         private
 
-        def add_to_subscription_list(regexp, &block)
+        def add_to_subscription_list(channel, &block)
           sub = Subscription.new(self, self.class.sub_id, block)
-          @subscriptions[regexp] ||= []
-          @subscriptions[regexp] << sub
+          @subscriptions[channel] ||= []
+          @subscriptions[channel] << sub
           sub
         end
       end

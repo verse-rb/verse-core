@@ -9,7 +9,7 @@ module Verse
         if result.respond_to?(:errors)
           super("verse.errors.validation_failed")
           @source = result&.errors
-        elsif(result.is_a?(String))
+        elsif result.is_a?(String)
           super(result)
         else
           super("verse.errors.validation_failed")

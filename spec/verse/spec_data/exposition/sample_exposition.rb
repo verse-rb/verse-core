@@ -34,8 +34,8 @@ class SampleExposition < Verse::Exposition::Base
 
     self.class.output = {
       name: "#{params[:name]} Doe",
-      context: context,
-      some_data: some_data
+      context:,
+      some_data:
     }
 
     self.class.output

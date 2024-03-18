@@ -3,44 +3,58 @@
 module Verse
   attr_accessor :event_manager
 
-  def publish(channel, content, headers: {}, reply_to: nil)
+  def publish(topic, payload, headers: {}, reply_to: nil)
     if manager = Verse.event_manager
       manager.publish(
-        channel,
-        content,
-        headers: headers,
-        reply_to: reply_to
+        topic,
+        payload,
+        headers:,
+        reply_to:
       )
     else
-      Verse.logger.debug{ "[no_em] publish on #{channel} #{content.inspect}" }
+      Verse.logger.debug{ "[no_em] publish on #{topic} #{content.inspect}" }
     end
   end
 
-  def request(channel, content, headers: {}, reply_to: nil, timeout: 0.5)
+  def publish_resource_event(resource_type:, resource_id:, event:, payload:, headers: {})
+    if manager = Verse.event_manager
+      manager.publish_resource_event(resource_type:, resource_id:, event:, payload:, headers:)
+    else
+      # :nocov:
+      Verse.logger.debug{ "[no_em] publish_event on #{resource}##{event} #{content.inspect}" }
+      # :nocov:
+    end
+  end
+
+  def request(channel, content = {}, headers: {}, reply_to: nil, timeout: 0.5)
     if manager = Verse.event_manager
       manager.request(
         channel,
         content,
-        headers: headers,
-        reply_to: reply_to,
-        timeout: timeout
+        headers:,
+        reply_to:,
+        timeout:
       )
     else
+      # :nocov:
       Verse.logger.debug{ "[no_em] request on #{channel} #{content.inspect}" }
+      # :nocov:
     end
   end
 
-  def request_all(channel, content, headers: {}, reply_to: nil, timeout: 0.5)
+  def request_all(channel, content = {}, headers: {}, reply_to: nil, timeout: 0.5)
     if manager = Verse.event_manager
       manager.request_all(
         channel,
         content,
-        headers: headers,
-        reply_to: reply_to,
-        timeout: timeout
+        headers:,
+        reply_to:,
+        timeout:
       )
     else
+      # :nocov:
       Verse.logger.debug{ "[no_em] request_all on #{channel} #{content.inspect}" }
+      # :nocov:
     end
   end
 end

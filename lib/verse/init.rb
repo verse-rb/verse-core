@@ -14,8 +14,14 @@ module Verse
   end
 
   def stop
+    @on_stop_callbacks&.each(&:call)
+    @on_stop_callbacks&.clear
+
+    Verse.event_manager&.stop
     Verse::Plugin.stop
     Verse::Plugin.finalize
+
+    @started = false
   end
 
   def start(
@@ -25,9 +31,9 @@ module Verse
     config_path: "./config"
   )
     init(
-      root_path: root_path,
-      logger: logger,
-      config_path: config_path
+      root_path:,
+      logger:,
+      config_path:
     )
     logger.info{ "init sequence... `#{mode}` mode" }
 
@@ -43,7 +49,9 @@ module Verse
 
     logger.info{ "notifying plugins start" }
     Verse::Plugin.start(mode)
-    logger.info{ "verse startup sequence completed" }
+    logger.info{ "starting event manager" }
+    @event_manager&.start
+    logger.info{ "Verse startup sequence completed" }
   end
 
   def initialize_event_manager!
@@ -54,7 +62,7 @@ module Verse
     adapter = em.fetch(:adapter)
 
     @event_manager = Verse::Event::Manager[adapter].new(
-      service_name, em.fetch(:config, {}), logger
+      service_name:, service_id:, config: em.fetch(:config, {}), logger:
     )
   end
 
@@ -63,6 +71,14 @@ module Verse
       block.call
     else
       (@on_boot_callbacks ||= []) << block
+    end
+  end
+
+  def on_stop(&block)
+    if !@started
+      block.call
+    else
+      (@on_stop_callbacks ||= []) << block
     end
   end
 
