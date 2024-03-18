@@ -324,7 +324,7 @@ RSpec.describe Verse::Model::Repository::Base do
   describe "json converter" do
     # FIXME: Understand why the converter is not used.
     it "can convert to json" do
-      post = @posts.find_by({title: "Hello"})
+      post = @posts.find_by({ title: "Hello" })
       expect(post.meta).to eq({ foo: "bar" })
     end
   end
