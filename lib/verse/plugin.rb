@@ -64,6 +64,10 @@ module Verse
       end
     end
 
+    def exists?(name)
+      @plugins.key?(name.to_sym)
+    end
+
     def all
       @plugins
     end
