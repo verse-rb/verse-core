@@ -31,6 +31,14 @@ RSpec.describe Verse::Exposition do
     ).to eq(6)
   end
 
+  it "exposes on command using request_all" do
+    expect(
+      Verse.request_all(
+        "verse_spec.sum", { numbers: [1, 2, 3] }, timeout: 0.01
+      ).first.content[:output]
+    ).to eq(6)
+  end
+
   it "exposes on broadcast" do
     Verse.publish("CHANNEL.spec.broadcast", {})
     expect(SampleExpositionEb.something_happened).to eq(true)

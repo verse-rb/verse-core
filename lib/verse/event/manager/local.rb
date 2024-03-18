@@ -56,6 +56,7 @@ module Verse
           @subscriptions.clear
         end
 
+        # @overload request(channel, content, headers: {}, reply_to: nil, timeout: 0.05)
         def request(channel, content, headers: {}, reply_to: nil, timeout: 0.05)
           reply_to ||= "_reply.#{SecureRandom.hex}"
 
@@ -86,7 +87,7 @@ module Verse
 
         def request_all(
           channel,
-          body: {},
+          content,
           headers: {},
           reply_to: nil, # rubocop:disable Lint/UnusedMethodArgument
           timeout: 0.5
@@ -95,7 +96,7 @@ module Verse
           begin
             out = []
             Timeout.timeout(timeout) do
-              out << request(channel, body:, headers:, timeout:)
+              out << request(channel, content, headers:, timeout:)
               sleep
             end
           rescue Timeout::Error
