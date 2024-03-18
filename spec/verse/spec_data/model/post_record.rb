@@ -14,6 +14,8 @@ class PostRecord < Verse::Model::Record::Base
 
   field :secret_field, type: :string, visible: false
 
+  field :meta, type: :json
+
   belongs_to :user
   belongs_to :category, foreign_key: :category_name
 

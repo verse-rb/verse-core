@@ -65,8 +65,8 @@ RSpec.describe Verse::Model::Repository::Base do
     id_post2 = nil
 
     @posts.no_event{ |_r|
-      id_post1 = @posts.create(title: "Hello", user_id: id_john, category_name: "Ruby")
-      id_post2 = @posts.create(title: "World", user_id: id_jane, category_name: "Rails")
+      id_post1 = @posts.create(title: "Hello", user_id: id_john, category_name: "Ruby", meta: { foo: "bar" })
+      id_post2 = @posts.create(title: "World", user_id: id_jane, category_name: "Rails", meta: { foo: "bar2" })
     }
 
     @comments.no_event{ |r|
@@ -318,6 +318,14 @@ RSpec.describe Verse::Model::Repository::Base do
     it "convert fields to correct type" do
       account = @accounts.find_by({})
       expect(account.email).to eq("john@example.tld")
+    end
+  end
+
+  describe "json converter" do
+    # FIXME: Understand why the converter is not used.
+    it "can convert to json" do
+      post = @posts.find_by({title: "Hello"})
+      expect(post.meta).to eq({ foo: "bar" })
     end
   end
 

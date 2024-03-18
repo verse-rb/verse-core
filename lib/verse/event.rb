@@ -20,7 +20,9 @@ module Verse
     if manager = Verse.event_manager
       manager.publish_resource_event(resource_type:, resource_id:, event:, payload:, headers:)
     else
+      # :nocov:
       Verse.logger.debug{ "[no_em] publish_event on #{resource}##{event} #{content.inspect}" }
+      # :nocov:
     end
   end
 
@@ -34,7 +36,9 @@ module Verse
         timeout:
       )
     else
+      # :nocov:
       Verse.logger.debug{ "[no_em] request on #{channel} #{content.inspect}" }
+      # :nocov:
     end
   end
 
@@ -48,7 +52,9 @@ module Verse
         timeout:
       )
     else
+      # :nocov:
       Verse.logger.debug{ "[no_em] request_all on #{channel} #{content.inspect}" }
+      # :nocov:
     end
   end
 end

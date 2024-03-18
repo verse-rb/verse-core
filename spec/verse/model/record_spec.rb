@@ -48,7 +48,8 @@ RSpec.describe Verse::Model::Record::Base do
         title: "Hello",
         content: "World",
         secret_field: "Foo Bar",
-        category_name: nil
+        category_name: nil,
+        meta: nil
       }
     )
 
@@ -59,6 +60,7 @@ RSpec.describe Verse::Model::Record::Base do
         title: "Hello",
         content: "World",
         category_name: nil,
+        meta: nil,
       }
     )
   end
@@ -84,7 +86,8 @@ RSpec.describe Verse::Model::Record::Base do
         user_id: 1,
         title: "Hello",
         content: "World",
-        secret_field: "Foo Bar"
+        secret_field: "Foo Bar",
+        meta: { foo: "bar" }
       }
     )
 
@@ -94,6 +97,7 @@ RSpec.describe Verse::Model::Record::Base do
       category_name: nil,
       title: "Hello",
       content: "World",
+      meta: { foo: "bar" }
     }.to_json)
   end
 end
