@@ -24,7 +24,7 @@ module Verse
     end
   end
 
-  def request(channel, content, headers: {}, reply_to: nil, timeout: 0.5)
+  def request(channel, content = {}, headers: {}, reply_to: nil, timeout: 0.5)
     if manager = Verse.event_manager
       manager.request(
         channel,
@@ -38,7 +38,7 @@ module Verse
     end
   end
 
-  def request_all(channel, content, headers: {}, reply_to: nil, timeout: 0.5)
+  def request_all(channel, content = {}, headers: {}, reply_to: nil, timeout: 0.5)
     if manager = Verse.event_manager
       manager.request_all(
         channel,
