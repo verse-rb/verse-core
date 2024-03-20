@@ -1,27 +1,21 @@
 # frozen_string_literal: true
 
 require_relative "./scope_dsl"
+require_relative "./simple_role_backend"
 
 module Verse
   module Auth
     # object describing authorizations
     class Context
-      @roles = {
-        system: ["*.*.*"],
-        anonymous: []
-      }
-
       class << self
-        attr_reader :roles
+        attr_reader :backend
 
-        def []=(name, rights)
-          @roles[name] = rights
-        end
-
-        def [](name)
-          new(@roles.fetch(name))
+        def [](role)
+          from_role(role)
         end
       end
+
+      @backend = Verse::Auth::SimpleRoleBackend
 
       attr_reader :custom_scopes, :metadata
 
@@ -47,6 +41,11 @@ module Verse
         @metadata = metadata
 
         generate_rights(rights)
+      end
+
+      def self.from_role(role, custom_scopes: {}, metadata: {})
+        right_list = backend.fetch(role)
+        new(right_list, custom_scopes:, metadata:)
       end
 
       # Check whether we can perform an action on a resource.

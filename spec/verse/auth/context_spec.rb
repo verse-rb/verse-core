@@ -44,7 +44,7 @@ RSpec.describe Verse::Auth::Context do
     end
 
     it "can create custom role" do
-      Verse::Auth::Context[:test] = ["users.*.*"]
+      Verse::Auth::SimpleRoleBackend[:test] = ["users.*.*"]
 
       auth = Verse::Auth::Context[:test]
       expect(auth.can?(:read, :users)).to eq(:all)
