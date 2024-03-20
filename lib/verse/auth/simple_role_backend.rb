@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Verse
   module Auth
     module SimpleRoleBackend
@@ -23,7 +25,6 @@ module Verse
           end
         end
       end
-
     end
   end
 end

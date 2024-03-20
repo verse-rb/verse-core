@@ -9,9 +9,9 @@ module Verse
     class << self
       def add_user(name, role, user_context = {}, scopes = {})
         @users[name] = {
-          role: role,
-          user_context: user_context,
-          scopes: scopes
+          role:,
+          user_context:,
+          scopes:
         }
       end
 
@@ -19,7 +19,6 @@ module Verse
         @users[name]
       end
     end
-
   end
 end
 
