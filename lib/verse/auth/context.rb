@@ -13,6 +13,11 @@ module Verse
         def [](role)
           from_role(role)
         end
+
+        def from_role(role, custom_scopes: {}, metadata: {})
+          right_list = backend.fetch(role)
+          new(right_list, custom_scopes:, metadata:)
+        end
       end
 
       @backend = Verse::Auth::SimpleRoleBackend
@@ -41,11 +46,6 @@ module Verse
         @metadata = metadata
 
         generate_rights(rights)
-      end
-
-      def self.from_role(role, custom_scopes: {}, metadata: {})
-        right_list = backend.fetch(role)
-        new(right_list, custom_scopes:, metadata:)
       end
 
       # Check whether we can perform an action on a resource.

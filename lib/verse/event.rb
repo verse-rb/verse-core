@@ -12,7 +12,7 @@ module Verse
         reply_to:
       )
     else
-      Verse.logger.debug{ "[no_em] publish on #{topic} #{content.inspect}" }
+      Verse.logger.debug{ "[no_em] publish on #{topic} (#{payload.size} bytes)" }
     end
   end
 
@@ -21,7 +21,7 @@ module Verse
       manager.publish_resource_event(resource_type:, resource_id:, event:, payload:, headers:)
     else
       # :nocov:
-      Verse.logger.debug{ "[no_em] publish_event on #{resource}##{event} #{content.inspect}" }
+      Verse.logger.debug{ "[no_em] publish_event on #{resource_type}:#{resource_id}##{event} (#{payload.size} bytes)" }
       # :nocov:
     end
   end
@@ -37,7 +37,7 @@ module Verse
       )
     else
       # :nocov:
-      Verse.logger.debug{ "[no_em] request on #{channel} #{content.inspect}" }
+      Verse.logger.debug{ "[no_em] request on #{channel} (#{content.size} bytes)" }
       # :nocov:
     end
   end
@@ -53,7 +53,7 @@ module Verse
       )
     else
       # :nocov:
-      Verse.logger.debug{ "[no_em] request_all on #{channel} #{content.inspect}" }
+      Verse.logger.debug{ "[no_em] request_all on #{channel} (#{content.inspect} bytes)" }
       # :nocov:
     end
   end
