@@ -8,7 +8,7 @@ module Verse
     # object describing authorizations
     class Context
       class << self
-        attr_reader :backend
+        attr_accessor :backend
 
         def [](role)
           from_role(role)
