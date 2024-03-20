@@ -8,6 +8,8 @@ module Verse
     @users = {}
 
     class << self
+      attr_reader :users
+
       def add_user(name, role, user_context = {}, scopes = {})
         @users[name] = {
           role:,

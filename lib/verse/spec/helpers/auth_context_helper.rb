@@ -6,11 +6,22 @@ module Verse
       attr_accessor :current_auth_context
 
       def self.included(base)
-        base.before do
-          @current_auth_context = Verse::Auth::Context.new(
-            user: Verse::Spec[:default_user],
-            scopes: Verse::Spec[:default_user][:scopes]
+        base.around do |example|
+          binding.pry
+          user = example.metadata[:as]
+          params = Verse::Spec.users.fetch(user) {
+            raise "user `#{user}` not found. Please add it with Verse::Spec.add_user"
+          }
+
+          @current_auth_context = Verse::Auth::Context.from_role(
+            params[:role],
+            custom_scopes: params[:scopes],
+            metadata: params[:user_context]
           )
+
+          example.run
+        ensure
+          @current_auth_context = nil
         end
       end
     end
