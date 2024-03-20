@@ -133,7 +133,7 @@ module Verse
         end
 
         def cancel_subscription(id)
-          @subscriptions.each do |_, subscribers|
+          @subscriptions.each_value do |subscribers|
             subscribers.reject! { |sub| sub.id == id }
           end
         end

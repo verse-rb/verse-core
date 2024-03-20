@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "./helpers/service_helper"
+require_relative "./helpers/auth_context_helper"
 
 module Verse
   module Spec
@@ -24,5 +25,5 @@ end
 
 RSpec.configure do |c|
   c.include Verse::Spec::ServiceHelper, type: :service
-  c.include Verse::Spec::ContextHelper, :as
+  c.include Verse::Spec::AuthContextHelper, :as
 end

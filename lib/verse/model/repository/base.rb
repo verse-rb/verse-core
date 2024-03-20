@@ -313,7 +313,7 @@ module Verse
           set = IncludeSet.new(included_list)
           tree = tree_from_include_list included_list
 
-          tree.each do |key, _value|
+          tree.each_key do |key|
             regexp = /^#{key}($|\.)/
 
             sub_included = \
