@@ -7,7 +7,6 @@ module Verse
 
       def self.included(base)
         base.around do |example|
-          binding.pry
           user = example.metadata[:as]
           params = Verse::Spec.users.fetch(user) {
             raise "user `#{user}` not found. Please add it with Verse::Spec.add_user"
