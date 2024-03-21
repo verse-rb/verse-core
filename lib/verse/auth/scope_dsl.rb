@@ -11,7 +11,7 @@ module Verse
 
         @scope = @context.can?(action.to_sym, resource.to_sym)
 
-        context.reject! unless @scope
+        context.reject!("unauthorized action #{action} on #{resource}") unless @scope
 
         @scope = @scope.to_sym
 

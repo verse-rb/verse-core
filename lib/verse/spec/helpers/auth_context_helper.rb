@@ -15,7 +15,7 @@ module Verse
           @current_auth_context = Verse::Auth::Context.from_role(
             params[:role],
             custom_scopes: params[:scopes],
-            metadata: params[:user_context]
+            metadata: params[:user_data]
           )
 
           example.run

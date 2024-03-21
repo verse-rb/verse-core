@@ -10,10 +10,10 @@ module Verse
     class << self
       attr_reader :users
 
-      def add_user(name, role, user_context = {}, scopes = {})
+      def add_user(name, role, user_data: {}, scopes: {})
         @users[name] = {
           role:,
-          user_context:,
+          user_data:,
           scopes:
         }
       end
