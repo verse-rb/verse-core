@@ -11,7 +11,7 @@ module Verse
       attr_reader :users
 
       def add_user(name, role, user_data: {}, scopes: {})
-        @users[name] = {
+        @users[name.to_sym] = {
           role:,
           user_data:,
           scopes:
