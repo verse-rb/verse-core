@@ -76,7 +76,7 @@ module Verse
 
         result = ScopeDSL.new(self, action, resource, &block).result
 
-        reject!("`#{action}` on `#{resource}` is unauthorized") if result.nil?
+        reject!("unauthorized action `#{action}` on `#{resource}`") if result.nil?
 
         result
       end
