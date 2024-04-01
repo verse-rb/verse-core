@@ -199,6 +199,10 @@ module Verse
                   next if condition && !condition.call(x)
 
                   # check key_type using model structure
+                  if !record.fields.key?(foreign_key.to_sym)
+                    raise "foreign key name not found: `#{foreign_key}` on relation `#{relation_name}`."
+                  end
+
                   pkey_info = record.fields[foreign_key.to_sym]
 
                   Verse::Model::Record::Converter.convert(
