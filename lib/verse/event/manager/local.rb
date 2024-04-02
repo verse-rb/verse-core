@@ -133,9 +133,10 @@ module Verse
 
         def publish_resource_event(resource_type:, resource_id:, event:, payload:, headers: {})
           logger.debug{ "Publish resource event #{resource_type} #{event}" }
+
           headers = headers.merge(event:)
           message = Message.new(payload, manager: self, headers:)
-          channel = [resource_type, resource_id]
+          channel = [resource_type, event]
 
           @subscriptions.lazy.select{ |chan, _| channel == chan }.map(&:last).each do |sub|
             sub.each{ |s| s.call(message, channel) }
