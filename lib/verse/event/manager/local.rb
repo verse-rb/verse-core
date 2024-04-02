@@ -39,12 +39,14 @@ module Verse
           mode: Manager::MODE_CONSUMER, # rubocop:disable Lint/UnusedMethodArgument
           &block
         )
+          logger.debug{ "Subscribe to #{topic}" }
           return if @config&.fetch(:disable_subscription, nil)
 
           add_to_subscription_list(topic, &block)
         end
 
         def subscribe_resource_event(resource_type:, event:, mode: Manager::MODE_CONSUMER, &block)
+          logger.debug{ "Subscribe to resource event #{resource_type} #{event}" }
           subscribe(topic: [resource_type, event], mode:, &block)
         end
 
@@ -53,11 +55,14 @@ module Verse
         end
 
         def stop
+          logger.debug{ "Stop local event manager" }
           @subscriptions.clear
         end
 
         # @overload request(channel, content, headers: {}, reply_to: nil, timeout: 0.05)
         def request(channel, content, headers: {}, reply_to: nil, timeout: 0.05)
+          logger.debug{ "Request to #{channel}" }
+
           reply_to ||= "_reply.#{SecureRandom.hex}"
 
           out = nil
@@ -92,6 +97,8 @@ module Verse
           reply_to: nil, # rubocop:disable Lint/UnusedMethodArgument
           timeout: 0.5
         )
+          logger.debug{ "Request all to #{channel}" }
+
           # Fake request all behavior
           begin
             out = []
@@ -100,7 +107,7 @@ module Verse
               sleep
             end
           rescue Timeout::Error
-            # Do nothing, we always timeout; same behavior into NATS EM
+            # Do nothing, we always timeout;
           end
 
           # Return array with one item only,
@@ -115,6 +122,8 @@ module Verse
         # @param headers [Hash] The headers of the message (if any)
         # @param reply_to [String] The reply_to of the message (if any)
         def publish(channel, payload, headers: {}, reply_to: nil)
+          logger.debug{ "Publish on #{channel}" }
+
           message = Message.new(payload, manager: self, headers:, reply_to:)
 
           @subscriptions.lazy.select{ |chan, _| channel == chan }.map(&:last).each do |sub|
@@ -123,6 +132,7 @@ module Verse
         end
 
         def publish_resource_event(resource_type:, resource_id:, event:, payload:, headers: {})
+          logger.debug{ "Publish resource event #{resource_type} #{event}" }
           headers = headers.merge(event:)
           message = Message.new(payload, manager: self, headers:)
           channel = [resource_type, resource_id]

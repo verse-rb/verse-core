@@ -7,6 +7,7 @@ module Verse
     module Repository
       class Base
         extend ClassMethods
+        @dispatch_event_mode = :on_commit
 
         attr_reader :auth_context, :metadata
 
@@ -31,6 +32,16 @@ module Verse
           # :nocov:
           raise NotImplementedError, "please implement after_commit"
           # :nocov:
+        end
+
+        def dispatch_event(&block)
+          return if @disable_event
+
+          if self.class.dispatch_event_mode == :immediate
+            block.call
+          else
+            after_commit(&block)
+          end
         end
 
         event

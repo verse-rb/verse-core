@@ -7,7 +7,7 @@ module Verse
     module Repository
       module ClassMethods
         attr_writer :model_class, :table, :primary_key, :resource
-        attr_accessor :custom_filters, :encoders
+        attr_accessor :custom_filters, :encoders, :dispatch_event_mode
 
         include Verse::Util
 
@@ -109,20 +109,19 @@ module Verse
                             " the newly created model, but #{result.class} given."
                     end
 
-                    unless @disable_event
+
+                    dispatch_event do
                       @event_cause = [self.class.resource, name]
 
-                      after_commit do
-                        Verse.publish_resource_event(
-                          resource_type: self.class.resource,
-                          resource_id: result.to_s,
-                          event: name,
-                          payload: {
-                            args:,
-                            metadata:
-                          }
-                        )
-                      end
+                      Verse.publish_resource_event(
+                        resource_type: self.class.resource,
+                        resource_id: result.to_s,
+                        event: name,
+                        payload: {
+                          args:,
+                          metadata:
+                        }
+                      )
                     end
 
                   else
@@ -132,20 +131,18 @@ module Verse
 
                     result = method.bind(self).call(*args)
 
-                    unless @disable_event
+                    dispatch_event do
                       @event_cause = [self.class.resource, name]
 
-                      after_commit do
-                        Verse.publish_resource_event(
-                          resource_type: self.class.resource,
-                          resource_id: id.to_s,
-                          event: name,
-                          payload: {
-                            args: arg2,
-                            metadata:
-                          },
-                        )
-                      end
+                      Verse.publish_resource_event(
+                        resource_type: self.class.resource,
+                        resource_id: id.to_s,
+                        event: name,
+                        payload: {
+                          args: arg2,
+                          metadata:
+                        },
+                      )
                     end
 
                   end
