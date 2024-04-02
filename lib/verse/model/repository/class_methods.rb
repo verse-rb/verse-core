@@ -110,7 +110,6 @@ module Verse
                             " the newly created model, but #{result.class} given."
                     end
 
-
                     dispatch_event do
                       @event_cause = [self.class.resource, name]
 
