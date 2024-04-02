@@ -64,6 +64,7 @@ module Verse
           super
           subklass.model_class = @model_class
           subklass.custom_filters = @custom_filters&.dup
+          subklass.encoders = @encoders&.dup
         end
 
         def define_query_method(method, method_name)

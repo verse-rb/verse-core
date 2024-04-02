@@ -37,7 +37,7 @@ module Verse
         def dispatch_event(&block)
           return if @disable_event
 
-          if self.class.dispatch_event_mode == :immediate
+          if Verse::Model::Repository::Base.dispatch_event_mode == :immediate
             block.call
           else
             after_commit(&block)
