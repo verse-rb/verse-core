@@ -114,8 +114,6 @@ module Verse
                     dispatch_event do
                       @event_cause = [self.class.resource, name]
 
-                      binding.pry if self.class.resource == "quiz:answers"
-
                       Verse.publish_resource_event(
                         resource_type: self.class.resource,
                         resource_id: result.to_s,
