@@ -108,7 +108,7 @@ RSpec.describe Verse::Model::Repository::Base do
         resource_type: "verse_spec:users",
         resource_id: "104",
         event: "created",
-        payload: { args: [name: "Joe"], metadata: {} }
+        payload: { args: [name: "Joe"], resource_id: "104", metadata: {} }
       )
 
       @users.create(name: "Joe")
@@ -119,7 +119,7 @@ RSpec.describe Verse::Model::Repository::Base do
         resource_type: "verse_spec:users",
         resource_id: "101",
         event: "updated",
-        payload: { args: [name: "John Doe"], metadata: {} }
+        payload: { args: [name: "John Doe"], resource_id: "101", metadata: {} }
       )
 
       @users.update(101, { name: "John Doe" })
