@@ -21,19 +21,19 @@ RSpec.describe Verse::Event::Manager::Local do
   it "can subscribe to events" do
     @queue = Queue.new
 
-    @test_manager.subscribe("test_event.example") do |message, subject|
+    @test_manager.subscribe(topic: "test_event.example") do |message, subject|
       expect(subject).to eq("test_event.example")
       expect(message.content).to eq("example")
       @queue.push 0 # 1 time
     end
 
-    @test_manager.subscribe("test_event.another_thread") do |message, subject|
+    @test_manager.subscribe(topic: "test_event.another_thread") do |message, subject|
       expect(subject).to eq("test_event.another_thread")
       expect(message.content).to eq("example2")
       @queue.push 0 # 1 time
     end
 
-    @test_manager.subscribe("another_subject.example") do |message, subject|
+    @test_manager.subscribe(topic: "another_subject.example") do |message, subject|
       expect(subject).to eq("another_subject.example")
       expect(message.content).to eq("example3")
       @queue.push 0 # 1 time
@@ -48,7 +48,7 @@ RSpec.describe Verse::Event::Manager::Local do
 
   context "#request" do
     it "can request" do
-      @test_manager.subscribe("hello.world") do |message, _subject|
+      @test_manager.subscribe(topic: "hello.world") do |message, _subject|
         message.reply("YES")
       end
 

@@ -35,7 +35,7 @@ module Verse
         end
 
         def subscribe(
-          topic,
+          topic:,
           mode: Manager::MODE_CONSUMER, # rubocop:disable Lint/UnusedMethodArgument
           &block
         )
@@ -62,7 +62,7 @@ module Verse
 
           out = nil
 
-          subscription = subscribe(reply_to) do |message|
+          subscription = subscribe(topic: reply_to) do |message|
             subscription.unsubscribe # Remove the subscription once a message is caught.
             out = message
           end

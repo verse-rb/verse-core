@@ -133,7 +133,7 @@ module Verse
           cp = channel_path
 
           if cp
-            Verse.event_manager.subscribe(channel_path, mode: @type, &code)
+            Verse.event_manager.subscribe(topic: channel_path, mode: @type, &code)
           end
 
           return unless resource_channel
