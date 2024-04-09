@@ -36,10 +36,15 @@ module Verse
 
             return repo if repo
 
-            repo = klass.new(auth_context)
-            repo.metadata.merge!(metadata.merge(
-                                   service: self.class.name
-                                 ))
+            if klass < Verse::Model::Repository::Base
+              repo = klass.new(auth_context)
+
+              repo.metadata.merge!(metadata.merge(
+                                    service: self.class.name
+                                  ))
+            elsif klass < Verse::Service::Base
+              repo = klass.new(auth_context, expo: metadata)
+            end
 
             instance_variable_set("@#{method}", repo)
 

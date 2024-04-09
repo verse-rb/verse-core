@@ -52,8 +52,6 @@ module Verse
         end
       end
 
-      alias use use_service
-
       def expose(exposition_type, &block)
         @exposition = build_expose(exposition_type, &block)
       end
