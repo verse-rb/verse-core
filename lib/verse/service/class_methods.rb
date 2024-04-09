@@ -47,6 +47,8 @@ module Verse
           end
         end
       end
+
+      alias use use_repo
     end
   end
 end

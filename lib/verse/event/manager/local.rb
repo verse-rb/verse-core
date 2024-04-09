@@ -131,6 +131,7 @@ module Verse
           end
         end
 
+        # rubocop:disable Lint/UnusedMethodArgument
         def publish_resource_event(resource_type:, resource_id:, event:, payload:, headers: {})
           logger.debug{ "Publish resource event #{resource_type} #{event}" }
 
@@ -142,6 +143,7 @@ module Verse
             sub.each{ |s| s.call(message, channel) }
           end
         end
+        # rubocop:enable Lint/UnusedMethodArgument
 
         def cancel_subscription(id)
           @subscriptions.each_value do |subscribers|
