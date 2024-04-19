@@ -186,7 +186,7 @@ module Verse
         end
 
         def delete!(id, scope = scoped(:delete))
-          output = delete(id, scope)
+          output = delete(id)
           raise Verse::Error::RecordNotFound, id unless output
         end
         ## === ===
