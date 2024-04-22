@@ -56,12 +56,14 @@ module Verse
         @exposition = build_expose(exposition_type, &block)
       end
 
-      def around(method, &block)
-        m = instance_method(method)
+      def around(*methods, &block)
+        methods.each do |method|
+          m = instance_method(method)
 
-        # redefine the method.
-        define_method(method) do
-          instance_exec(m.bind(self), &block)
+          # redefine the method.
+          define_method(method) do
+            instance_exec(m.bind(self), &block)
+          end
         end
       end
 
