@@ -6,22 +6,29 @@ class SpecHook < Verse::Exposition::Hook::Base
   attr_reader :some_data
 
   @callback = nil
+  @hooks = []
 
   class << self
-    attr_accessor :callback
+    attr_accessor :callback, :hooks
 
-    def trigger_exposition(input)
-      @callback.call(input)
+    def trigger(method_name, input)
+      hooks.find{ |hook| hook.method.name == method_name }.trigger(input)
     end
   end
 
   def initialize(exposition_class, some_data)
     super(exposition_class)
     @some_data = some_data
+
+    self.class.hooks << self
+  end
+
+  def trigger(input)
+    @callback.call(input)
   end
 
   def register_impl
-    self.class.callback = proc do |input|
+    @callback = proc do |input|
       params = @metablock.process_input(input)
 
       ctx = Verse::Auth::Context[:system]

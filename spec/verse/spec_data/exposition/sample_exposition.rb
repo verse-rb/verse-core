@@ -40,4 +40,18 @@ class SampleExposition < Verse::Exposition::Base
 
     self.class.output
   end
+
+  expose on_spec_hook({ data: false }) do
+    desc "Test around method"
+  end
+  def test_around_method
+    "ok"
+  end
+
+  around :test_around_method do |method|
+    auth_context.mark_as_checked!
+    self.class.output = "around"
+    method.call
+  end
+
 end

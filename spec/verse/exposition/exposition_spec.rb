@@ -27,7 +27,7 @@ RSpec.describe Verse::Exposition do
   it "run the block on trigger" do
     SampleExposition.output = nil
 
-    SpecHook.trigger_exposition({ name: "John" })
+    SpecHook.trigger(:do_something, { name: "John" })
 
     expect(SampleExposition.output).to eq(
       context: "This is some contextual information", name: "John Doe", some_data: { data: true }
@@ -41,7 +41,7 @@ RSpec.describe Verse::Exposition do
     SampleExposition.append_handler(Handlers::SampleHandler3)
     Handlers.clear
 
-    SpecHook.trigger_exposition({ name: "Jane" })
+    SpecHook.trigger(:do_something, { name: "Jane" })
 
     expect(Handlers.calls).to eq(
       [
@@ -61,7 +61,7 @@ RSpec.describe Verse::Exposition do
     SampleExposition.prepend_handler(Handlers::SampleHandler3)
     Handlers.clear
 
-    SpecHook.trigger_exposition({ name: "Jane" })
+    SpecHook.trigger(:do_something, { name: "Jane" })
 
     expect(Handlers.calls).to eq(
       [
@@ -83,7 +83,15 @@ RSpec.describe Verse::Exposition do
     SampleExposition.output = nil
 
     expect do
-      SpecHook.trigger_exposition({ name: "John", mode: :unchecked })
+      SpecHook.trigger(:do_something, { name: "John", mode: :unchecked })
     end.to raise_error(Verse::Error::Authorization)
+  end
+
+  it "works with around" do
+    SampleExposition.output = nil
+
+    SpecHook.trigger(:test_around_method, { name: "John" })
+
+    expect(SampleExposition.output).to eq("around")
   end
 end

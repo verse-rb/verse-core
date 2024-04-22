@@ -56,6 +56,15 @@ module Verse
         @exposition = build_expose(exposition_type, &block)
       end
 
+      def around(method, &block)
+        m = instance_method(method)
+
+        # redefine the method.
+        define_method(method) do
+          instance_exec(m.bind(self), &block)
+        end
+      end
+
       def build_expose(exposition_type, &block)
         {
           type: exposition_type,
@@ -83,6 +92,8 @@ module Verse
         return unless @exposition
 
         begin
+          puts "add to endpoint #{method_name}"
+
           @endpoints ||= []
           @endpoints << [method_name, @exposition]
         ensure
