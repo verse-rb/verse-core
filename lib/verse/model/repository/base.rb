@@ -70,8 +70,8 @@ module Verse
         end
 
         event
-        def delete(id)
-          id = find_by({ id: }, scope: scoped(:delete))&.id
+        def delete(id, scope = scoped(:delete))
+          id = find_by({ id: }, scope:)&.id
 
           return false unless id
 
@@ -186,7 +186,7 @@ module Verse
         end
 
         def delete!(id, scope = scoped(:delete))
-          output = delete(id)
+          output = delete(id, scope)
           raise Verse::Error::RecordNotFound, id unless output
         end
         ## === ===
