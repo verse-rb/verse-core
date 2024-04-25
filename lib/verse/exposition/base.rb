@@ -18,8 +18,7 @@ module Verse
         @current_action = action
 
         fields.each do |key, value|
-          raise "cannot redefine method `#{key}`" if key.methods.include?(key)
-
+          raise "cannot redefine method `#{key}`" if respond_to?(key)
           define_singleton_method(key) { value }
         end
       end

@@ -94,8 +94,6 @@ module Verse
         return unless @exposition
 
         begin
-          puts "add to endpoint #{method_name}"
-
           @endpoints ||= []
           @endpoints << [method_name, @exposition]
         ensure
