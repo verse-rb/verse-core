@@ -257,6 +257,14 @@ RSpec.describe Verse::Model::Repository::Base do
       expect(users.first.account).to be_a(AccountRecord)
     end
 
+    it "can index using include (symbol)" do
+      users = @users.index({}, included: [:account])
+
+      expect(users.length).to eq(3)
+      expect(users.first.account).to be_a(AccountRecord)
+    end
+
+
     it "can index using nested includes + has_many/has_one" do
       posts = @posts.index({}, included: ["user.account", "comments"])
 
@@ -267,8 +275,25 @@ RSpec.describe Verse::Model::Repository::Base do
       expect(posts.first.user.account.active?).to be true
     end
 
+    it "can index using nested includes + has_many/has_one (symbol)" do
+      posts = @posts.index({}, included: [:"user.account", :comments])
+
+      expect(posts.length).to eq(2)
+      expect(posts.first.user).to be_a(UserRecord)
+      expect(posts.first.comments).to be_a(Array)
+      expect(posts.first.user.account).to be_a(AccountRecord)
+      expect(posts.first.user.account.active?).to be true
+    end
+
+
     it "can index using nested includes + has_many/has_one (empty relations)" do
       toto_posts = @users.find_by({ name: "Toto" }, included: ["posts.comments"])
+      expect(toto_posts.posts).to be_a(Array)
+      expect(toto_posts.posts.length).to eq(0)
+    end
+
+    it "can index using nested includes + has_many/has_one (empty relations, symbol)" do
+      toto_posts = @users.find_by({ name: "Toto" }, included: [:"posts.comments"])
       expect(toto_posts.posts).to be_a(Array)
       expect(toto_posts.posts.length).to eq(0)
     end

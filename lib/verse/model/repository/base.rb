@@ -321,6 +321,7 @@ module Verse
         end
 
         def prepare_included(included_list, collection, record: self.class.model_class)
+          included_list = included_list.map(&:to_s)
           set = IncludeSet.new(included_list)
           tree = tree_from_include_list included_list
 
