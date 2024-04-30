@@ -49,7 +49,8 @@ RSpec.describe Verse::Model::Record::Base do
         content: "World",
         secret_field: "Foo Bar",
         category_name: nil,
-        meta: nil
+        meta: nil,
+        decimal_number: nil
       }
     )
 
@@ -61,6 +62,7 @@ RSpec.describe Verse::Model::Record::Base do
         content: "World",
         category_name: nil,
         meta: nil,
+        decimal_number: nil
       }
     )
   end
@@ -97,7 +99,8 @@ RSpec.describe Verse::Model::Record::Base do
       category_name: nil,
       title: "Hello",
       content: "World",
-      meta: { foo: "bar" }
+      meta: { foo: "bar" },
+      decimal_number: nil
     }.to_json)
   end
 end

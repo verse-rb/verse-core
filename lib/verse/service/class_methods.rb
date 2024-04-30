@@ -40,8 +40,8 @@ module Verse
               repo = klass.new(auth_context)
 
               repo.metadata.merge!(metadata.merge(
-                                    service: self.class.name
-                                  ))
+                                     service: self.class.name
+                                   ))
             elsif klass < Verse::Service::Base
               repo = klass.new(auth_context, expo: metadata)
             end

@@ -65,8 +65,14 @@ RSpec.describe Verse::Model::Repository::Base do
     id_post2 = nil
 
     @posts.no_event{ |_r|
-      id_post1 = @posts.create(title: "Hello", user_id: id_john, category_name: "Ruby", meta: { foo: "bar" })
-      id_post2 = @posts.create(title: "World", user_id: id_jane, category_name: "Rails", meta: { foo: "bar2" })
+      id_post1 = @posts.create(
+        title: "Hello", user_id: id_john, category_name: "Ruby",
+        meta: { foo: "bar" }, decimal_number: BigDecimal("1.52")
+      )
+      id_post2 = @posts.create(
+        title: "World", user_id: id_jane, category_name: "Rails",
+        meta: { foo: "bar2" }, decimal_number: BigDecimal(5.2, 5)
+      )
     }
 
     @comments.no_event{ |r|
@@ -264,7 +270,6 @@ RSpec.describe Verse::Model::Repository::Base do
       expect(users.first.account).to be_a(AccountRecord)
     end
 
-
     it "can index using nested includes + has_many/has_one" do
       posts = @posts.index({}, included: ["user.account", "comments"])
 
@@ -284,7 +289,6 @@ RSpec.describe Verse::Model::Repository::Base do
       expect(posts.first.user.account).to be_a(AccountRecord)
       expect(posts.first.user.account.active?).to be true
     end
-
 
     it "can index using nested includes + has_many/has_one (empty relations)" do
       toto_posts = @users.find_by({ name: "Toto" }, included: ["posts.comments"])
@@ -351,6 +355,13 @@ RSpec.describe Verse::Model::Repository::Base do
     it "can convert to json" do
       post = @posts.find_by({ title: "Hello" })
       expect(post.meta).to eq({ foo: "bar" })
+    end
+  end
+
+  describe "big decimal converter" do
+    it "can convert to big decimal" do
+      post = @posts.find_by({ title: "Hello" })
+      expect(post.decimal_number).to eq(1.52)
     end
   end
 

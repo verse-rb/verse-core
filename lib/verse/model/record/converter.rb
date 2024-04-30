@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require "bigdecimal"
+
+# frozen_string_literal: true
 module Verse
   module Model
     module Record
@@ -42,6 +45,8 @@ module Verse
         add_converter(Time) { |obj| Time.parse(obj) }
 
         add_converter(TrueClass){ |obj| !!obj }
+
+        add_converter(BigDecimal){ |obj| BigDecimal(obj) }
 
         add_converter :json do |obj|
           case obj

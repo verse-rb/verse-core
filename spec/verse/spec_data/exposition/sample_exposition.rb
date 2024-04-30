@@ -53,5 +53,4 @@ class SampleExposition < Verse::Exposition::Base
     self.class.output = "around"
     method.call
   end
-
 end
