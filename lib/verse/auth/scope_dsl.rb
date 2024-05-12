@@ -11,21 +11,23 @@ module Verse
 
         @scope = @context.can?(action.to_sym, resource.to_sym)
 
-        context.reject!("unauthorized action `#{action}` on `#{resource}`") unless @scope
-
-        @scope = @scope.to_sym
+        if @scope
+          @scope = @scope.to_sym
+        end
 
         block.call(self)
       end
 
       def method_missing(method_name, *_args, &block)
-        return false unless "#{@scope}?".to_sym == method_name
+        return false unless @scope
+        return false unless :"#{@scope}?" == method_name
 
         @result = block.call(self)
       end
 
       def respond_to_missing?(method_name, include_private = false)
-        method_name.to_s =~ /^[a_z0-9]+\?$/ || super
+        super if method_name.to_s !~ /^[a_z0-9]+\?$/
+        true
       end
 
       # Is used with custom scopes.
@@ -46,6 +48,9 @@ module Verse
 
       def result
         @result ||= @else&.call(self)
+
+        context.reject!("unauthorized action `#{@action}` on `#{@resource}`") unless @result
+
         @result
       end
 
