@@ -31,29 +31,45 @@ module Verse
         end
 
         list_of_repositories.each do |method, klass|
-          define_method(method) do
-            repo = instance_variable_get("@#{method}")
+          define_repo(method, klass)
+        end
+      end
 
-            return repo if repo
+      def use_system_repo(list_of_repositories)
+        unless list_of_repositories.is_a?(Hash)
+          list_of_repositories = { repo: list_of_repositories }
+        end
+        list_of_repositories.each do |method, klass|
+          define_repo(method, klass, system_context: true)
+        end
+      end
 
-            if klass < Verse::Model::Repository::Base
-              repo = klass.new(auth_context)
+      def define_repo(name, klass, system_context: false)
+        define_method(name) do
+          repo = instance_variable_get("@#{name}")
 
-              repo.metadata.merge!(metadata.merge(
-                                     service: self.class.name
-                                   ))
-            elsif klass < Verse::Service::Base
-              repo = klass.new(auth_context, expo: metadata)
-            end
+          return repo if repo
 
-            instance_variable_set("@#{method}", repo)
+          auth_context = system_context ? Verse::Auth::Context[:system] : self.auth_context
 
-            repo
+          if klass < Verse::Model::Repository::Base
+            repo = klass.new(auth_context)
+
+            repo.metadata.merge!(metadata.merge(
+                                   service: self.class.name
+                                 ))
+          elsif klass < Verse::Service::Base
+            repo = klass.new(auth_context, expo: metadata)
           end
+
+          instance_variable_set("@#{name}", repo)
+
+          repo
         end
       end
 
       alias use use_repo
+      alias use_system use_system_repo
     end
   end
 end

@@ -123,7 +123,7 @@ module Verse
           resource, action, scope = x.split(/\./)
 
           Verse::Util::Assertion.assert(resource && action && scope) do
-            "string must be in the format `[resource].[action].[scope]`"
+            "string must be in the format `[resource].[action].[scope]` but `#{x}` given"
           end
 
           resource_regexp = Regexp.new(resource.gsub("*", ".*"))
