@@ -78,7 +78,7 @@ module Verse
         def define_event_method(method, method_name)
           _, name, creation, key, metadata = @next_method_mode
 
-          define_method(method_name) do |*args|
+          define_method(method_name) do |*args, **hash|
             mode(:rw) do
               name ||= Verse.inflector.inflect_past(method_name)
 
@@ -103,12 +103,15 @@ module Verse
                   metadata.merge!(cause: @event_cause) if @event_cause
 
                   if creation
-                    result = method.bind(self).call(*args)
+                    result = method.bind(self).call(*args, **hash)
 
                     if result.class != Integer && result.class != String
                       raise "must returns a String or Integer which is the id of" \
                             " the newly created model, but #{result.class} given."
                     end
+
+                    # Pass the option hash to the event
+                    args << hash unless hash.empty?
 
                     dispatch_event do
                       @event_cause = [self.class.resource, name]
@@ -130,7 +133,10 @@ module Verse
                     arg2 = args.dup
                     arg2.slice!(key)
 
-                    result = method.bind(self).call(*args)
+                    result = method.bind(self).call(*args, **hash)
+
+                    # Pass the option hash to the event
+                    arg2 << hash unless hash.empty?
 
                     dispatch_event do
                       @event_cause = [self.class.resource, name]
