@@ -45,12 +45,12 @@ module Verse
         end
 
         event
-        def update(id, attributes, scope = scoped(:updated))
+        def update(id, attributes, scope: scoped(:updated))
           attributes = encode(attributes)
-          update_impl(id, attributes, scope)
+          update_impl(id, attributes, scope:)
         end
 
-        protected def update_impl(id, attributes, scope)
+        protected def update_impl(id, attributes, scope:)
           # :nocov:
           raise NotImplementedError, "please implement update"
           # :nocov:
@@ -70,7 +70,7 @@ module Verse
         end
 
         event
-        def delete(id, scope = scoped(:delete))
+        def delete(id, scope: scoped(:delete))
           id = find_by({ id: }, scope:)&.id
 
           return false unless id
@@ -180,13 +180,13 @@ module Verse
           record
         end
 
-        def update!(id, attributes, scope = scoped(:update))
-          output = update(id, attributes, scope)
+        def update!(id, attributes, scope: scoped(:update))
+          output = update(id, attributes, scope:)
           raise Verse::Error::RecordNotFound, id unless output
         end
 
-        def delete!(id, scope = scoped(:delete))
-          output = delete(id, scope)
+        def delete!(id, scope: scoped(:delete))
+          output = delete(id, scope:)
           raise Verse::Error::RecordNotFound, id unless output
         end
         ## === ===

@@ -135,6 +135,8 @@ module Verse
 
                     result = method.bind(self).call(*args, **hash)
 
+                    hash.delete(:scope) # Remove the scope from the event payload
+
                     # Pass the option hash to the event
                     arg2 << hash unless hash.empty?
 

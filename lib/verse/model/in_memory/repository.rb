@@ -49,7 +49,7 @@ module Verse
           end
         end
 
-        def update_impl(id, attributes, scope = scoped(:update))
+        def update_impl(id, attributes, scope: scoped(:update))
           target = scope.find{ |record| record[self.class.primary_key] == id }
 
           return false unless target
@@ -77,7 +77,7 @@ module Verse
           id_sequence
         end
 
-        def delete(id, scope = scoped(:delete))
+        def delete(id, scope: scoped(:delete))
           target = scope.find{ |record| record[self.class.primary_key] == id }
 
           return false unless target
