@@ -110,6 +110,8 @@ module Verse
                             " the newly created model, but #{result.class} given."
                     end
 
+                    hash.delete(:scope) # Remove the scope from the event payload
+
                     # Pass the option hash to the event
                     args << hash unless hash.empty?
 
