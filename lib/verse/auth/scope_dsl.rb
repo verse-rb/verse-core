@@ -49,7 +49,7 @@ module Verse
       def result
         @result ||= @else&.call(self)
 
-        context.reject!("unauthorized action `#{@action}` on `#{@resource}`") unless @result
+        @context.reject!("unauthorized action `#{@action}` on `#{@resource}`") unless @result
 
         @result
       end
