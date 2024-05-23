@@ -37,6 +37,7 @@ module Verse
 
         add_converter(:int,    &:to_i)
         add_converter(Integer, &:to_i)
+        add_converter(Float, &:to_f)
 
         add_converter(Hash, &:to_h)
         add_converter(Array, &:to_a)
