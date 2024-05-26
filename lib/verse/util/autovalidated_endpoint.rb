@@ -22,7 +22,7 @@ module Verse
       # Process the input, clean and validate input.
       # @param input [Hash] The input to process
       # @return [Hash] The processed input, cleaned from unwanted keys and
-      #                validated by dry-schema
+      #                validated by verse-schema
       def process_input(input)
         return input if input_schema.nil?
 
@@ -36,7 +36,7 @@ module Verse
       # Process the output, clean and validate output.
       # @param output [Hash] The output to process
       # @return [Hash] The processed output, cleaned from unwanted keys and
-      #                validated by dry-schema
+      #                validated by verse-schema
       def process_output(output)
         return output if output_schema.nil?
 
@@ -48,7 +48,7 @@ module Verse
       end
 
       # Define the input schema for this endpoint.
-      # @param schema [Dry::Schema] The schema to use for validation
+      # @param schema [Verse::Schema] The schema to use for validation
       # @param block [Proc] The block to use to build the schema
       # @raise [ArgumentError] If both schema and block are given
       def input(schema = nil, &block)
@@ -64,7 +64,7 @@ module Verse
       end
 
       # Define the output schema for this endpoint.
-      # @param schema [Dry::Schema] The schema to use for validation
+      # @param schema [Verse::Schema] The schema to use for validation
       # @param block [Proc] The block to use to build the schema
       # @raise [ArgumentError] If both schema and block are given
       def output(schema = nil, &block)
