@@ -164,7 +164,6 @@ module Verse
           @exposed_endpoints = {}
         end
 
-        puts "Add #{subklass}"
         Verse::Exposition::Base.all_expositions << subklass
       end
     end
