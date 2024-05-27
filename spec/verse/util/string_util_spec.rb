@@ -26,4 +26,9 @@ RSpec.describe Verse::Util::StringUtil do
     expect(subject.underscore("Test::TestTest")).to eq("test/test_test")
     expect(subject.underscore("Test::TestTestTest")).to eq("test/test_test_test")
   end
+
+  it "can strip indentation" do
+    expect(subject.strip_indent("  test\n    test")).to eq("test\n  test")
+  end
+
 end

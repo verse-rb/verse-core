@@ -19,6 +19,19 @@ module Verse
         string.gsub(%r{(?:_|(/))([a-z\d]*)}) { "#{$1}#{$2.capitalize}" }.gsub("/", "::")
       end
 
+      # when given a string with leading spaces, it will remove the same amount
+      # of spaces from each line.
+      # This is useful with heredocs, where the leading spaces are used for
+      # indentation, but you want to remove them when the string is used.
+      #
+      # @param string [String] the string to strip the indentation from
+      # @return [String] the string with the indentation removed
+      def strip_indent(string)
+        min_indent = string.scan(/^[ \t]*(?=\S)/).min
+        indent = min_indent ? min_indent.size : 0
+        string.gsub(/^[ \t]{#{indent}}/, '')
+      end
+
       # Convert a string to snake case
       # @param string [String] the string to convert
       # @return [String] the converted string
