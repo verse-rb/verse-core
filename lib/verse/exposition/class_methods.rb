@@ -131,29 +131,26 @@ module Verse
 
       # Return all exposition handlers.
       def handlers
-        @handlers || superclass.handlers
+        @handlers ||= superclass.handlers.dup
       end
 
       # Prepend handler to the handler chain.
       def prepend_handler(klass, **opts)
-        @handlers ||= superclass.handlers.dup
-        @handlers.prepend([klass, **opts])
+        handlers.prepend([klass, **opts])
       end
 
       # Append handler at the end of the chain.
       def append_handler(klass, **opts)
-        @handlers ||= superclass.handlers.dup
-        @handlers << [klass, **opts]
+        handlers << [klass, **opts]
       end
 
       # Remove a specific handler class from the handler chain.
       def remove_handler(klass)
-        @handlers ||= superclass.handlers.dup
-        @handlers.reject!{ |x| x.first == klass }
+        handlers.reject!{ |x| x.first == klass }
       end
 
       def clear_handlers
-        @handlers&.clear
+        handlers.clear
       end
 
       def inherited(subklass)
