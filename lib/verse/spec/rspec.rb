@@ -26,6 +26,7 @@ module Verse
 end
 
 RSpec.configure do |c|
+  c.include Verse::Spec::AsUserHelper
   c.include Verse::Spec::ServiceHelper, type: :service
   c.include Verse::Spec::AuthContextHelper, :as
 end
