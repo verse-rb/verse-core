@@ -11,24 +11,12 @@ module Verse
         @content = content
         @headers = headers
         @reply_to = reply_to
-
-        to_msgpack
       end
 
       def reply(content, headers: {})
         raise "cannot reply to: empty reply channel or no manager" unless allow_reply?
 
         @manager.publish(@reply_to, content, headers:)
-      end
-
-      def to_msgpack
-        {
-          content:,
-          headers:,
-          reply_to:
-        }.to_msgpack
-      rescue => e
-        binding.pry
       end
 
       def allow_reply?

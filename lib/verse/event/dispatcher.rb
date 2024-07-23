@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Verse
   module Event
     module Dispatcher
@@ -13,12 +15,12 @@ module Verse
       # fired at the end of the block.
       # @param mode [Symbol] the mode to use.
       def with_event_mode(mode)
-        old_mode = self.event_mode
+        old_mode = event_mode
         self.event_mode = mode
 
         output = yield
 
-        dispatch! if self.event_mode == :manual
+        dispatch! if event_mode == :manual
 
         output
       ensure
@@ -66,8 +68,6 @@ module Verse
 
         @event_mode = mode
       end
-
-
     end
   end
 end

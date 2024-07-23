@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A very few monkey patching to make things easier.
 
 class BigDecimal

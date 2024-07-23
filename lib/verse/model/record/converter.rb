@@ -49,7 +49,7 @@ module Verse
 
         add_converter(BigDecimal){ |obj| BigDecimal(obj) }
 
-        add_converter(NilClass){ |obj| nil }
+        add_converter(NilClass){ |_obj| nil }
 
         add_converter :json do |obj|
           case obj

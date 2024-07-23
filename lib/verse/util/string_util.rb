@@ -29,7 +29,7 @@ module Verse
       def strip_indent(string)
         min_indent = string.scan(/^[ \t]*(?=\S)/).min
         indent = min_indent ? min_indent.size : 0
-        string.gsub(/^[ \t]{#{indent}}/, '')
+        string.gsub(/^[ \t]{#{indent}}/, "")
       end
 
       # Convert a string to snake case

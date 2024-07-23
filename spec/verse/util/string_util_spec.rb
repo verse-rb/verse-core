@@ -30,5 +30,4 @@ RSpec.describe Verse::Util::StringUtil do
   it "can strip indentation" do
     expect(subject.strip_indent("  test\n    test")).to eq("test\n  test")
   end
-
 end

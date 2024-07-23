@@ -20,7 +20,7 @@ module Verse
 
       def method_missing(method_name, *_args, &block)
         return false unless @scope
-        return false unless :"#{@scope}?" == method_name
+        return false unless method_name == :"#{@scope}?"
 
         @result = block.call(self)
       end
