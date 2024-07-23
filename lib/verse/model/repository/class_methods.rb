@@ -7,7 +7,8 @@ module Verse
     module Repository
       module ClassMethods
         attr_writer :model_class, :table, :primary_key, :resource
-        attr_accessor :custom_filters, :encoders, :dispatch_event_mode
+        attr_accessor :custom_filters, :encoders
+        attr_reader :dispatch_event_mode
 
         include Verse::Util
 
