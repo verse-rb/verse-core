@@ -7,8 +7,7 @@ module Verse
     module Repository
       class Base
         extend ClassMethods
-        @dispatch_event_mode = :on_commit
-        @dispatch_events = []
+        @no_event = false
 
         attr_reader :auth_context, :metadata
 
@@ -36,7 +35,7 @@ module Verse
         end
 
         def dispatch_event(&block)
-          return if @disable_event
+          return if @disable_event || self.class.no_event
 
           case Verse::Event::Dispatcher.event_mode
           when :immediate
