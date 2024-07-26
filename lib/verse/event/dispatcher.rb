@@ -9,18 +9,24 @@ module Verse
 
       attr_reader :event_mode
 
-      # Change temporarly the dispatch event mode, then come back to the
+      # Change temporarly the dispatch event mode to manual, then come back to the
       # previous version.
-      # If the mode is set to :manual, the events will be automatically
-      # fired at the end of the block.
-      # @param mode [Symbol] the mode to use.
-      def with_event_mode(mode)
+      # During the time of the block, the  events are not going to be
+      # processed.
+      #
+      # On block completion, execute the event callbacks.
+      # This is useful in test mode, as transactional events
+      # are run in :immediate mode, which can cause issues
+      # such as the event being processed before the transaction is committed.
+      #
+      # If the block raise error, the events are not going to be processed.
+      def execute_later(&)
         old_mode = event_mode
-        self.event_mode = mode
+        self.event_mode = :manual
 
         output = yield
 
-        dispatch! if event_mode == :manual
+        dispatch! if event_mode
 
         output
       ensure
