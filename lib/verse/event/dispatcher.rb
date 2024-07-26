@@ -46,6 +46,7 @@ module Verse
         end
 
         @events&.each(&:call)
+      ensure
         @events&.clear
       end
 
