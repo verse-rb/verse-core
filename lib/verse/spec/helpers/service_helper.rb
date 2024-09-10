@@ -22,6 +22,7 @@ module Verse
 
         auth_context ||= Verse::Auth::Context[:system]
 
+        @service ||= {}
         @service[user] ||= Verse::Util::Reflection.constantize(self.class.top_level_description).new(
           auth_context
         )
