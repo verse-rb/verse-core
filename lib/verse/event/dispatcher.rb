@@ -64,7 +64,7 @@ module Verse
       #     Note: This can cause issues with RSpec or other test units, as the event might not
       #     be dispatched at all if you're using transaction blocks and rollbacks in your tests.
       #
-      #   - :manual: Dispatches the event manually. This is useful when you want to dispatch
+      #   - :manual: Dispatches the event manually using `dispatch!`. This is useful when you want to dispatch
       #     the event at a specific time, such as in test setups to simulate a transaction commit.
       #
       # @raise [ArgumentError] if the mode is not one of :immediate, :on_commit, :manual.
