@@ -109,8 +109,7 @@ module Verse
     # @param plugin [Hash] the plugin configuration
     # @param logger [Logger] the logger to use when initializing the plugin
     def load_plugin(plugin, logger = Verse.logger)
-      type = plugin.fetch(:class)
-      name = plugin.fetch(:name, type)
+      name, type = infer_name_and_class(plugin.fetch(:name))
       config = plugin.fetch(:config, {})
 
       dependencies = plugin.fetch(:dep, {})
@@ -134,6 +133,8 @@ module Verse
       name = plugin.name.to_sym
 
       @plugins.key?(name) and raise "Plugin already registered: `#{name}`"
+
+      binding.pry if name =~ /</
 
       @plugins[name] = plugin
     end

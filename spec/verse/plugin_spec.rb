@@ -62,7 +62,7 @@ RSpec.describe Verse::Plugin do
         end.to raise_error(
           Verse::Plugin::DependencyError,
           Verse::Plugin::DependencyError::ERROR_MSG_DEPENDS_MAP % [
-            "another_plugin_with_dependencies <plugin_with_dependencies>",
+            "another_plugin_with_dependencies",
             "dependent_plugin",
             "dependent_plugin_2"
           ]
