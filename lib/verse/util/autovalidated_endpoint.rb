@@ -19,6 +19,25 @@ module Verse
         end
       end
 
+      # Add metadata to the endpoint.
+      # Metadata can be used to store any information about the endpoint.
+      # It can be used for documentation and other purposes.
+      #
+      # @param value [Hash] The metadata to add. If nil given, return the current
+      #                    metadata value.
+      # @return [Hash] The metadata value
+      # @example
+      #  meta({ foo: "bar" })
+      #  meta[:foo] # => "bar"
+      #  meta[:foo] = "baz"
+      def meta(value = nil)
+        if value
+          @meta = value
+        else
+          @meta
+        end
+      end
+
       # Process the input, clean and validate input.
       # @param input [Hash] The input to process
       # @return [Hash] The processed input, cleaned from unwanted keys and
