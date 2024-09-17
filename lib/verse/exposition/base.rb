@@ -13,9 +13,10 @@ module Verse
 
       @handlers = [Verse::Auth::CheckAuthenticationHandler]
 
-      def initialize(auth_context, action, _hook, **fields)
-        @auth_context = auth_context
+      def initialize(auth_context, action, hook, **fields)
+        @auth_context   = auth_context
         @current_action = action
+        @hook           = hook
 
         fields.each do |key, value|
           raise "cannot redefine method `#{key}`" if respond_to?(key)
