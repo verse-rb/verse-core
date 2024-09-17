@@ -134,8 +134,6 @@ module Verse
 
       @plugins.key?(name) and raise "Plugin already registered: `#{name}`"
 
-      binding.pry if name =~ /</
-
       @plugins[name] = plugin
     end
 
