@@ -48,7 +48,7 @@ module Verse
         end
 
         event
-        def update(id, attributes, scope: scoped(:updated))
+        def update(id, attributes, scope: scoped(:update))
           attributes = encode(attributes)
           update_impl(id, attributes, scope:)
         end
