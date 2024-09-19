@@ -209,7 +209,9 @@ module Verse
         end
         ## === ===
 
-        def with_metadata
+        # copy metadata structure,
+        # and restore older version after running the block.
+        protected def with_metadata
           old_metadata = @metadata
           @metadata = @metadata.dup
           yield
