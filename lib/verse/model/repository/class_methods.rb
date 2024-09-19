@@ -115,6 +115,11 @@ module Verse
                       # Pass the option hash to the event
                       args << hash unless hash.empty?
 
+                      # The dispatch event method will be called
+                      # after the transaction is committed. So we
+                      # copy locally the metadata for later.
+                      metadata = @metadata.dup
+
                       dispatch_event do
                         @event_cause = [self.class.resource, name]
 
@@ -142,6 +147,11 @@ module Verse
                       # Pass the option hash to the event
                       arg2 << hash unless hash.empty?
 
+                      # The dispatch event method will be called
+                      # after the transaction is committed. So we
+                      # copy locally the metadata for later.
+                      metadata = @metadata.dup
+
                       dispatch_event do
                         @event_cause = [self.class.resource, name]
 
@@ -157,7 +167,6 @@ module Verse
                         )
                       end
                     end
-
                   end
                 ensure
                   @event_cause = old_event_cause # revert the cause.

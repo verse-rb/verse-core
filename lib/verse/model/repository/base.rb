@@ -34,14 +34,14 @@ module Verse
           # :nocov:
         end
 
-        def with_metadata(&block)
-          begin
-            old_metadata = @metadata
-            @metadata = @metadata.dup
-            yield
-          ensure
-            @metadata = old_metadata
-          end
+        # copy metadata structure,
+        # and restore older version after running the block.
+        protected def with_metadata
+          old_metadata = @metadata
+          @metadata = @metadata.dup
+          yield
+        ensure
+          @metadata = old_metadata
         end
 
         def add_metadata(**opts)
@@ -208,16 +208,6 @@ module Verse
           raise Verse::Error::RecordNotFound, id unless output
         end
         ## === ===
-
-        # copy metadata structure,
-        # and restore older version after running the block.
-        protected def with_metadata
-          old_metadata = @metadata
-          @metadata = @metadata.dup
-          yield
-        ensure
-          @metadata = old_metadata
-        end
 
         # Redefine if the adapter allow multiple connection for read or write.
         def mode(_read_write, &_block)
