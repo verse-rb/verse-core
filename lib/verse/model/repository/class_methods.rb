@@ -99,62 +99,63 @@ module Verse
                   #  - updated(metadata: {cause: "domain.resource.triggered"})
                   #  - triggered(metadata: {})
                   #
-                  metadata = @metadata.dup # duplicate because we might change metadata before commit.
-                  metadata.merge!(cause: @event_cause) if @event_cause
+                  with_metadata do
+                    add_metadata cause: @event_cause if @event_cause
 
-                  if creation
-                    result = method.bind(self).call(*args, **hash)
+                    if creation
+                      result = method.bind(self).call(*args, **hash)
 
-                    if result.class != Integer && result.class != String
-                      raise "must returns a String or Integer which is the id of" \
-                            " the newly created model, but #{result.class} given."
-                    end
+                      if result.class != Integer && result.class != String
+                        raise "must returns a String or Integer which is the id of" \
+                              " the newly created model, but #{result.class} given."
+                      end
 
-                    hash.delete(:scope) # Remove the scope from the event payload
+                      hash.delete(:scope) # Remove the scope from the event payload
 
-                    # Pass the option hash to the event
-                    args << hash unless hash.empty?
+                      # Pass the option hash to the event
+                      args << hash unless hash.empty?
 
-                    dispatch_event do
-                      @event_cause = [self.class.resource, name]
+                      dispatch_event do
+                        @event_cause = [self.class.resource, name]
 
-                      Verse.publish_resource_event(
-                        resource_type: self.class.resource,
-                        resource_id: result.to_s,
-                        event: name,
-                        payload: {
-                          args:,
+                        Verse.publish_resource_event(
+                          resource_type: self.class.resource,
                           resource_id: result.to_s,
-                          metadata:
-                        }
-                      )
-                    end
+                          event: name,
+                          payload: {
+                            args:,
+                            resource_id: result.to_s,
+                            metadata:
+                          }
+                        )
+                      end
 
-                  else
-                    id = args[key]
-                    arg2 = args.dup
-                    arg2.slice!(key)
+                    else
+                      id = args[key]
+                      arg2 = args.dup
+                      arg2.slice!(key)
 
-                    result = method.bind(self).call(*args, **hash)
+                      result = method.bind(self).call(*args, **hash)
 
-                    hash.delete(:scope) # Remove the scope from the event payload
+                      hash.delete(:scope) # Remove the scope from the event payload
 
-                    # Pass the option hash to the event
-                    arg2 << hash unless hash.empty?
+                      # Pass the option hash to the event
+                      arg2 << hash unless hash.empty?
 
-                    dispatch_event do
-                      @event_cause = [self.class.resource, name]
+                      dispatch_event do
+                        @event_cause = [self.class.resource, name]
 
-                      Verse.publish_resource_event(
-                        resource_type: self.class.resource,
-                        resource_id: id.to_s,
-                        event: name,
-                        payload: {
-                          args: arg2,
+                        Verse.publish_resource_event(
+                          resource_type: self.class.resource,
                           resource_id: id.to_s,
-                          metadata:
-                        },
-                      )
+                          event: name,
+                          payload: {
+                            args: arg2,
+                            resource_id: id.to_s,
+                            metadata:
+                          },
+                        )
+                      end
                     end
 
                   end

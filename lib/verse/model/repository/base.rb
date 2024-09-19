@@ -34,6 +34,21 @@ module Verse
           # :nocov:
         end
 
+        def with_metadata(&block)
+          begin
+            old_metadata = @metadata
+            @metadata = @metadata.dup
+            yield
+          ensure
+            @metadata = old_metadata
+          end
+        end
+
+        def add_metadata(**opts)
+          @metadata ||= {}
+          @metadata.merge!(opts)
+        end
+
         def dispatch_event(&block)
           return if @disable_event || self.class.no_event
 
@@ -194,9 +209,9 @@ module Verse
         end
         ## === ===
 
-        def with_metadata(metadata)
+        def with_metadata
           old_metadata = @metadata
-          @metadata = @metadata.merge(metadata)
+          @metadata = @metadata.dup
           yield
         ensure
           @metadata = old_metadata
