@@ -142,6 +142,9 @@ module Verse
 
                       result = method.bind(self).call(*args, **hash)
 
+                      # If result is false (update or delete failing), do not dispatch event
+                      next result if result == false
+
                       hash.delete(:scope) # Remove the scope from the event payload
 
                       # Pass the option hash to the event
