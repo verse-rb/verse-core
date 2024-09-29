@@ -102,7 +102,7 @@ module Verse
           scope:,
           page: 1, items_per_page: 1000,
           sort: nil,
-          query_count: true
+          query_count: false
         )
           query = filtering.filter_by(scope, filters, self.class.custom_filters)
           total_count = query.size

@@ -151,7 +151,7 @@ module Verse
           items_per_page: 1_000,
           sort: nil,
           record: self.class.model_class,
-          query_count: true
+          query_count: false
         )
           filters = encode_filters(filters)
 
