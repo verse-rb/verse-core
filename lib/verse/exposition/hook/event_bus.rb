@@ -102,6 +102,8 @@ module Verse
               )
 
               output = exposition.run do
+                auth_context.mark_as_checked!
+
                 metablock.process_output(
                   method.bind(self).call
                 )
