@@ -52,6 +52,7 @@ module Verse
     Verse::Plugin.start(mode)
     logger.info{ "starting event manager" }
     @event_manager&.start
+
     logger.info{ "Verse startup sequence completed" }
   end
 

@@ -1,4 +1,4 @@
-service_name: ejar3_services_base_test
+service_name: verse-core-spec
 description: Configuration testing
 logger:
   level: warn
