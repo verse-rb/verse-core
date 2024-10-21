@@ -27,6 +27,14 @@ RSpec.describe Verse::Util::StringUtil do
     expect(subject.underscore("Test::TestTestTest")).to eq("test/test_test_test")
   end
 
+  it "can convert string to title case" do
+    expect(subject.titleize("this_is_snake_case")).to eq("This Is Snake Case")
+    expect(subject.titleize("thisIsCamelCase")).to eq("This Is Camel Case")
+    expect(subject.titleize("this::is::a::class::constant")).to eq("This Is A Class Constant")
+    expect(subject.titleize("Already Titleized")).to eq("Already Titleized")
+    expect(subject.titleize("under_score: some(example)")).to eq("Under Score: Some(Example)")
+  end
+
   it "can strip indentation" do
     expect(subject.strip_indent("  test\n    test")).to eq("test\n  test")
   end

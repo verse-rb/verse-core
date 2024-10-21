@@ -36,11 +36,22 @@ module Verse
       # @param string [String] the string to convert
       # @return [String] the converted string
       def underscore(string)
-        string.gsub(/::/, "/")
+        string.gsub("::", "/")
               .gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2')
               .gsub(/([a-z\d])([A-Z])/, '\1_\2')
               .tr("-", "_")
               .downcase
+      end
+
+      # Convert a string to title case
+      # @param string [String] the string to convert
+      # @return [String] the converted string
+      def titleize(string)
+        # Use 'tr' to replace underscores and '::' in one go
+        string = string.tr("_", " ").gsub("::", " ")
+                       .gsub(/([a-z])([A-Z])/, '\1 \2') # Handle camelCase
+        # Split by spaces, capitalize each word, and join them back with a space
+        string.split(/([^\w])/).map(&:capitalize).join
       end
     end
   end
