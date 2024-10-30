@@ -51,7 +51,7 @@ module Verse
     logger.info{ "notifying plugins start" }
     Verse::Plugin.start(mode)
     logger.info{ "starting event manager" }
-    @event_manager&.start
+    @event_manager&.start unless mode == :task
 
     logger.info{ "Verse startup sequence completed" }
   end
