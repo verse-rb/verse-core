@@ -45,7 +45,6 @@ module Verse
         end
 
         def add_metadata(**opts)
-          @metadata ||= {}
           @metadata.merge!(opts)
         end
 
