@@ -153,7 +153,7 @@ module Verse
                       # The dispatch event method will be called
                       # after the transaction is committed. So we
                       # copy locally the metadata for later.
-                      metadata = @metadata.dup
+                      md = @metadata.dup
 
                       dispatch_event do
                         @event_cause = [self.class.resource, name]
@@ -165,7 +165,7 @@ module Verse
                           payload: {
                             args: arg2,
                             resource_id: id.to_s,
-                            metadata:
+                            metadata: md
                           },
                         )
                       end
