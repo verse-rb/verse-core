@@ -76,7 +76,7 @@ module Verse
         end
 
         def define_event_method(method, method_name)
-          _, name, creation, key, metadata = @next_method_mode
+          _, name, creation, key, _metadata = @next_method_mode
 
           define_method(method_name) do |*args, **hash|
             mode(:rw) do
