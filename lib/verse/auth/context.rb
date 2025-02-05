@@ -14,15 +14,15 @@ module Verse
           from_role(role)
         end
 
-        def from_role(role, custom_scopes: {}, metadata: {}, exp: nil)
+        def from_role(role, custom_scopes: {}, metadata: {})
           right_list = backend.fetch(role)
-          new(right_list, role:, custom_scopes:, metadata:, exp:)
+          new(right_list, role:, custom_scopes:, metadata:)
         end
       end
 
       @backend = Verse::Auth::SimpleRoleBackend
 
-      attr_reader :role, :custom_scopes, :metadata, :exp
+      attr_reader :role, :custom_scopes, :metadata
 
       # Use this class to mock an auth context for testing purposes.
       #
@@ -39,13 +39,12 @@ module Verse
       # Verse::Auth::Context.new(["users.read.*", "users.write.?"])
       # ```
       #
-      def initialize(rights = ["*.*.*"], role: nil, custom_scopes: {}, metadata: {}, exp: nil)
+      def initialize(rights = ["*.*.*"], role: nil, custom_scopes: {}, metadata: {})
         super()
 
         @role = role
         @custom_scopes = custom_scopes.transform_keys(&:to_sym)
         @metadata = metadata
-        @exp = exp
 
         generate_rights(rights)
       end
