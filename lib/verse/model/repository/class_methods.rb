@@ -76,7 +76,7 @@ module Verse
         end
 
         def define_event_method(method, method_name)
-          _, name, creation, key, metadata = @next_method_mode
+          _, name, creation, key, _metadata = @next_method_mode
 
           define_method(method_name) do |*args, **hash|
             mode(:rw) do
@@ -118,7 +118,7 @@ module Verse
                       # The dispatch event method will be called
                       # after the transaction is committed. So we
                       # copy locally the metadata for later.
-                      metadata = @metadata.dup
+                      md = @metadata.dup
 
                       dispatch_event do
                         @event_cause = [self.class.resource, name]
@@ -130,7 +130,7 @@ module Verse
                           payload: {
                             args:,
                             resource_id: result.to_s,
-                            metadata:
+                            metadata: md
                           }
                         )
                       end
