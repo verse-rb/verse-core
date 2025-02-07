@@ -12,7 +12,11 @@ module Verse
         @scope = @context.can?(action.to_sym, resource.to_sym)
 
         if @scope
-          @scope = @scope.to_sym
+          if @scope =~ /\A\{.+\}\z/
+            @scope = @scope[1..-2].split(",").map(&:strip)
+          else
+            @scope = @scope.to_sym
+          end
         end
 
         block.call(self)
@@ -30,8 +34,20 @@ module Verse
         true
       end
 
-      # Is used with custom scopes.
-      # @param scope [String] the scope to check
+      # This method is used with custom scopes encoded in the token.
+      #
+      # @param key [String] the key used in the token to store the custom scope.
+      #
+      # @example
+      #
+      #  auth_context = Verse::Auth::Context.new(["users.read.custom"],
+      #   custom_scopes: { users: [1,2,3] }
+      #  )
+      #  auth_context.can! :read, :user do |scope|
+      #     scope.custom?(:users) do |users|
+      #       puts users # will return [1,2,3]
+      #     end
+      #  end
       def custom?(key = nil, &block)
         key ||= @resource.to_sym
 
@@ -42,10 +58,41 @@ module Verse
         )
       end
 
+      # Is used when the scope is an array of elements.
+      #
+      # @param block [Proc] the block to execute when the scope
+      # is an array.
+      #
+      # @example
+      #   auth_context = Verse::Auth::Context.new(["users.read.{a,b,c}"])
+      #   auth_context.can! :read, :user do |scope|
+      #     scope.array? do |users|
+      #     puts users # will return ["a", "b", "c"]
+      #   end
+      def array?(&block)
+        return unless @scope.is_a?(Array)
+
+        @result = block.call(@scope)
+      end
+
+      # If no block is matching the scope, then the else? block will be executed.
+      # If no else? block is defined, then the action will be rejected.
+      # @param block [Proc] the block to execute when no other block is matching.
+      #
+      # @example
+      #
+      #   auth_context = Verse::Auth::Context.new(["users.read.*"])
+      #   auth_context.can! :write, :user do
+      #     scope.else? do
+      #       puts "No scope found"
+      #       false
+      #     end
+      #   end
       def else?(&block)
         @else = block
       end
 
+      # :nodoc:
       def result
         @result ||= @else&.call(self)
 
@@ -54,6 +101,7 @@ module Verse
         @result
       end
 
+      # Reject the action and raise an error.
       def reject!
         @context.reject!
       end

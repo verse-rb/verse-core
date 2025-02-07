@@ -6,7 +6,8 @@ RSpec.describe Verse::Auth::Context do
   {
     ["*.*.*"] => [1, 2, 3, 4],
     ["users.read.?"] => ["1234"],
-    ["users.read.myself"] => [1]
+    ["users.read.myself"] => [1],
+    ["users.read.{myself, customer}"] => ["myself", "customer"],
   }.each do |right, value|
     it "scopes correctly for #{right}" do
       can_method = proc do |context|
@@ -16,6 +17,7 @@ RSpec.describe Verse::Auth::Context do
           }
           scope.custom?{ |users| users }
           scope.myself?{ [context.metadata[:user_id]] }
+          scope.array?{ |arr| arr }
 
           scope.else?(&:reject!)
         end
