@@ -11,14 +11,6 @@ module Verse
 
         @scope = @context.can?(action.to_sym, resource.to_sym)
 
-        if @scope
-          @scope = if @scope =~ /\A\{.+\}\z/
-                     @scope[1..-2].split(",").map(&:strip)
-                   else
-                     @scope.to_sym
-                   end
-        end
-
         block.call(self)
       end
 

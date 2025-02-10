@@ -88,7 +88,15 @@ module Verse
 
         scope = @rights.find{ |(res, act, _)| res =~ resource && act =~ action }
 
-        (scope && scope[2]) || false
+        result = (scope && scope[2])
+
+        return false unless result
+
+        if result =~ /\A\{.+\}\z/
+          return result[1..-2].split(",").map{ |s| s.strip.to_sym }
+        else
+          result.to_sym
+        end
       end
 
       # Confirm that the security context has been checked.
