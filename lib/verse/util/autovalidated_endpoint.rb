@@ -4,6 +4,16 @@ module Verse
   module Util
     # Auto validated endpoint gives metadata for any endpoints,
     # and the possibility to validate any input/output schema.
+    #
+    # They are used in conjunction with hooks to provide a way to
+    # validate input and output of the endpoint.
+    #
+    # Because in Verse, Exposition layer is in charge of syntaxic
+    # validation of the input and output, this is useful to declare
+    # the schema of the input and output of the endpoint.
+    #
+    # Finally, it offers some metadata to describe the endpoint and
+    # generate documentation.
     module AutovalidatedEndpoint
       attr_reader :input_schema, :output_schema
 
@@ -39,6 +49,7 @@ module Verse
       end
 
       # Process the input, clean and validate input.
+      #
       # @param input [Hash] The input to process
       # @return [Hash] The processed input, cleaned from unwanted keys and
       #                validated by verse-schema
@@ -53,6 +64,7 @@ module Verse
       end
 
       # Process the output, clean and validate output.
+      #
       # @param output [Hash] The output to process
       # @return [Hash] The processed output, cleaned from unwanted keys and
       #                validated by verse-schema
@@ -67,6 +79,7 @@ module Verse
       end
 
       # Define the input schema for this endpoint.
+      #
       # @param schema [Verse::Schema] The schema to use for validation
       # @param block [Proc] The block to use to build the schema
       # @raise [ArgumentError] If both schema and block are given
@@ -83,6 +96,7 @@ module Verse
       end
 
       # Define the output schema for this endpoint.
+      #
       # @param schema [Verse::Schema] The schema to use for validation
       # @param block [Proc] The block to use to build the schema
       # @raise [ArgumentError] If both schema and block are given
