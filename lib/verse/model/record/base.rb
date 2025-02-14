@@ -15,7 +15,7 @@ module Verse
         @record_root_path       = "Model"
         @repositories_root_path = "Model"
 
-        attr_reader :relations, :fields, :included, :local_included
+        attr_reader :relations, :fields, :included, :local_included, :meta
 
         # Initialize a new record. Include set is used to append the relations to
         # the record.

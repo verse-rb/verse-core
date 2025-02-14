@@ -313,7 +313,8 @@ module Verse
         #       "#{first_name} #{last_name}"
         #     end
         #  end
-        def field(name, type: :any, key: nil, primary: false, visible: true, readonly: false, required: false, &block)
+        def field(name, type: :any, key: nil, primary: false, visible: true,
+                  readonly: false, required: false, meta: {}, &block)
           key ||= name.to_sym
 
           @fields[key] = { name:, key:, type:, visible:, readonly:, required: }
