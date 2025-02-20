@@ -317,7 +317,7 @@ module Verse
                   readonly: false, required: false, meta: {}, &block)
           key ||= name.to_sym
 
-          @fields[key] = { name:, key:, type:, visible:, readonly:, required: }
+          @fields[key] = { name:, key:, type:, visible:, readonly:, required:, meta: }
 
           if primary
             raise "type unknown: #{type}" unless Converter.has_converter?(type)

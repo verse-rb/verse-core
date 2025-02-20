@@ -81,13 +81,13 @@ module Verse
         base_method = instance_method(method)
 
         while @exposed_endpoints.key?(method)
-          if method.to_s =~ /_\d+$/ # already defined
-            method = method.to_s.gsub(/_(\d+)$/) do
-              "_#{$1.to_i + 1}"
-            end.to_sym
-          else
-            method = "#{method}_1".to_sym
-          end
+          method = if method.to_s =~ /_\d+$/ # already defined
+                     method.to_s.gsub(/_(\d+)$/) do
+                       "_#{$1.to_i + 1}"
+                     end.to_sym
+                   else
+                     "#{method}_1".to_sym
+                   end
         end
 
         @exposed_endpoints[method] = exposition_hash
