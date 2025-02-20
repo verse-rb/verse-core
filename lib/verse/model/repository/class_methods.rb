@@ -120,6 +120,12 @@ module Verse
                       # copy locally the metadata for later.
                       md = @metadata.dup
 
+                      md[:at] = Time.now
+
+                      if account_id = auth_context.metadata[:id]
+                        md[:account_id] = account_id
+                      end
+
                       dispatch_event do
                         @event_cause = [self.class.resource, name]
 
@@ -157,6 +163,12 @@ module Verse
 
                       dispatch_event do
                         @event_cause = [self.class.resource, name]
+
+                        md[:at] = Time.now
+
+                        if account_id = auth_context.metadata[:id]
+                          md[:account_id] = account_id
+                        end
 
                         Verse.publish_resource_event(
                           resource_type: self.class.resource,
