@@ -19,6 +19,14 @@ module Verse
         end
       end
 
+      def meta(value = nil)
+        if value
+          @meta = value
+        else
+          @meta
+        end
+      end
+
       # Create helper method to use a specific service.
       # @example
       #  class MyExposition < Verse::Exposition::Base

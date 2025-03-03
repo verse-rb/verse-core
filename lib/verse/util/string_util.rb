@@ -26,10 +26,12 @@ module Verse
       #
       # @param string [String] the string to strip the indentation from
       # @return [String] the string with the indentation removed
-      def strip_indent(string)
-        min_indent = string.scan(/^[ \t]*(?=\S)/).min
-        indent = min_indent ? min_indent.size : 0
-        string.gsub(/^[ \t]{#{indent}}/, "")
+      def strip_indent(string, tab_width: 2)
+        first_line_indent = string[/\A[ \t]*/] || ""
+        first_line_indent.gsub!(/\t/, " " * tab_width)
+        indent_size = first_line_indent.size
+
+        string.gsub(/^[ \t]{#{indent_size}}/, "")
       end
 
       # Convert a string to snake case
