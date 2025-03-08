@@ -47,7 +47,7 @@ module Verse
 
         def subscribe_resource_event(resource_type:, event:, mode: Manager::MODE_CONSUMER, &block)
           logger.debug{ "Subscribe to resource event #{resource_type} #{event}" }
-          subscribe(topic: [resource_type, event], mode:, &block)
+          subscribe(topic: [resource_type, event].join(":"), mode:, &block)
         end
 
         def start
@@ -73,7 +73,7 @@ module Verse
           end
 
           Timeout.timeout(timeout) do
-            message = Message.new(content, manager: self, headers:, reply_to:)
+            message = Message.new(content, manager: self, headers:, reply_to:, channel:)
 
             @subscriptions.each do |pattern, subscribers|
               next unless pattern.match?(channel)
@@ -124,7 +124,7 @@ module Verse
         def publish(channel, payload, headers: {}, reply_to: nil)
           logger.debug{ "Publish on #{channel}" }
 
-          message = Message.new(payload, manager: self, headers:, reply_to:)
+          message = Message.new(payload, manager: self, headers:, reply_to:, channel:)
 
           @subscriptions.lazy.select{ |chan, _| channel == chan }.map(&:last).each do |sub|
             sub.each{ |s| s.call(message, channel) }
@@ -136,8 +136,9 @@ module Verse
           logger.debug{ "Publish resource event #{resource_type} #{event}" }
 
           headers = headers.merge(event:)
-          message = Message.new(payload, manager: self, headers:)
-          channel = [resource_type, event]
+          channel = [resource_type, event].join(":")
+
+          message = Message.new(payload, manager: self, headers:, channel:)
 
           @subscriptions.lazy.select{ |chan, _| channel == chan }.map(&:last).each do |sub|
             sub.each{ |s| s.call(message, channel) }

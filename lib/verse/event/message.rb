@@ -3,14 +3,16 @@
 module Verse
   module Event
     class Message
-      attr_reader :headers, :content, :reply_to, :manager
+      attr_reader :headers, :content, :reply_to, :manager, :channel
 
-      def initialize(content, manager: nil, headers: {}, reply_to: nil)
+      def initialize(content, manager: nil, headers: {}, reply_to: nil, channel: nil)
         @manager = manager
 
         @content = content
         @headers = headers
         @reply_to = reply_to
+
+        @channel = channel
       end
 
       def reply(content, headers: {})

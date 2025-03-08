@@ -18,7 +18,7 @@ class DummyEventManager
 
   # rubocop:disable Lint/UnusedMethodArgument
   def publish_resource_event(resource_type:, resource_id:, event:, payload:, headers:, reply_to:)
-    channel = [resource_type, event]
+    channel = [resource_type, event].join(":")
     publish(channel, payload)
   end
   # rubocop:enable Lint/UnusedMethodArgument
