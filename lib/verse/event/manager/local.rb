@@ -74,12 +74,11 @@ module Verse
 
           Timeout.timeout(timeout) do
             message = Message.new(content,
-              manager: self,
-              headers:,
-              reply_to:,
-              channel:,
-              event: channel
-            )
+                                  manager: self,
+                                  headers:,
+                                  reply_to:,
+                                  channel:,
+                                  event: channel)
 
             @subscriptions.each do |pattern, subscribers|
               next unless pattern.match?(channel)
