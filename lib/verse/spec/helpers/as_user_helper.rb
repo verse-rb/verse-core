@@ -8,6 +8,12 @@ module Verse
       def as_user(username, &block)
         old_context = @current_auth_context
 
+        if username.nil?
+          @current_auth_context = nil
+          block.call
+          return
+        end
+
         params = Verse::Spec.users.fetch(username) {
           raise "user `#{username}` not found. Please add it with Verse::Spec.add_user"
         }
