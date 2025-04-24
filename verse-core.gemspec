@@ -39,7 +39,7 @@ Gem::Specification.new do |spec|
   spec.executables   = ["verse"]
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "verse-schema", "~> 1.0.0"
+  spec.add_dependency "verse-schema", ">= 1"
 
   spec.add_dependency "thor", "~> 1.2.1"
 
