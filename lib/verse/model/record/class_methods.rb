@@ -51,14 +51,14 @@ module Verse
             # If the format of this record is `::Repository`, we assume the project is using
             # [Namespace]::[Model]::[Repository|Record] format:
             # e.g. `User::Record` => `Object::Repository`
-            repository = name.gsub(/[^:]+::Repository$/, "#{StringUtil.camelize(relation_name.to_s)}::Repository")
+            name.gsub(/[^:]+::Repository$/, "#{StringUtil.camelize(relation_name.to_s)}::Repository")
           when /::[^:]+$/
             # If the format is `[Namespace]::[ModelRepository|ModelRecord]`, we assume the project is using
             # [Namespace]::[Model][Repository|Record] format:
             # e.g. `UserRecord` => `ObjectRepository`
-            repository = name.gsub(/::[^:]+$/, "::#{StringUtil.camelize(relation_name.to_s)}Repository")
+            name.gsub(/::[^:]+$/, "::#{StringUtil.camelize(relation_name.to_s)}Repository")
           else # In case there is no namespace, we, we simply use the class name
-            repository = "#{StringUtil.camelize(relation_name.to_s)}Repository"
+            "#{StringUtil.camelize(relation_name.to_s)}Repository"
           end
         end
 
