@@ -46,19 +46,20 @@ module Verse
 
         # :nodoc:
         def infer_repository(relation_name)
+          camelized_name = StringUtil.camelize(relation_name.to_s)
           case name
           when /::Repository$/
             # If the format of this record is `::Repository`, we assume the project is using
             # [Namespace]::[Model]::[Repository|Record] format:
             # e.g. `User::Record` => `Object::Repository`
-            name.gsub(/[^:]+::Repository$/, "#{StringUtil.camelize(relation_name.to_s)}::Repository")
+            name.sub(/[^:]+::Repository$/, "#{camelized_name}::Repository")
           when /::[^:]+$/
             # If the format is `[Namespace]::[ModelRepository|ModelRecord]`, we assume the project is using
             # [Namespace]::[Model][Repository|Record] format:
             # e.g. `UserRecord` => `ObjectRepository`
-            name.gsub(/::[^:]+$/, "::#{StringUtil.camelize(relation_name.to_s)}Repository")
+            name.sub(/::[^:]+$/, "::#{camelized_name}Repository")
           else # In case there is no namespace, we, we simply use the class name
-            "#{StringUtil.camelize(relation_name.to_s)}Repository"
+            "#{camelized_name}Repository"
           end
         end
 
