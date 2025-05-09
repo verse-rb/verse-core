@@ -4,8 +4,6 @@ module Verse
   module Model
     module Record
       module ClassMethods
-        attr_accessor :record_root_path, :repositories_root_path
-
         attr_reader :fields, :relations
 
         include Verse::Util
@@ -46,6 +44,24 @@ module Verse
           end
         end
 
+        # :nodoc:
+        def infer_repository(relation_name)
+          case name
+          when /::Repository$/
+            # If the format of this record is `::Repository`, we assume the project is using
+            # [Namespace]::[Model]::[Repository|Record] format:
+            # e.g. `User::Record` => `Object::Repository`
+            repository = name.gsub(/[^:]+::Repository$/, "#{StringUtil.camelize(relation_name.to_s)}::Repository")
+          when /::[^:]+$/
+            # If the format is `[Namespace]::[ModelRepository|ModelRecord]`, we assume the project is using
+            # [Namespace]::[Model][Repository|Record] format:
+            # e.g. `UserRecord` => `ObjectRepository`
+            repository = name.gsub(/::[^:]+$/, "::#{StringUtil.camelize(relation_name.to_s)}Repository")
+          else # In case there is no namespace, we, we simply use the class name
+            repository = "#{StringUtil.camelize(relation_name.to_s)}Repository"
+          end
+        end
+
         # This is a belong to relation.
         #
         # This allow to avoid N+1 query.
@@ -60,7 +76,8 @@ module Verse
         #
         # @param relation_name [Symbol] the name of the relation
         # @param primary_key [Symbol] the primary key of the relation
-        # @param foreign_key [Symbol] the foreign key of the relation
+        # @param foreign_key [Symbol] the foreign key of the relation. If not set, it will be
+        #      inferred from the relation name and the repository name, e.g. PostRecord => post_id.
         # @param repository [String] the repository of the relation
         # @param record [String] the record of the relation
         # @param opts [Hash] the options of the relation
@@ -78,8 +95,8 @@ module Verse
         #   end
         #
         def belongs_to(relation_name, primary_key: nil, foreign_key: nil, repository: nil, record: nil, filters: {}, **opts)
-          root = name.split(/::[^:]+$/).first
-          repository ||= "#{root}::#{StringUtil.camelize(relation_name.to_s)}Repository"
+          # Try to infer the repository name from the class name:
+          repository ||= infer_repository(relation_name)
 
           unless foreign_key
             begin
@@ -170,8 +187,7 @@ module Verse
         #   end
         #
         def has_many(relation_name, primary_key: nil, foreign_key: nil, repository: nil, record: nil, filters: {}, **opts) # rubocop:disable Naming/PredicateName
-          root = name.split(/::[^:]+$/).first
-          repository ||= "#{root}::#{StringUtil.camelize(Verse.inflector.singularize(relation_name.to_s))}Repository"
+          repository ||= infer_repository(Verse.inflector.singularize(relation_name.to_s))
 
           opts = opts.merge({
                               array: true,
@@ -233,8 +249,7 @@ module Verse
         end
 
         def has_one(relation_name, primary_key: nil, foreign_key: nil, repository: nil, record: nil, filters: {}, **opts) # rubocop:disable Naming/PredicateName
-          root = name.split(/::[^:]+$/).first
-          repository ||= "#{root}::#{StringUtil.camelize(Verse.inflector.singularize(relation_name.to_s))}Repository"
+          repository ||= infer_repository(relation_name)
 
           opts = opts.merge({
                               array: false,

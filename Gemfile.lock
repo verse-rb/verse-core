@@ -12,7 +12,7 @@ PATH
     verse-core (2.0.0)
       i18n (~> 1.10.0)
       thor (~> 1.2.1)
-      verse-schema (~> 1.0.0)
+      verse-schema (>= 1)
 
 GEM
   remote: https://rubygems.org/
