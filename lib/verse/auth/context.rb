@@ -135,7 +135,7 @@ module Verse
 
           resource_regexp = Regexp.new(resource.gsub("*", ".*"))
           action_regexp = Regexp.new(action.gsub("*", ".*"))
-          scope = scope.gsub("*", "all").gsub(/^\?$/, "custom")
+          scope = scope.gsub("*", "all").sub(/^\?$/, "custom")
 
           if scope == "custom" && (resource == "*")
             raise "custom scope `?` not allowed for wildcard resources"

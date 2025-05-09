@@ -90,7 +90,7 @@ module Verse
 
         while @exposed_endpoints.key?(method)
           method = if method.to_s =~ /_\d+$/ # already defined
-                     method.to_s.gsub(/_(\d+)$/) do
+                     method.to_s.sub(/_(\d+)$/) do
                        "_#{$1.to_i + 1}"
                      end.to_sym
                    else

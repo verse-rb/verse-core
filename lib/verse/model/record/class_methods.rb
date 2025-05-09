@@ -4,6 +4,10 @@ module Verse
   module Model
     module Record
       module ClassMethods
+        # Define the main module where the records and repositories are stored.
+        # This is used to infer the type of the record.
+        attr_accessor :model_root_path
+
         attr_reader :fields, :relations
 
         include Verse::Util
@@ -44,24 +48,7 @@ module Verse
           end
         end
 
-        # :nodoc:
-        def infer_repository(relation_name)
-          camelized_name = StringUtil.camelize(relation_name.to_s)
-          case name
-          when /::Repository$/
-            # If the format of this record is `::Repository`, we assume the project is using
-            # [Namespace]::[Model]::[Repository|Record] format:
-            # e.g. `User::Record` => `Object::Repository`
-            name.sub(/[^:]+::Repository$/, "#{camelized_name}::Repository")
-          when /::[^:]+$/
-            # If the format is `[Namespace]::[ModelRepository|ModelRecord]`, we assume the project is using
-            # [Namespace]::[Model][Repository|Record] format:
-            # e.g. `UserRecord` => `ObjectRepository`
-            name.sub(/::[^:]+$/, "::#{camelized_name}Repository")
-          else # In case there is no namespace, we, we simply use the class name
-            "#{camelized_name}Repository"
-          end
-        end
+
 
         # This is a belong to relation.
         #
@@ -381,13 +368,53 @@ module Verse
 
         protected
 
+        # :nodoc:
+        def infer_repository(relation_name)
+          camelized_name = StringUtil.camelize(relation_name.to_s)
+          case name
+          when /::Repository$/
+            # If the format of this record is `::Repository`, we assume the project is using
+            # [Namespace]::[Model]::[Repository|Record] format:
+            # e.g. `User::Record` => `Object::Repository`
+            name.sub(/[^:]+::Repository$/, "#{camelized_name}::Repository")
+          when /::[^:]+$/
+            # If the format is `[Namespace]::[ModelRepository|ModelRecord]`, we assume the project is using
+            # [Namespace]::[Model][Repository|Record] format:
+            # e.g. `UserRecord` => `ObjectRepository`
+            name.sub(/::[^:]+$/, "::#{camelized_name}Repository")
+          else # In case there is no namespace, we, we simply use the class name
+            "#{camelized_name}Repository"
+          end
+        end
+
+        # :nodoc:
+        # Follow format module/name_pluralized
         def infer_record_type_by_class_name
-          regexp = /(::)?([a-zA-Z0-9_]+)$/
-          Verse.inflector.pluralize(
-            StringUtil.underscore(
-              name[regexp].gsub(regexp, "\\2").gsub(/(.?)Record$/, "\\1")
+          # Remove the main module name if it exists:
+          name = self.name
+          name = name.sub("#{model_root_path}::", "") if model_root_path
+
+          case name
+          when /::Record$/
+            # If the format of this record is `::Record`, we assume the project is using
+            # [Namespace]::[Model]::[Repository|Record] format:
+            # e.g. `User::Record` => `Object::Record`
+            Verse::Util::StringUtil.underscore(
+              Verse.inflector.pluralize(
+                name.sub(/([^:]+)::Record$/, "\\1")
+              )
             )
-          )
+          else
+            # If the format is `[Namespace]::[ModelRepository|ModelRecord]`, we assume the project is using
+            # [Namespace]::[Model][Repository|Record] format:
+            # e.g. `UserRecord` => `ObjectRecord`
+
+            Verse::Util::StringUtil.underscore(
+              Verse.inflector.pluralize(
+                name.sub(/Record$/, "")
+              )
+            )
+          end
         end
       end
     end
