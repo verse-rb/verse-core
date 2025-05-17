@@ -82,7 +82,7 @@ module Verse
           end
 
           code = ->(message, subject) do
-            Verse.logger.debug{ "received event from #{subject}" }
+            Verse.logger.debug{ "Received event from `#{subject}`" }
 
             output = nil
 

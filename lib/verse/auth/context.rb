@@ -125,6 +125,11 @@ module Verse
         @custom_scopes[resource.to_sym]
       end
 
+      protected def regexify(string)
+        string = string.to_s.gsub("*", ".*")
+        /\A#{string}\z/.freeze
+      end
+
       protected def generate_rights(rights)
         @rights = rights.map{ |x|
           resource, action, scope = x.split(/\./)
@@ -133,9 +138,9 @@ module Verse
             "string must be in the format `[resource].[action].[scope]` but `#{x}` given"
           end
 
-          resource_regexp = Regexp.new(resource.gsub("*", ".*"))
-          action_regexp = Regexp.new(action.gsub("*", ".*"))
-          scope = scope.gsub("*", "all").sub(/^\?$/, "custom")
+          resource_regexp = Regexp.new(regexify(resource))
+          action_regexp = Regexp.new(regexify(action))
+          scope = scope.gsub("*", "all").sub(/\A\?\z/, "custom")
 
           if scope == "custom" && (resource == "*")
             raise "custom scope `?` not allowed for wildcard resources"
