@@ -21,13 +21,13 @@ module Verse
             # start_gc_thread unless config[:skip_gc_thread]
           end
 
-          def increment(counter_name, amount = 1, ttl: nil)
+          def increment(counter_name, amount = 1, ttl: nil, now: Time.now)
             @mutex.synchronize do
               check_and_expire_counter(counter_name)
 
               entry = @counters[counter_name] || { value: 0, expires_at: nil }
               entry[:value] += amount
-              entry[:expires_at] = ttl ? Time.now + ttl : entry[:expires_at] # Update TTL if provided
+              entry[:expires_at] = ttl ? now + ttl : entry[:expires_at] # Update TTL if provided
 
               @counters[counter_name] = entry
               entry[:value]
@@ -36,17 +36,17 @@ module Verse
 
           # decrement is handled by the abstract module using increment(key, -amount)
 
-          def get(counter_name)
+          def get(counter_name, now: Time.now)
             @mutex.synchronize do
-              check_and_expire_counter(counter_name)
+              check_and_expire_counter(counter_name, now:)
               @counters[counter_name] ? @counters[counter_name][:value] : nil
             end
           end
 
-          def set(counter_name, value, ttl: nil)
+          def set(counter_name, value, ttl: nil, now: Time.now)
             @mutex.synchronize do
               # No need to check expiry before a direct set, as it overwrites.
-              expires_at = ttl ? Time.now + ttl : nil
+              expires_at = ttl ? now + ttl : nil
               @counters[counter_name] = { value: value, expires_at: expires_at }
             end
             nil # void return
@@ -66,9 +66,9 @@ module Verse
 
           private
 
-          def check_and_expire_counter(counter_name)
+          def check_and_expire_counter(counter_name, now: Time.now)
             entry = @counters[counter_name]
-            if entry && entry[:expires_at] && entry[:expires_at] <= Time.now
+            if entry && entry[:expires_at] && entry[:expires_at] <= now
               @counters.delete(counter_name)
             end
           end

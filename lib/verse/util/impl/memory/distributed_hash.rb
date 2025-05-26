@@ -27,8 +27,12 @@ module Verse
             @cleanup_interval_seconds = config.fetch(
               :cleanup_interval_seconds,
               DEFAULT_CLEANUP_INTERVAL_SECONDS
-            ).to_i
+            ).to_f
 
+            @stop = false # Flag to stop the cleanup thread
+            @cond = new_cond # Condition variable for the cleanup thread
+
+            puts "cleanup_interval_seconds: #{@cleanup_interval_seconds}"
             start_cleanup_thread if @cleanup_interval_seconds > 0
           end
 
@@ -62,7 +66,7 @@ module Verse
               entry = @store[key]
               # If entry exists and is expired, it's effectively already gone for a get,
               # but delete should still confirm its removal from the store.
-              if entry&.fetch(:expires_at, NEVER_EXPIRES) <= now_timestamp
+              if entry&.fetch(:expires_at, NEVER_EXPIRES)&.<=(now_timestamp)
                 @store.delete(key) # Clean up expired entry
                 # If it was expired, it means it wasn't accessible via get.
                 # The return value of delete usually indicates if an *active* item was removed.
@@ -70,8 +74,7 @@ module Verse
                 return false
               end
 
-              @store.delete(key)
-              return true
+              !!@store.delete(key)
             end
           end
 
@@ -83,24 +86,52 @@ module Verse
             nil
           end
 
+          # Stops the cleanup thread gracefully.
+          def stop_cleanup_thread
+            return unless @cleanup_thread&.alive?
+
+            mon_synchronize do
+              @stop = true
+              @cond.signal # Wake up the thread if it's waiting
+            end
+            @cleanup_thread.join # Wait for the thread to finish
+            @cleanup_thread = nil
+          end
+
+          def cleanup(now: Time.now)
+            if @cleanup_thread&.alive?
+              mon_synchronize do
+                @cond.signal
+                @cond.wait
+              end
+            else
+              cleanup_expired_keys(now:) # If no thread, do cleanup immediately
+            end
+          end
+
           private
 
           def start_cleanup_thread
             @cleanup_thread = Thread.new do
               loop do
-                begin
-                  # Sleep first, then cleanup. Or cleanup then sleep.
-                  # Sleeping first means the first cleanup is delayed.
-                  # Cleaning up first means immediate cleanup then sleep.
-                  # Let's sleep first to give the application time to start.
-                  sleep @cleanup_interval_seconds
+                # Lock is acquired to check @stop and wait on @cond
+                should_stop = mon_synchronize do
+                  @cond.wait(@cleanup_interval_seconds) unless @stop
+                  @stop
+                end
 
-                  # Perform cleanup
+                break if should_stop # Exit loop if stop flag is true
+
+                begin
                   cleanup_expired_keys(now: Time.now)
                 rescue StandardError => e
-                  Verse.logger.error("Error in DistributedHash cleanup thread: #{e.message}")
-                  Verse.logger.error(e.backtrace.join("\n"))
-                  sleep 1
+                  # In a real app, Verse.logger should be used if available and configured
+                  # For now, print to stderr to avoid dependency if logger isn't set up.
+                  warn "Error in DistributedHash cleanup thread: #{e.message}\n#{e.backtrace.join("\n")}"
+                  # If an error occurs, we still want to respect the interval before retrying,
+                  # but the wait above already handled the primary sleep.
+                  # A short additional sleep might be useful if errors are persistent.
+                  mon_synchronize { @cond.wait(1) unless @stop } # Short wait on error, check stop again
                 end
               end
             end
@@ -120,6 +151,9 @@ module Verse
                   @store.delete(key)
                 end
               end
+
+            ensure
+              @cond.signal # Signal that cleanup is done, if any threads are waiting
             end
           end
         end
