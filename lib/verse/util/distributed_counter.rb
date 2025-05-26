@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Verse
   module Util
     # Abstract module defining the interface for a distributed atomic counter.

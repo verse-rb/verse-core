@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "spec_helper"
 require "verse/util/registry"
 require "verse/util/errors"
@@ -5,17 +7,21 @@ require "verse/util/errors"
 # Dummy classes for testing
 class TestAdapterOne
   attr_reader :config
+
   def initialize(config = {})
     @config = config
   end
+
   def identity = :one
 end
 
 class TestAdapterTwo
   attr_reader :config
+
   def initialize(config = {})
     @config = config
   end
+
   def identity = :two
 end
 

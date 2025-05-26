@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "spec_helper"
 require "verse/util/impl/memory/distributed_counter"
 require "verse/util/distributed_counter" # To ensure it includes the base module
@@ -90,7 +92,6 @@ RSpec.describe Verse::Util::Impl::Memory::DistributedCounter do
       expect(counter_store.get("counter", now: start_time + 0.08)).to eq(2)
       expect(counter_store.get("counter", now: start_time + 0.12)).to be_nil
     end
-
 
     it "does not expire if TTL is nil" do
       counter_store.set("no_ttl_counter", 20, now: start_time)

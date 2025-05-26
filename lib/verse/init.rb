@@ -98,7 +98,8 @@ module Verse
   end
 
   # Accessor for DistributedHash utility
-  def distributed_hash = Verse::Util::Registry.resolve(:distributed_hash) # Renamed
+  # Renamed
+  def distributed_hash = Verse::Util::Registry.resolve(:distributed_hash)
   # Accessor for DistributedLock utility
   def distributed_lock = Verse::Util::Registry.resolve(:distributed_lock)
   # Accessor for DistributedCounter utility
@@ -111,7 +112,7 @@ module Verse
   def initialize_utilities!
     # Config values will have defaults from schema if the :utilities key exists.
     # If :utilities is entirely missing, `dig` returns nil, so we default to memory.
-    base_utils_config = Verse::Config.config.dig(:utilities) || {}
+    base_utils_config = Verse::Config.config[:utilities] || {}
 
     dh_conf = base_utils_config[:distributed_hash] || { adapter: :memory, config: {} } # Renamed ds_conf to dh_conf and key
     Verse::Util::Registry.set_default_adapter(:distributed_hash, dh_conf[:adapter]) # Renamed

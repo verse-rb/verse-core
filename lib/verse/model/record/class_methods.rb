@@ -48,8 +48,6 @@ module Verse
           end
         end
 
-
-
         # This is a belong to relation.
         #
         # This allow to avoid N+1 query.

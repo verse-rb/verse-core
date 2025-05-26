@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "spec_helper"
 require "verse/util/impl/memory/distributed_hash"
 require "verse/util/distributed_hash" # To ensure it includes the base module correctly
@@ -76,7 +78,7 @@ RSpec.describe Verse::Util::Impl::Memory::DistributedHash do
       hash_store.set("key", "value2", ttl: 0.3, now: start_time + 0.05) # New expiry at start_time + 0.05 + 0.3 = start_time + 0.35
 
       expect(hash_store.get("key", now: start_time + 0.2)).to eq("value2") # Should exist past original 0.1 TTL
-      expect(hash_store.get("key", now: start_time + 0.4)).to be_nil    # Should be gone after new 0.35 TTL
+      expect(hash_store.get("key", now: start_time + 0.4)).to be_nil # Should be gone after new 0.35 TTL
     end
 
     it "delete returns false if key was already expired" do

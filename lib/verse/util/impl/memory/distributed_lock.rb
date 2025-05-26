@@ -1,4 +1,5 @@
-require "thread" # For Mutex
+# frozen_string_literal: true
+
 require "securerandom" # For lock tokens
 require_relative "../../distributed_lock"
 require_relative "../../errors"
@@ -15,7 +16,7 @@ module Verse
         class DistributedLock
           include Verse::Util::DistributedLock
 
-          def initialize(config = {})
+          def initialize(_config = {})
             @locks = {} # { lock_key => { token: "...", expires_at: Time } }
             @mutex = Mutex.new
             # @ttl_check_interval = config.fetch(:ttl_check_interval, 60) # For proactive GC if implemented
@@ -37,9 +38,10 @@ module Verse
                   @locks[lock_key] = { token: token, expires_at: expires_at }
                   return token
                 end
-              end # Release mutex
+              end
 
               return nil if Time.now >= deadline # Timeout exceeded
+
               sleep(0.01) # Short sleep before retrying
             end
           end
@@ -48,23 +50,11 @@ module Verse
             @mutex.synchronize do
               lock_info = @locks[lock_key]
 
-              if lock_info && lock_info[:token] == lock_token
-                # Check expiry again, though it might have been re-acquired if TTL was short
-                if lock_info[:expires_at] > Time.now
-                  @locks.delete(lock_key)
-                  return true
-                else
-                  # Lock expired before release, or was already cleaned up
-                  @locks.delete(lock_key) # Ensure it's gone
-                  # Consider this a successful release of an expired lock if token matches,
-                  # or false if strict "must be active" is required.
-                  # For simplicity, if token matches, we say it's "released" even if it auto-expired.
-                  return true # Or false if strict "must be active and held by this token"
-                end
-              else
-                # Token mismatch or lock not found
-                return false
-              end
+              return false unless lock_info && lock_info[:token] == lock_token
+
+              # Check expiry again, though it might have been re-acquired if TTL was short
+              @locks.delete(lock_key)
+              return true
             end
           end
 
@@ -74,12 +64,12 @@ module Verse
 
               lock_info = @locks[lock_key]
 
-              if lock_info && lock_info[:token] == lock_token && lock_info[:expires_at] > Time.now
-                lock_info[:expires_at] = Time.now + (new_ttl_ms / 1000.0)
-                return true
-              else
-                return false # Lock not held by this token or expired
-              end
+              return false unless lock_info && lock_info[:token] == lock_token && lock_info[:expires_at] > Time.now
+
+              lock_info[:expires_at] = Time.now + (new_ttl_ms / 1000.0)
+              return true
+
+              # Lock not held by this token or expired
             end
           end
 
@@ -92,9 +82,9 @@ module Verse
 
           def check_and_expire_lock(lock_key)
             lock_info = @locks[lock_key]
-            if lock_info && lock_info[:expires_at] <= Time.now
-              @locks.delete(lock_key)
-            end
+            return unless lock_info && lock_info[:expires_at] <= Time.now
+
+            @locks.delete(lock_key)
           end
 
           # Optional: Proactive garbage collection thread for locks

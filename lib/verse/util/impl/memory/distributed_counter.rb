@@ -1,4 +1,5 @@
-require "thread" # For Mutex
+# frozen_string_literal: true
+
 require_relative "../../distributed_counter"
 
 module Verse
@@ -13,7 +14,7 @@ module Verse
         class DistributedCounter
           include Verse::Util::DistributedCounter
 
-          def initialize(config = {})
+          def initialize(_config = {})
             @counters = {} # { counter_name => { value: Integer, expires_at: Time } }
             @mutex = Mutex.new
             # @ttl_check_interval = config.fetch(:ttl_check_interval, 60) # For proactive GC
@@ -68,9 +69,9 @@ module Verse
 
           def check_and_expire_counter(counter_name, now: Time.now)
             entry = @counters[counter_name]
-            if entry && entry[:expires_at] && entry[:expires_at] <= now
-              @counters.delete(counter_name)
-            end
+            return unless entry && entry[:expires_at] && entry[:expires_at] <= now
+
+            @counters.delete(counter_name)
           end
 
           # Optional: Proactive garbage collection thread for counters

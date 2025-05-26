@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "monitor" # For MonitorMixin
 require_relative "../../distributed_hash"
 
@@ -144,14 +146,13 @@ module Verse
             # with respect to other operations on @store.
             mon_synchronize do
               # Iterate over a copy of keys to safely delete from the hash
-              @store.keys.each do |key|
+              @store.each_key do |key|
                 entry = @store[key] # Re-fetch entry in case it was changed/deleted by another thread
-                                    # just before this key was processed, though less likely with Monitor.
-                if entry&.fetch(:expires_at, NEVER_EXPIRES) <= now_timestamp
+                # just before this key was processed, though less likely with Monitor.
+                if entry&.fetch(:expires_at, NEVER_EXPIRES)&.<= now_timestamp
                   @store.delete(key)
                 end
               end
-
             ensure
               @cond.signal # Signal that cleanup is done, if any threads are waiting
             end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "spec_helper"
 require "verse/util/impl/memory/distributed_lock"
 require "verse/util/distributed_lock" # To ensure it includes the base module
