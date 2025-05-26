@@ -27,6 +27,26 @@ module Verse
         field(:adapter, String).filled
         field(:config, Hash).optional
       end
+
+      field?(:utilities, Hash) do
+        field?(:distributed_hash, Hash) do # Renamed from distributed_set
+          field(:adapter, Symbol).filled.default(:memory)
+          field(:config, Hash).optional.default({})
+        end
+        field?(:distributed_lock, Hash) do
+          field(:adapter, Symbol).filled.default(:memory)
+          field(:config, Hash).optional.default({})
+        end
+        field?(:distributed_counter, Hash) do
+          field(:adapter, Symbol).filled.default(:memory)
+          field(:config, Hash).optional.default({})
+        end
+
+        field?(:inflector, Hash) do
+          field(:adapter, Symbol).filled.default(:default) # :default will map to Verse::Util::Inflector
+          field(:config, Hash).optional.default({}) # For custom exceptions, e.g., { verb_exceptions: {...} }
+        end
+      end
     end
   end
 end

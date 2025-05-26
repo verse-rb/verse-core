@@ -3,6 +3,19 @@
 require "logger"
 require "securerandom"
 
+require_relative "./util/registry"
+require_relative "./util/errors" # Ensure errors are loaded for registry/accessors
+require_relative "./util/impl/memory/distributed_hash" # Renamed
+require_relative "./util/impl/memory/distributed_lock"
+require_relative "./util/impl/memory/distributed_counter"
+require_relative "./util/inflector"
+
+# Register default in-memory adapters
+Verse::Util::Registry.register(:distributed_hash, :memory, Verse::Util::Impl::Memory::DistributedHash) # Renamed
+Verse::Util::Registry.register(:distributed_lock, :memory, Verse::Util::Impl::Memory::DistributedLock)
+Verse::Util::Registry.register(:distributed_counter, :memory, Verse::Util::Impl::Memory::DistributedCounter)
+Verse::Util::Registry.register(:inflector, :default, Verse::Util::Inflector)
+
 module Verse
   extend self
 
@@ -84,7 +97,38 @@ module Verse
     end
   end
 
+  # Accessor for DistributedHash utility
+  def distributed_hash = Verse::Util::Registry.resolve(:distributed_hash) # Renamed
+  # Accessor for DistributedLock utility
+  def distributed_lock = Verse::Util::Registry.resolve(:distributed_lock)
+  # Accessor for DistributedCounter utility
+  def distributed_counter = Verse::Util::Registry.resolve(:distributed_counter)
+  # Accessor for Inflector utility
+  def inflector = Verse::Util::Registry.resolve(:inflector)
+
   protected
+
+  def initialize_utilities!
+    # Config values will have defaults from schema if the :utilities key exists.
+    # If :utilities is entirely missing, `dig` returns nil, so we default to memory.
+    base_utils_config = Verse::Config.config.dig(:utilities) || {}
+
+    dh_conf = base_utils_config[:distributed_hash] || { adapter: :memory, config: {} } # Renamed ds_conf to dh_conf and key
+    Verse::Util::Registry.set_default_adapter(:distributed_hash, dh_conf[:adapter]) # Renamed
+    Verse::Util::Registry.adapter_config(:distributed_hash, dh_conf[:adapter], dh_conf[:config] || {}) # Renamed
+
+    dl_conf = base_utils_config[:distributed_lock] || { adapter: :memory, config: {} }
+    Verse::Util::Registry.set_default_adapter(:distributed_lock, dl_conf[:adapter])
+    Verse::Util::Registry.adapter_config(:distributed_lock, dl_conf[:adapter], dl_conf[:config] || {})
+
+    dc_conf = base_utils_config[:distributed_counter] || { adapter: :memory, config: {} }
+    Verse::Util::Registry.set_default_adapter(:distributed_counter, dc_conf[:adapter])
+    Verse::Util::Registry.adapter_config(:distributed_counter, dc_conf[:adapter], dc_conf[:config] || {})
+
+    inflector_conf = base_utils_config[:inflector] || { adapter: :default, config: {} }
+    Verse::Util::Registry.set_default_adapter(:inflector, inflector_conf[:adapter])
+    Verse::Util::Registry.adapter_config(:inflector, inflector_conf[:adapter], inflector_conf[:config] || {})
+  end
 
   # Initialize the microservice within the current path
   def init(
@@ -108,5 +152,7 @@ module Verse
 
     Verse::Plugin.load_configuration(Verse::Config.config)
     Verse::Plugin.init
+
+    initialize_utilities!
   end
 end

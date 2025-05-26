@@ -2,11 +2,9 @@
 
 module Verse
   module Util
-    # Inflector used to conjugate english verbs to and from the past tense
-    # this is used to generate events related to commands.
-    #
-    # @example
-    #  Inflector.past_tense("create") # => "created"
+    # Default Inflector implementation for Verse.
+    # Handles pluralization, singularization, and verb past tense inflection.
+    # This class can be configured with custom exceptions via its initializer.
     class Inflector
       # https://www.grammar.cl/Past/Irregular_Verbs_List.htm
       PAST_TENSE_EXCEPTIONS = {
@@ -149,11 +147,15 @@ module Verse
         [/^(.*)s$/, '\1'],         # Default rule (remove "s")
       ].freeze
 
-      def initialize(verb_exceptions = PAST_TENSE_EXCEPTIONS, plural_exceptions = PLURAL_EXCEPTIONS)
-        @verb_exceptions = verb_exceptions
-
-        @plural_exceptions = plural_exceptions
-        @singular_exceptions = plural_exceptions.lazy.map(&:reverse).to_h.freeze
+      # Initializes the inflector.
+      #
+      # @param config [Hash] Configuration options.
+      #   - :verb_exceptions [Hash] Custom exceptions for past tense inflection.
+      #   - :plural_exceptions [Hash] Custom exceptions for pluralization.
+      def initialize(config = {})
+        @verb_exceptions = config.fetch(:verb_exceptions, PAST_TENSE_EXCEPTIONS)
+        @plural_exceptions = config.fetch(:plural_exceptions, PLURAL_EXCEPTIONS)
+        @singular_exceptions = @plural_exceptions.lazy.map(&:reverse).to_h.freeze
       end
 
       # Inflect words to plural form.
