@@ -4,7 +4,7 @@ module Verse
   module Util
     module Errors
       # Base error class for Verse::Util components
-      class UtilError < StandardError; end
+      class UtilError < Verse::Error::BaseStandardError; end
 
       # Errors related to distributed lock operations
       class LockError < UtilError; end
@@ -23,6 +23,8 @@ module Verse
 
       # Raised when there's a configuration issue with a utility
       class ConfigurationError < UtilError; end
+
+      class SerializationError < UtilError; end
     end
   end
 end
