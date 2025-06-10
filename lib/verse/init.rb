@@ -5,13 +5,13 @@ require "securerandom"
 
 require_relative "./util/registry"
 require_relative "./util/error" # Ensure errors are loaded for registry/accessors
-require_relative "./util/impl/memory/distributed_hash" # Renamed
+require_relative "./util/impl/memory/distributed_hash"
 require_relative "./util/impl/memory/distributed_lock"
 require_relative "./util/impl/memory/distributed_counter"
 require_relative "./util/inflector"
 
 # Register default in-memory adapters
-Verse::Util::Registry.register(:distributed_hash, :memory, Verse::Util::Impl::Memory::DistributedHash) # Renamed
+Verse::Util::Registry.register(:distributed_hash, :memory, Verse::Util::Impl::Memory::DistributedHash)
 Verse::Util::Registry.register(:distributed_lock, :memory, Verse::Util::Impl::Memory::DistributedLock)
 Verse::Util::Registry.register(:distributed_counter, :memory, Verse::Util::Impl::Memory::DistributedCounter)
 Verse::Util::Registry.register(:inflector, :default, Verse::Util::Inflector)
@@ -98,7 +98,6 @@ module Verse
   end
 
   # Accessor for DistributedHash utility
-  # Renamed
   def distributed_hash = Verse::Util::Registry.resolve(:distributed_hash)
   # Accessor for DistributedLock utility
   def distributed_lock = Verse::Util::Registry.resolve(:distributed_lock)
@@ -114,9 +113,9 @@ module Verse
     # If :utilities is entirely missing, `dig` returns nil, so we default to memory.
     base_utils_config = Verse::Config.config[:utilities] || {}
 
-    dh_conf = base_utils_config[:distributed_hash] || { adapter: :memory, config: {} } # Renamed ds_conf to dh_conf and key
-    Verse::Util::Registry.set_default_adapter(:distributed_hash, dh_conf[:adapter]) # Renamed
-    Verse::Util::Registry.adapter_config(:distributed_hash, dh_conf[:adapter], dh_conf[:config] || {}) # Renamed
+    dh_conf = base_utils_config[:distributed_hash] || { adapter: :memory, config: {} }
+    Verse::Util::Registry.set_default_adapter(:distributed_hash, dh_conf[:adapter])
+    Verse::Util::Registry.adapter_config(:distributed_hash, dh_conf[:adapter], dh_conf[:config] || {})
 
     dl_conf = base_utils_config[:distributed_lock] || { adapter: :memory, config: {} }
     Verse::Util::Registry.set_default_adapter(:distributed_lock, dl_conf[:adapter])

@@ -19,9 +19,6 @@ module Verse
           def initialize(_config = {})
             @locks = {} # { lock_key => { token: "...", expires_at: Time } }
             @mutex = Mutex.new
-            # @ttl_check_interval = config.fetch(:ttl_check_interval, 60) # For proactive GC if implemented
-            # @stop_gc_thread = false
-            # start_gc_thread unless config[:skip_gc_thread]
           end
 
           def acquire(lock_key, requested_ttl_ms, acquire_timeout_ms)
@@ -72,11 +69,6 @@ module Verse
               # Lock not held by this token or expired
             end
           end
-
-          # def stop_gc
-          #   @stop_gc_thread = true
-          #   @gc_thread&.join
-          # end
 
           private
 
