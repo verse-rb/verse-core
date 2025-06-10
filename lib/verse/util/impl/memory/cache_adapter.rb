@@ -63,6 +63,7 @@ module Verse
             end
           end
 
+          # rubocop:disable Naming/MethodParameterName
           def cache(key, selector, data, ex: nil)
             synchronize do
               key_store = @cache.fetch(key) do
@@ -85,20 +86,23 @@ module Verse
 
               node.move_to_head(@head)
 
-              if @size > @capacity
+              if (@size > @capacity) && @tail.prev
                 # Remove the least recently used item
-                remove(*@tail.prev.key) if @tail.prev
+                remove(*@tail.prev.key)
               end
             end
             data # Return the cached data
           end
+          # rubocop:enable Naming/MethodParameterName
 
           def remove(key, selector)
             synchronize do
               key_store = @cache[key]
               return unless key_store
+
               node = key_store.delete(selector)
               return unless node
+
               node.detach
               @cache.delete(key) if key_store.empty?
               # Return cache size after removal
@@ -111,9 +115,10 @@ module Verse
               selectors_to_flush = selectors.is_a?(Array) ? selectors : [selectors]
               key_store = @cache[key]
               return unless key_store
+
               selectors_to_flush.each do |selector|
                 if selector == "*"
-                  key_store.keys.each { |sel| remove(key, sel) }
+                  key_store.each_key { |sel| remove(key, sel) }
                 else
                   remove(key, selector)
                 end

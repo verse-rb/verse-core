@@ -13,8 +13,7 @@ module Verse
           def serialize(object)
             payload = [Marshal::MAJOR_VERSION, Marshal::MINOR_VERSION, object]
             # Marshal the object and compress it using Zlib
-            compressed_data = Zlib::Deflate.deflate(Marshal.dump(payload))
-            compressed_data
+            Zlib::Deflate.deflate(Marshal.dump(payload))
           end
 
           def deserialize(data)
@@ -22,7 +21,11 @@ module Verse
             return nil if data.nil? || data.empty?
 
             begin
+              # rubocop:disable Security/MarshalLoad
+              # As stated above, we are aware that Marshal.load can be dangerous
+              # if the data is not trusted.
               major, minor, payload = Marshal.load(Zlib::Inflate.inflate(data))
+              # rubocop:enable Security/MarshalLoad
 
               unless major == Marshal::MAJOR_VERSION && minor == Marshal::MINOR_VERSION
                 raise ArgumentError, "Invalid payload (bad version)"
