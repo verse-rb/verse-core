@@ -2,7 +2,7 @@
 
 require "securerandom" # For lock tokens
 require_relative "../../distributed_lock"
-require_relative "../../errors"
+require_relative "../../error"
 
 module Verse
   module Util

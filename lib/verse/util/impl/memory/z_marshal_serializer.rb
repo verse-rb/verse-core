@@ -29,8 +29,8 @@ module Verse
               end
 
               payload
-            rescue TypeError, ArgumentError => e
-              raise Verse::Errors::SerializationError, "Failed to deserialize data: #{e.message}"
+            rescue TypeError, ArgumentError, Zlib::DataError => e
+              raise Error::SerializationError, "Failed to deserialize data: #{e.message}"
             end
           end
         end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "./errors"
+require_relative "./error"
 
 module Verse
   module Util
@@ -48,12 +48,12 @@ module Verse
         # @param type [Symbol] The type of utility.
         # @param name [Symbol, nil] The specific adapter name. If nil, the configured default for the type is used.
         # @return [Object] An instance of the adapter.
-        # @raise [Verse::Util::Errors::ConfigurationError] if the adapter or default is not found/configured.
+        # @raise [Verse::Util::Error::ConfigurationError] if the adapter or default is not found/configured.
         def resolve(type, name = nil)
           adapter_name = name || @default_adapters[type]
 
           unless adapter_name
-            raise Errors::ConfigurationError, "No default adapter configured for utility type ':#{type}'."
+            raise Error::ConfigurationError, "No default adapter configured for utility type ':#{type}'."
           end
 
           # Check if instance already exists
@@ -62,7 +62,7 @@ module Verse
 
           adapter_class_or_proc = @adapters.dig(type, adapter_name)
           unless adapter_class_or_proc
-            raise Errors::ConfigurationError, "Adapter ':#{adapter_name}' not registered for utility type ':#{type}'."
+            raise Error::ConfigurationError, "Adapter ':#{adapter_name}' not registered for utility type ':#{type}'."
           end
 
           config = @adapter_configs.dig(type, adapter_name) || {}
@@ -74,7 +74,7 @@ module Verse
             when Proc
               adapter_class_or_proc.call(config)
             else
-              raise Errors::ConfigurationError, "Adapter ':#{adapter_name}' is not a valid class or proc."
+              raise Error::ConfigurationError, "Adapter ':#{adapter_name}' is not a valid class or proc."
             end
 
           # Store the new instance

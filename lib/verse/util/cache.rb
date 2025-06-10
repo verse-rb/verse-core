@@ -18,7 +18,7 @@ module Verse
 
       # fetch the cache, or set it if it doesn't exist.
       # Every cache key are in the shape of [key]:[selector], where selector is a unique identifier for the cache and
-      # key is the general identifier for the cache.
+      # key is theattiribute general identifier for the cache.
       # Example:
       #
       # with_cache("my_cache", "my_selector") do
@@ -42,7 +42,9 @@ module Verse
 
         cached_data = adapter.fetch(key, selector)
 
-        return load_payload(cached_data) if cached_data
+        data = load_payload(cached_data) if cached_data
+
+        return data if data
 
         data = block.call
 
@@ -67,8 +69,8 @@ module Verse
 
         begin
           @serializer.deserialize(payload)
-        rescue Verse::Errors::SerializationError => e
-          Verse.logger.warn("Cache deserialization failed: #{e.message}")
+        rescue Error::SerializationError => e
+          Verse.logger&.warn("Cache deserialization failed: #{e.message}")
           nil
         end
       end

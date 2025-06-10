@@ -2,7 +2,7 @@
 
 require "spec_helper"
 require "verse/util/registry"
-require "verse/util/errors"
+require "verse/util/error"
 
 # Dummy classes for testing
 class TestAdapterOne
@@ -65,13 +65,13 @@ RSpec.describe Verse::Util::Registry do
       registry.register(:test_service, :one, TestAdapterOne)
       expect {
         registry.resolve(:test_service, :non_existent)
-      }.to raise_error(Verse::Util::Errors::ConfigurationError, "Adapter ':non_existent' not registered for utility type ':test_service'.")
+      }.to raise_error(Verse::Util::Error::ConfigurationError, "Adapter ':non_existent' not registered for utility type ':test_service'.")
     end
 
     it "raises ConfigurationError if utility type is not registered at all" do
       expect {
         registry.resolve(:unknown_service, :one)
-      }.to raise_error(Verse::Util::Errors::ConfigurationError, "Adapter ':one' not registered for utility type ':unknown_service'.")
+      }.to raise_error(Verse::Util::Error::ConfigurationError, "Adapter ':one' not registered for utility type ':unknown_service'.")
     end
   end
 
@@ -97,7 +97,7 @@ RSpec.describe Verse::Util::Registry do
       # No default set for :test_service here
       expect {
         registry.resolve(:test_service)
-      }.to raise_error(Verse::Util::Errors::ConfigurationError, "No default adapter configured for utility type ':test_service'.")
+      }.to raise_error(Verse::Util::Error::ConfigurationError, "No default adapter configured for utility type ':test_service'.")
     end
 
     it "returns the same instance for default adapter when resolved multiple times" do
@@ -176,11 +176,11 @@ RSpec.describe Verse::Util::Registry do
 
       expect {
         registry.resolve(:test_service, :one)
-      }.to raise_error(Verse::Util::Errors::ConfigurationError)
+      }.to raise_error(Verse::Util::Error::ConfigurationError)
 
       expect {
         registry.resolve(:test_service)
-      }.to raise_error(Verse::Util::Errors::ConfigurationError, "No default adapter configured for utility type ':test_service'.")
+      }.to raise_error(Verse::Util::Error::ConfigurationError, "No default adapter configured for utility type ':test_service'.")
     end
   end
 end

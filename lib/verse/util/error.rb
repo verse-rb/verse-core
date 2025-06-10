@@ -4,7 +4,7 @@ require_relative "../error/base"
 
 module Verse
   module Util
-    module Errors
+    module Error
       # Base error class for Verse::Util components
       class UtilError < Verse::Error::Base; end
 
@@ -12,7 +12,7 @@ module Verse
       class LockError < UtilError; end
 
       # Raised when acquiring a lock times out
-      class LockAcquisitionTimeoutError < LockError; end
+      class LockAcquisitionTimeout < LockError; end
 
       # Raised when releasing a lock fails (e.g., token mismatch, lock not held)
       class LockReleaseError < LockError; end

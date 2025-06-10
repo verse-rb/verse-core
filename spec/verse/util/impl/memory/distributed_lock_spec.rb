@@ -3,7 +3,7 @@
 require "spec_helper"
 require "verse/util/impl/memory/distributed_lock"
 require "verse/util/distributed_lock" # To ensure it includes the base module
-require "verse/util/errors"
+require "verse/util/error"
 
 RSpec.describe Verse::Util::Impl::Memory::DistributedLock do
   let(:config) { {} }
@@ -144,14 +144,14 @@ RSpec.describe Verse::Util::Impl::Memory::DistributedLock do
       expect(lock_service.acquire(lock_key, ttl_ms, 0)).to be_a(String)
     end
 
-    it "raises LockAcquisitionTimeoutError if lock cannot be acquired" do
+    it "raises LockAcquisitionTimeout if lock cannot be acquired" do
       lock_service.acquire(lock_key, ttl_ms * 5, 0) # Hold the lock long
 
       expect {
         lock_service.with_lock(lock_key, ttl_ms, timeout_ms) do
           # This block should not execute
         end
-      }.to raise_error(Verse::Util::Errors::LockAcquisitionTimeoutError)
+      }.to raise_error(Verse::Util::Error::LockAcquisitionTimeout)
     end
 
     it "releases the lock even if the block raises an error" do

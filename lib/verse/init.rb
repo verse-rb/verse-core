@@ -4,7 +4,7 @@ require "logger"
 require "securerandom"
 
 require_relative "./util/registry"
-require_relative "./util/errors" # Ensure errors are loaded for registry/accessors
+require_relative "./util/error" # Ensure errors are loaded for registry/accessors
 require_relative "./util/impl/memory/distributed_hash" # Renamed
 require_relative "./util/impl/memory/distributed_lock"
 require_relative "./util/impl/memory/distributed_counter"
