@@ -1,61 +1,121 @@
 # frozen_string_literal: true
 
+require "monitor"
+
 module Verse
   module Util
     module Impl
       module Memory
+        # Simple in-memory cache adapter that implements a
+        # Least Recently Used (LRU) cache.
         class CacheAdapter
-          def initialize
-            @store = {} # Stores { cache_key => { value: data, expires_at: timestamp_or_nil } }
-            @mutex = Mutex.new # For thread-safety
+          include MonitorMixin
+
+          attr_reader :size
+
+          Node = Struct.new(:key, :value, :exp, :prev, :next) do
+            def detach
+              prev.next = self.next
+              self.next.prev = prev
+              self.prev = nil
+              self.next = nil
+              self
+            end
+
+            def move_to_head(head)
+              # Head --> X
+              # => Head --> self --> X
+              previous = head.next
+              previous.prev = self
+              head.next = self
+              self.prev = head
+              self.next = previous
+              self
+            end
           end
 
-          def fetch(key, selector)
-            cache_key = "#{key}:#{selector}"
+          def initialize(capacity = 10_000)
+            super()
+            @capacity = capacity
+            @size = 0
+            @cache = {}
+            @head = Node.new(nil, nil, nil)
+            @tail = Node.new(nil, nil, nil)
+            @head.next = @tail
+            @tail.prev = @head
+          end
 
-            @mutex.synchronize do
-              entry = @store[cache_key]
-              return nil unless entry
+          def fetch(key, selector, now: Time.now)
+            synchronize do
+              key_store = @cache.fetch(key) { return nil }
+              node = key_store.fetch(selector) { return nil }
 
-              expiration_time = entry[:expires_at]
-
-              if expiration_time && Time.now.to_i >= expiration_time
-                @store.delete(cache_key)
+              expiration = node.exp
+              if expiration && now.to_i >= expiration
+                node.detach
+                key_store.delete(selector)
+                @cache.delete(key) if key_store.empty?
+                @size -= 1
                 return nil
               end
 
-              entry[:value]
+              node.detach.move_to_head(@head).value
             end
           end
 
           def cache(key, selector, data, ex: nil)
-            cache_key = "#{key}:#{selector}"
+            synchronize do
+              key_store = @cache.fetch(key) do
+                @cache[key] = {}
+              end
 
-            @mutex.synchronize do
-              expiration_time = ex ? (Time.now.to_i + ex) : nil
-              @store[cache_key] = { value: data, expires_at: expiration_time }
+              node = key_store[selector]
+              if node
+                node.detach
+                node.value = data
+                node.exp = ex ? (Time.now.to_i + ex) : nil
+              else
+                node = key_store[selector] = Node.new(
+                  [key, selector],
+                  data,
+                  ex ? (Time.now.to_i + ex) : nil
+                )
+                @size += 1
+              end
+
+              node.move_to_head(@head)
+
+              if @size > @capacity
+                # Remove the least recently used item
+                remove(*@tail.prev.key) if @tail.prev
+              end
             end
-
             data # Return the cached data
           end
 
-          def flush(key, selectors)
-            @mutex.synchronize do
-              selectors_to_flush = selectors.is_a?(Array) ? selectors : [selectors]
+          def remove(key, selector)
+            synchronize do
+              key_store = @cache[key]
+              return unless key_store
+              node = key_store.delete(selector)
+              return unless node
+              node.detach
+              @cache.delete(key) if key_store.empty?
+              # Return cache size after removal
+              @size -= 1
+            end
+          end
 
+          def flush(key, selectors)
+            synchronize do
+              selectors_to_flush = selectors.is_a?(Array) ? selectors : [selectors]
+              key_store = @cache[key]
+              return unless key_store
               selectors_to_flush.each do |selector|
                 if selector == "*"
-                  # Flush all entries for the given key
-                  prefix_to_clear = "#{key}:"
-                  @store.keys.each do |k|
-                    if k.start_with?(prefix_to_clear)
-                      @store.delete(k)
-                    end
-                  end
+                  key_store.keys.each { |sel| remove(key, sel) }
                 else
-                  # Flush specific entry
-                  cache_key_to_clear = "#{key}:#{selector}"
-                  @store.delete(cache_key_to_clear)
+                  remove(key, selector)
                 end
               end
             end

@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require_relative "impl/memory/cache_adapter"
+require_relative "impl/memory/z_marshal_serializer"
+
 module Verse
   module Util
     module Cache

@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
+require_relative "../error/base"
+
 module Verse
   module Util
     module Errors
       # Base error class for Verse::Util components
-      class UtilError < Verse::Error::BaseStandardError; end
+      class UtilError < Verse::Error::Base; end
 
       # Errors related to distributed lock operations
       class LockError < UtilError; end
