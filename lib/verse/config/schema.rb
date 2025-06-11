@@ -32,33 +32,33 @@ module Verse
         field(:adapter, String).filled.default("Verse::Cache::Impl::MemoryCacheAdapter")
         field?(:config, Hash).default({})
       end.default({
-        adapter: "Verse::Cache::Impl::MemoryCacheAdapter",
-        config: {}
-      })
+                    adapter: "Verse::Cache::Impl::MemoryCacheAdapter",
+                    config: {}
+                  })
 
       field?(:kv_store, Hash) do
         field(:adapter, String).filled.default("Verse::Distributed::Impl::MemoryKVStore")
         field?(:config, Hash).default({})
       end.default({
-        adapter: "Verse::Distributed::Impl::MemoryKVStore",
-        config: {}
-      })
+                    adapter: "Verse::Distributed::Impl::MemoryKVStore",
+                    config: {}
+                  })
 
       field?(:lock, Hash) do
         field(:adapter, String).filled.default("Verse::Distributed::Impl::LocalLock")
         field?(:config, Hash).default({})
       end.default({
-        adapter: "Verse::Distributed::Impl::LocalLock",
-        config: {}
-      })
+                    adapter: "Verse::Distributed::Impl::LocalLock",
+                    config: {}
+                  })
 
       field?(:counter, Hash) do
         field(:adapter, String).filled.default("Verse::Distributed::Impl::MemoryCounter")
         field?(:config, Hash).default({})
       end.default({
-        adapter: "Verse::Distributed::Impl::MemoryCounter",
-        config: {}
-      })
+                    adapter: "Verse::Distributed::Impl::MemoryCounter",
+                    config: {}
+                  })
 
       extra_fields
     end
