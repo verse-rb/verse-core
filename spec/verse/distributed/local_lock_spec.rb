@@ -58,7 +58,7 @@ RSpec.describe Verse::Distributed::Impl::LocalLock do
 
       # Start a thread to release the lock after a short delay
       Thread.new do
-        sleep(ttl_ms / 2000.0) # Sleep for 0.025s (25ms)
+        sleep(ttl_ms * 0.0001)
         lock_service.release(lock_key, token1)
       end
 
