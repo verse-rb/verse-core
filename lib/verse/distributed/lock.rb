@@ -25,7 +25,8 @@ module Verse
       # @return [String, nil] A unique lock token if the lock was acquired, or nil if the acquisition timed out
       #         or failed. This token must be used for releasing or renewing the lock.
       # @raise [Verse::Util::Error::LockError] for unexpected errors during acquisition.
-      def acquire(lock_key, requested_ttl_ms, acquire_timeout_ms) = raise NotImplementedError # :nocov:
+      # :nocov:
+      def acquire(lock_key, requested_ttl_ms, acquire_timeout_ms) = raise NotImplementedError
 
       # Releases a previously acquired lock.
       #

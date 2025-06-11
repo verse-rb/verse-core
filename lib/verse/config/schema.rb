@@ -28,25 +28,39 @@ module Verse
         field(:config, Hash).optional
       end
 
-      field?(:utilities, Hash) do
-        field?(:distributed_hash, Hash) do # Renamed from distributed_set
-          field(:adapter, Symbol).filled.default(:memory)
-          field(:config, Hash).optional.default({})
-        end
-        field?(:distributed_lock, Hash) do
-          field(:adapter, Symbol).filled.default(:memory)
-          field(:config, Hash).optional.default({})
-        end
-        field?(:distributed_counter, Hash) do
-          field(:adapter, Symbol).filled.default(:memory)
-          field(:config, Hash).optional.default({})
-        end
+      field?(:cache, Hash) do
+        field(:adapter, String).filled.default("Verse::Cache::Impl::MemoryCacheAdapter")
+        field?(:config, Hash).default({})
+      end.default({
+        adapter: "Verse::Cache::Impl::MemoryCacheAdapter",
+        config: {}
+      })
 
-        field?(:inflector, Hash) do
-          field(:adapter, Symbol).filled.default(:default) # :default will map to Verse::Util::Inflector
-          field(:config, Hash).optional.default({}) # For custom exceptions, e.g., { verb_exceptions: {...} }
-        end
-      end
+      field?(:kv_store, Hash) do
+        field(:adapter, String).filled.default("Verse::Distributed::Impl::MemoryKVStore")
+        field?(:config, Hash).default({})
+      end.default({
+        adapter: "Verse::Distributed::Impl::MemoryKVStore",
+        config: {}
+      })
+
+      field?(:lock, Hash) do
+        field(:adapter, String).filled.default("Verse::Distributed::Impl::LocalLock")
+        field?(:config, Hash).default({})
+      end.default({
+        adapter: "Verse::Distributed::Impl::LocalLock",
+        config: {}
+      })
+
+      field?(:counter, Hash) do
+        field(:adapter, String).filled.default("Verse::Distributed::Impl::MemoryCounter")
+        field?(:config, Hash).default({})
+      end.default({
+        adapter: "Verse::Distributed::Impl::MemoryCounter",
+        config: {}
+      })
+
+      extra_fields
     end
   end
 end

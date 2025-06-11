@@ -12,6 +12,12 @@ Style/StringLiteralsInInterpolation:
   Enabled: true
   EnforcedStyle: double_quotes
 
+Style/CommentedKeyword:
+  Enabled: false
+
+Style/DefWithParentheses:
+  Enabled: false
+
 Style/AccessModifierDeclarations:
   Enabled: false
 

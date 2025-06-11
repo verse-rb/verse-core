@@ -53,6 +53,8 @@ module Verse
         @config
       )
 
+      @config = result.value
+
       return unless result.errors.any?
 
       raise Verse::Config::SchemaError, "Config errors: #{result.errors.to_h}"

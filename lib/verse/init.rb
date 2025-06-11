@@ -3,7 +3,6 @@
 require "logger"
 require "securerandom"
 
-require_relative "./util/registry"
 require_relative "./util/error" # Ensure errors are loaded for registry/accessors
 require_relative "./util/inflector"
 
@@ -28,12 +27,19 @@ module Verse
   end
 
   def stop
+    return unless @started
+
     @on_stop_callbacks&.each(&:call)
     @on_stop_callbacks&.clear
 
     Verse.event_manager&.stop
     Verse::Plugin.stop
     Verse::Plugin.finalize
+
+    # Allow to switch via config.
+    @kvstore = nil
+    @lock = nil
+    @counter = nil
 
     @started = false
   end
@@ -44,6 +50,8 @@ module Verse
     logger: Logger.new($stdout),
     config_path: "./config"
   )
+    @started = true
+
     init(
       root_path:,
       logger:,
@@ -52,8 +60,6 @@ module Verse
     logger.info{ "init sequence... `#{mode}` mode" }
 
     initialize_event_manager!
-
-    @started = true
 
     logger.info{ "running post-init callbacks" }
     @on_boot_callbacks&.each(&:call)
@@ -98,38 +104,40 @@ module Verse
   end
 
   # Accessor for DistributedHash utility
-  def hash = Verse::Util::Registry.resolve(:distributed_hash)
-  # Accessor for DistributedLock utility
-  def lock = Verse::Util::Registry.resolve(:distributed_lock)
-  # Accessor for DistributedCounter utility
-  def counter = Verse::Util::Registry.resolve(:distributed_counter)
+  def kvstore
+    @kvstore ||= begin
+      adapter, config = Verse.config[:kv_store].values_at(:adapter, :config)
+      Util::Reflection.constantize(adapter).new(config)
+    end
+  end
 
-  # Accessor for Inflector utility
-  def inflector = Verse::Util::Registry.resolve(:inflector)
+  # Accessor for DistributedLock utility
+  def lock
+    @lock ||= begin
+      adapter, config = Verse.config[:lock].values_at(:adapter, :config)
+      Util::Reflection.constantize(adapter).new(config)
+    end
+  end
+
+  # Accessor for DistributedCounter utility
+  def counter
+    @counter ||= begin
+      adapter, config = Verse.config[:counter].values_at(:adapter, :config)
+      Util::Reflection.constantize(adapter).new(config)
+    end
+  end
+
+  def config = Verse::Config.config
+
+  def inflector
+    # Inflector is not defined in config because it doesn't require
+    # configuration which change between environments.
+    @inflector ||= Verse::Util::Inflector.new
+  end
+
+  attr_writer :counter, :kvstore, :lock, :inflector
 
   protected
-
-  def initialize_utilities!
-    # Config values will have defaults from schema if the :utilities key exists.
-    # If :utilities is entirely missing, `dig` returns nil, so we default to memory.
-    base_utils_config = Verse::Config.config[:utilities] || {}
-
-    dh_conf = base_utils_config[:distributed_hash] || { adapter: :memory, config: {} }
-    Verse::Util::Registry.set_default_adapter(:distributed_hash, dh_conf[:adapter])
-    Verse::Util::Registry.adapter_config(:distributed_hash, dh_conf[:adapter], dh_conf[:config] || {})
-
-    dl_conf = base_utils_config[:distributed_lock] || { adapter: :memory, config: {} }
-    Verse::Util::Registry.set_default_adapter(:distributed_lock, dl_conf[:adapter])
-    Verse::Util::Registry.adapter_config(:distributed_lock, dl_conf[:adapter], dl_conf[:config] || {})
-
-    dc_conf = base_utils_config[:distributed_counter] || { adapter: :memory, config: {} }
-    Verse::Util::Registry.set_default_adapter(:distributed_counter, dc_conf[:adapter])
-    Verse::Util::Registry.adapter_config(:distributed_counter, dc_conf[:adapter], dc_conf[:config] || {})
-
-    inflector_conf = base_utils_config[:inflector] || { adapter: :default, config: {} }
-    Verse::Util::Registry.set_default_adapter(:inflector, inflector_conf[:adapter])
-    Verse::Util::Registry.adapter_config(:inflector, inflector_conf[:adapter], inflector_conf[:config] || {})
-  end
 
   # Initialize the microservice within the current path
   def init(
@@ -153,7 +161,5 @@ module Verse
 
     Verse::Plugin.load_configuration(Verse::Config.config)
     Verse::Plugin.init
-
-    initialize_utilities!
   end
 end

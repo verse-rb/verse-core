@@ -6,7 +6,6 @@ module Verse
     # Concrete implementations (e.g., in-memory, Redis-backed) should include
     # this module and implement its methods.
     module Counter
-
       attr_reader :config
 
       # Initializes the distributed counter adapter.

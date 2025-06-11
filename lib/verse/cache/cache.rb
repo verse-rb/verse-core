@@ -5,7 +5,6 @@ require_relative "impl/z_marshal_serializer"
 
 module Verse
   module Cache
-
     SerializationError = Class.new(Verse::Error::Base)
 
     extend self
