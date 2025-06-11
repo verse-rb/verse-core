@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require "verse/util/impl/memory/distributed_counter"
-require "verse/util/distributed_counter" # To ensure it includes the base module
+require "verse/distributed/counter"
+require "verse/distributed/impl/memory_counter"
 
-RSpec.describe Verse::Util::Impl::Memory::DistributedCounter do
+RSpec.describe Verse::Distributed::Impl::MemoryCounter do
   let(:config) { {} } # In-memory counter might not need config, but for consistency
   subject(:counter_store) { described_class.new(config) }
 
-  it "includes Verse::Util::DistributedCounter module" do
-    expect(described_class.ancestors).to include(Verse::Util::DistributedCounter)
+  it "includes Verse::Distributed::Counter module" do
+    expect(described_class.ancestors).to include(Verse::Distributed::Counter)
   end
 
   describe "basic operations" do

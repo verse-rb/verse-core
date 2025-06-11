@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require "verse/util/impl/memory/cache_adapter"
+require "verse/cache/impl/memory_cache_adapter"
 
-RSpec.describe Verse::Util::Impl::Memory::CacheAdapter do
+RSpec.describe Verse::Cache::Impl::MemoryCacheAdapter do
   let(:capacity) { 10 }
   let(:adapter) { described_class.new(capacity) }
 

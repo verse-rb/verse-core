@@ -5,16 +5,16 @@ require "securerandom"
 
 require_relative "./util/registry"
 require_relative "./util/error" # Ensure errors are loaded for registry/accessors
-require_relative "./util/impl/memory/distributed_hash"
-require_relative "./util/impl/memory/distributed_lock"
-require_relative "./util/impl/memory/distributed_counter"
 require_relative "./util/inflector"
 
-# Register default in-memory adapters
-Verse::Util::Registry.register(:distributed_hash, :memory, Verse::Util::Impl::Memory::DistributedHash)
-Verse::Util::Registry.register(:distributed_lock, :memory, Verse::Util::Impl::Memory::DistributedLock)
-Verse::Util::Registry.register(:distributed_counter, :memory, Verse::Util::Impl::Memory::DistributedCounter)
-Verse::Util::Registry.register(:inflector, :default, Verse::Util::Inflector)
+require_relative "./distributed/errors"
+require_relative "./distributed/counter"
+require_relative "./distributed/kv_store"
+require_relative "./distributed/lock"
+
+require_relative "./distributed/impl/local_lock"
+require_relative "./distributed/impl/memory_counter"
+require_relative "./distributed/impl/memory_kv_store"
 
 module Verse
   extend self
@@ -98,11 +98,12 @@ module Verse
   end
 
   # Accessor for DistributedHash utility
-  def distributed_hash = Verse::Util::Registry.resolve(:distributed_hash)
+  def hash = Verse::Util::Registry.resolve(:distributed_hash)
   # Accessor for DistributedLock utility
-  def distributed_lock = Verse::Util::Registry.resolve(:distributed_lock)
+  def lock = Verse::Util::Registry.resolve(:distributed_lock)
   # Accessor for DistributedCounter utility
-  def distributed_counter = Verse::Util::Registry.resolve(:distributed_counter)
+  def counter = Verse::Util::Registry.resolve(:distributed_counter)
+
   # Accessor for Inflector utility
   def inflector = Verse::Util::Registry.resolve(:inflector)
 

@@ -83,7 +83,7 @@ module Verse
         x.on_start(mode)
       end
     rescue StandardError => e
-      Verse.logger.fatal(e)
+      Verse.logger&.fatal(e)
       exit(-1)
     end
 
@@ -91,7 +91,7 @@ module Verse
       @plugins.each_value do |p|
         p.on_stop
       rescue StandardError => e
-        Verse.logger.error(e)
+        Verse.logger&.error(e)
       end
     end
 
@@ -99,7 +99,7 @@ module Verse
       @plugins.each_value do |p|
         p.on_finalize
       rescue StandardError => e
-        Verse.logger.error(e)
+        Verse.logger&.error(e)
       end
 
       @plugins.clear

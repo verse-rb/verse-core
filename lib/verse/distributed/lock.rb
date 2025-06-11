@@ -1,17 +1,19 @@
 # frozen_string_literal: true
 
-require_relative "./error"
-
 module Verse
-  module Util
+  module Distributed
     # Abstract module defining the interface for a distributed lock.
     # Concrete implementations (e.g., in-memory, Redis-backed) should include
     # this module and implement its methods.
-    module DistributedLock
+    module Lock
+      attr_reader :config
+
       # Initializes the distributed lock adapter.
       #
       # @param config [Hash] Adapter-specific configuration.
-      def initialize(config = {}); end
+      def initialize(config = {})
+        @config = config
+      end
 
       # Attempts to acquire a lock.
       #
@@ -23,7 +25,7 @@ module Verse
       # @return [String, nil] A unique lock token if the lock was acquired, or nil if the acquisition timed out
       #         or failed. This token must be used for releasing or renewing the lock.
       # @raise [Verse::Util::Error::LockError] for unexpected errors during acquisition.
-      def acquire(lock_key, requested_ttl_ms, acquire_timeout_ms) = raise NotImplementedError
+      def acquire(lock_key, requested_ttl_ms, acquire_timeout_ms) = raise NotImplementedError # :nocov:
 
       # Releases a previously acquired lock.
       #
@@ -32,7 +34,7 @@ module Verse
       #        This ensures that only the holder of the lock can release it.
       # @return [Boolean] True if the lock was successfully released, false otherwise (e.g., token mismatch, lock not found).
       # @raise [Verse::Util::Error::LockReleaseError] for critical errors during release.
-      def release(lock_key, lock_token) = raise NotImplementedError
+      def release(lock_key, lock_token) = raise NotImplementedError # :nocov:
 
       # Renews/extends the TTL of an acquired lock.
       #
@@ -41,7 +43,7 @@ module Verse
       # @param new_ttl_ms [Integer] The new time-to-live for the lock in milliseconds, from the moment of renewal.
       # @return [Boolean] True if the lock TTL was successfully renewed, false otherwise (e.g., token mismatch, lock expired).
       # @raise [Verse::Util::Error::LockRenewalError] for critical errors during renewal.
-      def renew(lock_key, lock_token, new_ttl_ms)= raise NotImplementedError
+      def renew(lock_key, lock_token, new_ttl_ms)= raise NotImplementedError # :nocov:
 
       # A convenience method to acquire a lock, execute a block of code,
       # and ensure the lock is released.
@@ -57,7 +59,7 @@ module Verse
         token = acquire(lock_key, requested_ttl_ms, acquire_timeout_ms)
 
         unless token
-          raise Error::LockAcquisitionTimeout, "Failed to acquire lock '#{lock_key}' within #{acquire_timeout_ms}ms."
+          raise LockAcquisitionTimeout, "Failed to acquire lock '#{lock_key}' within #{acquire_timeout_ms}ms."
         end
 
         begin

@@ -77,12 +77,12 @@ module Verse
 
         def register_impl
           if Verse.event_manager.nil?
-            Verse.logger.warn{ "Your service doesn't have event manager setup. Exposition linked to events won't be registered." }
+            Verse.logger&.warn{ "Your service doesn't have event manager setup. Exposition linked to events won't be registered." }
             return false
           end
 
           code = ->(message, subject) do
-            Verse.logger.debug{ "Received event from `#{subject}`" }
+            Verse.logger&.debug{ "Received event from `#{subject}`" }
 
             output = nil
 
@@ -109,8 +109,8 @@ module Verse
                 )
               end
             rescue StandardError => e
-              Verse.logger.warn{ "Error while processing for method at #{@method.source_location.join(":")}" }
-              Verse.logger.warn(e)
+              Verse.logger&.warn{ "Error while processing for method at #{@method.source_location.join(":")}" }
+              Verse.logger&.warn(e)
 
               is_error = true
               output = e
@@ -121,7 +121,7 @@ module Verse
                 subject, output, is_error:
               )
 
-              Verse.logger.debug{ "Reply to #{message.reply_to}" }
+              Verse.logger&.debug{ "Reply to #{message.reply_to}" }
               message.reply(
                 out, headers:
               )

@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require "verse/util/impl/memory/distributed_lock"
-require "verse/util/distributed_lock" # To ensure it includes the base module
 require "verse/util/error"
+require "verse/distributed/lock"
+require "verse/distributed/impl/local_lock"
 
-RSpec.describe Verse::Util::Impl::Memory::DistributedLock do
+RSpec.describe Verse::Distributed::Impl::LocalLock do
   let(:config) { {} }
   subject(:lock_service) { described_class.new(config) }
 
@@ -13,8 +13,8 @@ RSpec.describe Verse::Util::Impl::Memory::DistributedLock do
   let(:ttl_ms) { 100 } # 100 milliseconds
   let(:timeout_ms) { 50 } # 50 milliseconds
 
-  it "includes Verse::Util::DistributedLock module" do
-    expect(described_class.ancestors).to include(Verse::Util::DistributedLock)
+  it "includes Verse::Distributed::Lock module" do
+    expect(described_class.ancestors).to include(Verse::Distributed::Lock)
   end
 
   describe "basic acquire and release" do
@@ -151,7 +151,7 @@ RSpec.describe Verse::Util::Impl::Memory::DistributedLock do
         lock_service.with_lock(lock_key, ttl_ms, timeout_ms) do
           # This block should not execute
         end
-      }.to raise_error(Verse::Util::Error::LockAcquisitionTimeout)
+      }.to raise_error(Verse::Distributed::LockAcquisitionTimeout)
     end
 
     it "releases the lock even if the block raises an error" do

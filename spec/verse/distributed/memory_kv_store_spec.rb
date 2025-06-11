@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require "verse/util/impl/memory/distributed_hash"
-require "verse/util/distributed_hash" # To ensure it includes the base module correctly
+require "verse/distributed/kv_store"
+require "verse/distributed/impl/memory_kv_store"
 
-RSpec.describe Verse::Util::Impl::Memory::DistributedHash do
+RSpec.describe Verse::Distributed::Impl::MemoryKVStore do
   let(:config) { {} }
   subject(:hash_store) { described_class.new(config) }
 
@@ -12,8 +12,8 @@ RSpec.describe Verse::Util::Impl::Memory::DistributedHash do
     hash_store.stop_cleanup_thread if hash_store.cleanup_thread&.alive?
   end
 
-  it "includes Verse::Util::DistributedHash module" do
-    expect(described_class.ancestors).to include(Verse::Util::DistributedHash)
+  it "includes Verse::Distributed::KVStore module" do
+    expect(described_class.ancestors).to include(Verse::Distributed::KVStore)
   end
 
   describe "basic operations" do
@@ -48,6 +48,16 @@ RSpec.describe Verse::Util::Impl::Memory::DistributedHash do
       hash_store.clear_all
       expect(hash_store.get("key1")).to be_nil
       expect(hash_store.get("key2")).to be_nil
+    end
+
+    it "handles nil as a value" do
+      hash_store.set("nil_key", nil)
+      expect(hash_store.get("nil_key")).to be_nil
+    end
+
+    it "handles false as a value" do
+      hash_store.set("false_key", false)
+      expect(hash_store.get("false_key")).to be false
     end
   end
 
@@ -87,6 +97,15 @@ RSpec.describe Verse::Util::Impl::Memory::DistributedHash do
       # Let it expire
       expect(hash_store.delete("exp_del_key", now: start_time + 0.1)).to be false
     end
+
+    it "removes the key from the store when deleting an expired key" do
+      start_time = Time.now
+      hash_store.set("exp_del_key", "value", ttl: 0.05, now: start_time)
+      # Let it expire and delete
+      hash_store.delete("exp_del_key", now: start_time + 0.1)
+      # Verify it's gone from the internal store
+      expect(hash_store.instance_variable_get(:@store).key?("exp_del_key")).to be false
+    end
   end
 
   describe "cleanup thread" do
@@ -116,6 +135,20 @@ RSpec.describe Verse::Util::Impl::Memory::DistributedHash do
       let(:config) { { cleanup_interval_seconds: 0 } }
       it "does not start the cleanup thread" do
         expect(hash_store.cleanup_thread).to be_nil
+      end
+
+      it "manually cleans up expired keys" do
+        start_time = Time.now
+        hash_store.set("key1", "v1", ttl: 0.01, now: start_time)
+        hash_store.set("key2", "v2", ttl: 10, now: start_time)
+
+        # Manually trigger cleanup after key1 should have expired
+        hash_store.cleanup(now: start_time + 0.05)
+
+        # Check internal store to ensure cleanup happened without `get`
+        internal_store = hash_store.instance_variable_get(:@store)
+        expect(internal_store.key?("key1")).to be false
+        expect(internal_store.key?("key2")).to be true
       end
     end
   end

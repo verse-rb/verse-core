@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require "verse/util/cache"
+require "verse/cache/cache"
 
-RSpec.describe Verse::Util::Cache do
-  let(:adapter) { Verse::Util::Impl::Memory::CacheAdapter.new }
-  let(:serializer) { Verse::Util::Impl::Memory::ZMarshalSerializer.new }
+RSpec.describe Verse::Cache do
+  let(:adapter) { Verse::Cache::Impl::MemoryCacheAdapter.new }
+  let(:serializer) { Verse::Cache::Impl::ZMarshalSerializer.new }
 
   before do
     described_class.adapter = adapter
