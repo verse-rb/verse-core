@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ruby-version: ['3.3', '3.1']
+        ruby-version: ['3.4', '3.2']
     steps:
       - uses: actions/checkout@v3
       - name: Setup git access
@@ -34,10 +34,10 @@ jobs:
           git config --global url."https://github.com/".insteadOf git@github.com: && \
           git config --global url."https://".insteadOf git://
       - name: Set up Ruby ${{ matrix.ruby-version }}
-        uses: ruby/setup-ruby@359bebbc29cbe6c87da6bc9ea3bc930432750108
+        uses: ruby/setup-ruby@v1  # Use the latest version instead of pinned commit
         with:
           bundler-cache: true
-          ruby-version: 3.0
+          ruby-version: ${{ matrix.ruby-version }}
       - name: Install dependencies
         run: bundle install
       - name: Rubocop

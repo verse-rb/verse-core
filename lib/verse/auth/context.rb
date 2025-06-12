@@ -127,7 +127,7 @@ module Verse
 
       protected def regexify(string)
         string = string.to_s.gsub("*", ".*")
-        /\A#{string}\z/.freeze
+        /\A#{string}\z/
       end
 
       protected def generate_rights(rights)

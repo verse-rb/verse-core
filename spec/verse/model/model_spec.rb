@@ -86,6 +86,10 @@ RSpec.describe Verse::Model::Repository::Base do
     }
   end
 
+  after do
+    Verse.stop
+  end
+
   describe "#self.table" do
     it "should infer table name" do
       expect(UserRepository.table).to eq("users")

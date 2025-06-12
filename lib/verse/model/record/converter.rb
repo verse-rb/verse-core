@@ -2,7 +2,6 @@
 
 require "bigdecimal"
 
-# frozen_string_literal: true
 module Verse
   module Model
     module Record

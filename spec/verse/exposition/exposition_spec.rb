@@ -20,6 +20,10 @@ RSpec.describe Verse::Exposition do
     Verse.start(:server, config_path: File.join(__dir__, "../spec_data/config.yml"))
   end
 
+  after do
+    Verse.stop
+  end
+
   it "can read the description" do
     expect(SampleExposition.desc).to eq("This is a sample exposition")
   end

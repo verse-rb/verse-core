@@ -53,6 +53,8 @@ RSpec.describe Verse::Plugin do
             "plugin_with_dependencies", "dependent_plugin"
           ]
         )
+      ensure
+        Verse.stop
       end
 
       it "fails to load the plugin if the dependency is not met (2)" do
@@ -67,6 +69,8 @@ RSpec.describe Verse::Plugin do
             "dependent_plugin_2"
           ]
         )
+      ensure
+        Verse.stop
       end
     end
   end
