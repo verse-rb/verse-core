@@ -108,25 +108,18 @@ With verse-core, you will get access to:
 
 Those plugins are maintained by the Verse development team.
 
-Name | Description |
+Name | Status | Description |
 ---------|----------|
- verse-apm | ELK APM integration for Verse |
- verse-auth | JWT authorization implementation |
- verse-csv | A CSV renderer for verse-http using streaming capabilities |
- verse-discovery | Command between services |
- verse-execute | At runtime remote code execution |
- verse-http | Sinatra based HTTP server |
- verse-instrument | instrumentation endpoints for your services |
- verse-jsonapi | JSON::Api renderer for your API |
- verse-mongo | Repositories implementation for mongodb |
- verse-nats | Event Bus implementation using NATS as backend |
- verse-periodic | CRON and repeatable tasks |
- verse-redis | Redis integration to Verse |
- verse-sentry | Integration with Sentry.io bug tracking |
- verse-sequel | Repositories implementation using the Sequel gem. |
- verse-shrine | File storage using the Shrine gem. |
- verse-email | Email effect layer |
- verse-saga | Saga management and Jobs made for Verse |
+[verse-http](https://github.com/verse-rb/verse-http) | Ready | Sinatra based HTTP server |
+[verse-jsonapi](https://github.com/verse-rb/verse-jsonapi) | Ready | JSON::Api renderer for your API |
+[verse-jsonrpc](https://github.com/verse-rb/verse-jsonrpc) | Ready | Json RPC renderer for your API |
+[verse-login](https://github.com/verse-rb/verse-login) | In Progress | JWT authorization implementation |
+[verse-otelemetry](https://github.com/verse-rb/verse-otelemetry) | Planned | open telemetry integration |
+[verse-periodic](https://github.com/verse-rb/verse-periodic) | Ready | CRON and repeatable tasks |
+[verse-redis](https://github.com/verse-rb/verse-redis) | Ready | Redis integration to Verse |
+[verse-saga](https://github.com/verse-rb/verse-saga) | Planned | Job and Saga management |
+[verse-sequel](https://github.com/verse-rb/verse-sequel) | Ready | Repositories implementation using the Sequel gem. |
+[verse-shrine](https://github.com/verse-rb/verse-shrine) | Ready | File storage using the Shrine gem. |
 
 ## MultiVerse Plugins
 
