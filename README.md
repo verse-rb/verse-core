@@ -109,17 +109,17 @@ With verse-core, you will get access to:
 Those plugins are maintained by the Verse development team.
 
 Name | Status | Description |
----------|----------|
-[verse-http](https://github.com/verse-rb/verse-http) | Ready | Sinatra based HTTP server |
-[verse-jsonapi](https://github.com/verse-rb/verse-jsonapi) | Ready | JSON::Api renderer for your API |
-[verse-jsonrpc](https://github.com/verse-rb/verse-jsonrpc) | Ready | Json RPC renderer for your API |
-[verse-login](https://github.com/verse-rb/verse-login) | In Progress | JWT authorization implementation |
-[verse-otelemetry](https://github.com/verse-rb/verse-otelemetry) | Planned | open telemetry integration |
-[verse-periodic](https://github.com/verse-rb/verse-periodic) | Ready | CRON and repeatable tasks |
-[verse-redis](https://github.com/verse-rb/verse-redis) | Ready | Redis integration to Verse |
-[verse-saga](https://github.com/verse-rb/verse-saga) | Planned | Job and Saga management |
-[verse-sequel](https://github.com/verse-rb/verse-sequel) | Ready | Repositories implementation using the Sequel gem. |
-[verse-shrine](https://github.com/verse-rb/verse-shrine) | Ready | File storage using the Shrine gem. |
+|----------|----------|-----------|
+| [verse-http](https://github.com/verse-rb/verse-http) | Ready | Sinatra based HTTP server |
+| [verse-jsonapi](https://github.com/verse-rb/verse-jsonapi) | Ready | JSON::Api renderer for your API |
+| [verse-jsonrpc](https://github.com/verse-rb/verse-jsonrpc) | Ready | Json RPC renderer for your API |
+| [verse-login](https://github.com/verse-rb/verse-login) | In Progress | JWT authorization implementation |
+| [verse-otelemetry](https://github.com/verse-rb/verse-otelemetry) | Planned | open telemetry integration |
+| [verse-periodic](https://github.com/verse-rb/verse-periodic) | Ready | CRON and repeatable tasks |
+| [verse-redis](https://github.com/verse-rb/verse-redis) | Ready | Redis integration to Verse |
+| [verse-saga](https://github.com/verse-rb/verse-saga) | Planned | Job and Saga management |
+| [verse-sequel](https://github.com/verse-rb/verse-sequel) | Ready | Repositories implementation using the Sequel gem. |
+| [verse-shrine](https://github.com/verse-rb/verse-shrine) | Ready | File storage using the Shrine gem. |
 
 ## MultiVerse Plugins
 
