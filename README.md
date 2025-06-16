@@ -52,10 +52,10 @@ class MyExposition < Verse::Expo::Base
     end
 
     # hook the time
-    expose on_cron("5 4 * * *") do
+    expose on_schedule("5 4 * * *") do
         desc "Every day at 4:05. Will run once per service (not per instance!)"
     end
-    def on_cron
+    def on_schedule
         service.perform_maintenance_task!
     end
 
