@@ -320,7 +320,7 @@ module Verse
         # return a hash tree from the include list:
         # ["a.b.c", "c.d"] => { a: {b: {c: {}}}, c: {d: {}} }
         def tree_from_include_list(include, root = {})
-          include.filter{ |x| x.is_a?(String) }.each_with_object(root) do |inc, root| # rubocop:disable Lint/ShadowingOuterLocalVariable
+          include.filter{ |x| x.is_a?(String) }.each_with_object(root) do |inc, root|
             first_part, remainer = inc.split "."
             root[first_part] = tree_from_include_list(
               [remainer].compact,

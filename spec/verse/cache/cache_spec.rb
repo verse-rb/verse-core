@@ -12,7 +12,9 @@ class DummyCacheAdapter
     "cached_value"
   end
 
+  # rubocop:disable Naming/MethodParameterName
   def cache(_key, _selector, _value, ex:); end
+  # rubocop:enable Naming/MethodParameterName
 
   def flush(_key, _selectors); end
 end

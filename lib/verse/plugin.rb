@@ -38,10 +38,10 @@ module Verse
         name, klass = infer_name_and_class(plugin.name)
 
         {
-          name:     plugin.name    || name,
-          class:    klass,
-          config:   plugin.config  || {},
-          dep:      plugin.dep     || {}
+          name: plugin.name || name,
+          class: klass,
+          config: plugin.config || {},
+          dep: plugin.dep || {}
         }
       end
 

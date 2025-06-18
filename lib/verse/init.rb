@@ -81,7 +81,7 @@ module Verse
     adapter = em.adapter
 
     @event_manager = Verse::Event::Manager[adapter].new(
-      service_name:, service_id:, config: (em.config || {}), logger:
+      service_name:, service_id:, config: em.config || {}, logger:
     )
   end
 

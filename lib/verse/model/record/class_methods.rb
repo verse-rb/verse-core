@@ -172,7 +172,8 @@ module Verse
         #     has_many :published_posts, foreign_key: :author_id, if: ->(x) { x[:status] == "published" }
         #   end
         #
-        def has_many(relation_name, primary_key: nil, foreign_key: nil, repository: nil, record: nil, filters: {}, **opts) # rubocop:disable Naming/PredicateName
+        # rubocop:disable Naming/PredicatePrefix
+        def has_many(relation_name, primary_key: nil, foreign_key: nil, repository: nil, record: nil, filters: {}, **opts)
           repository ||= infer_repository(Verse.inflector.singularize(relation_name.to_s))
 
           opts = opts.merge({
@@ -233,8 +234,10 @@ module Verse
             ]
           end
         end
+        # rubocop:enable Naming/PredicatePrefix
 
-        def has_one(relation_name, primary_key: nil, foreign_key: nil, repository: nil, record: nil, filters: {}, **opts) # rubocop:disable Naming/PredicateName
+        # rubocop:disable Naming/PredicatePrefix
+        def has_one(relation_name, primary_key: nil, foreign_key: nil, repository: nil, record: nil, filters: {}, **opts)
           repository ||= infer_repository(relation_name)
 
           opts = opts.merge({
@@ -291,6 +294,7 @@ module Verse
             ]
           end
         end
+        # rubocop:enable Naming/PredicatePrefix
 
         # define a field of the record
         #
