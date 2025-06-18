@@ -65,8 +65,6 @@ module Verse
     @on_boot_callbacks&.each(&:call)
     @on_boot_callbacks&.clear
 
-    Verse::I18n.load_i18n
-
     logger.info{ "notifying plugins start" }
     Verse::Plugin.start(mode)
     logger.info{ "starting event manager" }
@@ -76,14 +74,14 @@ module Verse
   end
 
   def initialize_event_manager!
-    em = Config.config.fetch(:em, nil)
+    em = Config.config.em
 
     return unless em
 
-    adapter = em.fetch(:adapter)
+    adapter = em.adapter
 
     @event_manager = Verse::Event::Manager[adapter].new(
-      service_name:, service_id:, config: em.fetch(:config, {}), logger:
+      service_name:, service_id:, config: (em.config || {}), logger:
     )
   end
 
@@ -106,24 +104,24 @@ module Verse
   # Accessor for DistributedHash utility
   def kvstore
     @kvstore ||= begin
-      adapter, config = Verse.config[:kv_store].values_at(:adapter, :config)
-      Util::Reflection.constantize(adapter).new(config)
+      kvstore = Verse.config.kv_store
+      Util::Reflection.constantize(kvstore.adapter).new(kvstore.config)
     end
   end
 
   # Accessor for DistributedLock utility
   def lock
     @lock ||= begin
-      adapter, config = Verse.config[:lock].values_at(:adapter, :config)
-      Util::Reflection.constantize(adapter).new(config)
+      lock = Verse.config.lock
+      Util::Reflection.constantize(lock.adapter).new(lock.config)
     end
   end
 
   # Accessor for DistributedCounter utility
   def counter
     @counter ||= begin
-      adapter, config = Verse.config[:counter].values_at(:adapter, :config)
-      Util::Reflection.constantize(adapter).new(config)
+      counter = Verse.config.counter
+      Util::Reflection.constantize(counter.adapter).new(counter.config)
     end
   end
 
@@ -156,8 +154,6 @@ module Verse
     Config.config.dig(:logging, :level)&.tap do |level|
       @logger.level = level.to_sym
     end
-
-    Verse::I18n.init
 
     Verse::Plugin.load_configuration(Verse::Config.config)
     Verse::Plugin.init

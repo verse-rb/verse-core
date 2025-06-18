@@ -11,11 +11,20 @@ module Verse
 
     attr_accessor :adapter, :enabled, :serializer
 
-    # Set default adapter and serializer
-    @adapter = Impl::MemoryCacheAdapter.new
-    @serializer = Impl::ZMarshalSerializer.new
-
     @enabled = true
+
+    def setup!
+      return if @setup_done
+
+      config = Verse.config.cache
+
+      adapter_klass = Verse::Util::Reflection.constantize(config.adapter)
+      serializer_klass = Verse::Util::Reflection.constantize(config.serializer)
+
+      @adapter = adapter_klass.new(**config.config)
+      @serializer = serializer_klass.new
+      @setup_done = true
+    end
 
     # fetch the cache, or set it if it doesn't exist.
     # Every cache key are in the shape of [key]:[selector], where selector is a unique identifier for the cache and
@@ -39,6 +48,7 @@ module Verse
     # @param block [Proc] the block to call if the cache is not found
     # @return [Object] the data fetched from the cache
     def with_cache(key, selector = "$nosel", expires_in: nil, &block)
+      setup!
       return block.call unless @enabled
 
       cached_data = adapter.fetch(key, selector)
