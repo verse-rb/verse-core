@@ -35,38 +35,42 @@ module Verse
         File.join(config_path, "config.yml"),
         File.join(config_path, "config.#{Verse.environment}.yml"),
         File.join(config_path),
-      ].select do |file|
+      ]
+
+      found = lookup.select do |file|
         File.exist?(file) && !File.directory?(file)
       end
 
-      if lookup.empty?
-        raise "No config file found (looked at #{config_path})"
+      if found.empty?
+        raise "No config file found (looked at #{lookup.join(", ")})"
       end
 
-      lookup.each(&method(:inject_to_config))
+      config = {}
 
-      validate_config_schema!
+      found.each do |file|
+        inject_to_config(config, file)
+      end
+
+      validate_config_schema!(config)
     end
 
-    protected def validate_config_schema!
-      result = Verse::Config::Schema.validate(
-        @config
-      )
+    protected def validate_config_schema!(config)
+      result = Verse::Config::Schema.validate(config)
 
-      @config = result.value
+      raise Verse::Config::SchemaError, "Config errors: #{result.errors.to_h}" if result.errors.any?
 
-      return unless result.errors.any?
-
-      raise Verse::Config::SchemaError, "Config errors: #{result.errors.to_h}"
+      @config = Verse::Config::Dataclass.new(result.value)
     end
 
     # :nodoc:
-    def inject_to_config(file)
-      yaml_content = ERB.new(File.read(file)).result
+    def inject_to_config(config, file)
+      yaml_content = ERB.new(
+        File.read(file)
+      ).result
 
-      @config.merge!(
+      config.merge!(
         HashUtil.deep_symbolize_keys(
-          YAML.safe_load(yaml_content)
+          YAML.safe_load(yaml_content, permitted_classes: [Symbol])
         )
       )
     end

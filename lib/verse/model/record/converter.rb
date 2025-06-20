@@ -21,11 +21,11 @@ module Verse
           @converters[type] = block
         end
 
-        # rubocop:disable Naming/PredicateName
+        # rubocop:disable Naming/PredicatePrefix
         def has_converter?(type)
           @converters.key?(type)
         end
-        # rubocop:enable Naming/PredicateName
+        # rubocop:enable Naming/PredicatePrefix
 
         add_converter(:any){ |obj| obj }
 

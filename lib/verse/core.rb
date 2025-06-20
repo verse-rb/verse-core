@@ -9,7 +9,7 @@ module Verse
   GEM_PATH = File.expand_path("..", __dir__)
 
   def service_name
-    Config.config.fetch(:service_name)
+    Config.config.service_name
   end
 end
 

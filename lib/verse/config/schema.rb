@@ -23,18 +23,13 @@ module Verse
         field(:show_full_error, TrueClass).optional.filled
       end
 
-      field?(:event_bus, Hash) do
+      # Event manager configuration
+      field?(:em, Hash) do
         field(:adapter, String).filled
         field(:config, Hash).optional
       end
 
-      field?(:cache, Hash) do
-        field(:adapter, String).filled.default("Verse::Cache::Impl::MemoryCacheAdapter")
-        field?(:config, Hash).default({})
-      end.default({
-                    adapter: "Verse::Cache::Impl::MemoryCacheAdapter",
-                    config: {}
-                  })
+      field(:cache, Verse::Cache::ConfigSchema).default({})
 
       field?(:kv_store, Hash) do
         field(:adapter, String).filled.default("Verse::Distributed::Impl::MemoryKVStore")
@@ -62,5 +57,7 @@ module Verse
 
       extra_fields
     end
+
+    Dataclass = Schema.dataclass
   end
 end
