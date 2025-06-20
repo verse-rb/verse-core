@@ -14,7 +14,7 @@ module Verse
     @enabled = true
 
     def setup!
-      return if @setup_done
+      return if @setup_done || !@enabled
 
       config = Verse.config.cache
 
