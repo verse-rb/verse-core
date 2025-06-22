@@ -30,24 +30,19 @@ module Verse
     #       db: sequel # Map `db` dependency to sequel plugin
     # ```
     def load_configuration(config)
-      plugins = config.fetch(:plugins, [])
+      plugins = config.plugins || []
 
-      case plugins
-      when Array
-        plugins = plugins.map do |plugin|
-          plugin = plugin.dup
+      plugins = plugins.map do |plugin|
+        plugin = plugin.dup
 
-          name, klass = infer_name_and_class(plugin.fetch(:name))
+        name, klass = infer_name_and_class(plugin.name)
 
-          plugin[:name]    ||= name
-          plugin[:class]     = klass
-          plugin[:config]  ||= {}
-          plugin[:mapping] ||= {}
-
-          plugin
-        end
-      else
-        raise "Invalid plugin configuration"
+        {
+          name: plugin.name || name,
+          class: klass,
+          config: plugin.config || {},
+          dep: plugin.dep || {}
+        }
       end
 
       plugins.each do |plugin|
