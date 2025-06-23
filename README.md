@@ -10,18 +10,18 @@ We haven't found any framework in Ruby, so we've made one !
 With Verse, you can quickly design, implement and deploy web applications,
 scaling
 
-Verse is an opiniated microframework.
+Verse is an opinionated microframework.
 
-It is a microframework, as it requires very little dependencies and provide the
+It is a microframework, as it requires very few dependencies and provides the
 bare minimum.
-By default, Verse will require `dry` gems, `i18n` and `thor` (for CLI usage only).
+By default, Verse will require `verse-schema`.
 
 Compared to Rails, your application will boot extremely fast, and the scope pollution (e.g. monkey patching & method definition) is minimal.
 
-Verse is 3 tiered architecture:
+Verse is a 3-tiered architecture:
 1. Exposition Layer
 2. Service Layer
-3. Effect Layer
+3. Model Layer
 
 ## Exposition layer
 
@@ -34,24 +34,24 @@ The role of the exposition layer is to:
 - Filter the noise, by removing useless informations.
 - Define output format and/or used renderer.
 
-An example of exposition (using [universe plugins](#universe-plugins))
+An example of exposition (using [UniVerse plugins](#universe-plugins))
 
 ```ruby
 class MyExposition < Verse::Expo::Base
     use_service MyService
 
-    # hook the web
+    # hook the web (from verse-http plugin)
     expose on_http(:get, "/endpoint") do
         desc "this will listen to HTTP GET over /endpoint"
         input do
-            required(:id).filled(:integer)
+            field(:id, Integer).filled
         end
     end
     def do_something
         service.do_something(params[:id])
     end
 
-    # hook the time
+    # hook the time (from verse-periodic plugin)
     expose on_schedule("5 4 * * *") do
         desc "Every day at 4:05. Will run once per service (not per instance!)"
     end
@@ -62,8 +62,8 @@ class MyExposition < Verse::Expo::Base
     # hook the event bus
     expose on_event("other_service.form.sent") do
         input do
-            required(:id).filled(:integer)
-            required(:email).filled(:string)
+            field(:id, Integer).filled
+            field(:email, String).filled
         end
     end
     def on_form_edited
@@ -85,24 +85,28 @@ class MyService < Verse::Service::Base
 end
 ```
 
-Finally, the effect layer is in charge of applying effect.
+Finally, the model layer is in charge of applying effects.
 By effect, we mean operations that would transform/create data in your system.
-So any access to the database, any file storage or any 3rd party API call.
-Please note that in verse, anything related to the authorization is made at effect level.
-Unlike many software, you won't define authorization at the controller level (e.g. can access this specific endpoint) but, instead you will work with our powerful Auth Context system (as _role_, I have _action_ access to a subset (_scope_) of _resources_ )
+This includes any access to the database, file storage, or any 3rd party API call.
+In Verse, anything related to authorization is made at the model level.
+Unlike many frameworks, you won't define authorization at the controller level (e.g., can access this specific endpoint). Instead, you will work with our powerful Auth Context system (as a _role_, I have _action_ access to a subset (_scope_) of _resources_).
 
 ## What contains Verse Core exactly?
 
 Not much. Verse-core doesn't even have an HTTP server by default!
-Verse has been built with modularity in mind, and offers a simple and powerful plugin system.
-Running bare-minimum Verse won't get you very far, but check the [Getting started](./manual/getting_started.md) page for how to setup a quick project using verse-sinatra, verse-sequel and verse-nats !
+Verse has been built with modularity in mind and offers a simple and powerful plugin system.
+Running bare-minimum Verse won't get you very far, but check the [Getting started](./manual/getting_started.md) page for how to set up a quick project using `verse-http`, `verse-sequel` and `verse-redis` (for event-bus)!
 
 With verse-core, you will get access to:
-- Service lifecycle
-- Foundation for each layers
-- Foundation for side stuff like specs and generator
-- Some abstract classes for Repository and Record access
-- Publish to event bus. Need an adapter (currently NATS is supported)
+- Service lifecycle management.
+- Foundations for each layer (Exposition, Service, Model).
+- Authentication and Authorization system (`Verse::Auth`).
+- Caching (`Verse::Cache`) with a default in-memory adapter.
+- Distributed primitives (`Verse::Distributed`) like Lock, Counter, and KV Store, with default in-memory implementations.
+- A standard set of errors for common scenarios (`Verse::Error`).
+- Foundational modules for specs and generators.
+- Abstract classes for Repository and Record access.
+- Event publishing system. An adapter is required for message transport (e.g., `verse-redis`).
 
 ## UniVerse plugins
 
@@ -113,11 +117,12 @@ Name | Status | Description |
 | [verse-http](https://github.com/verse-rb/verse-http) | Ready | Sinatra based HTTP server |
 | [verse-jsonapi](https://github.com/verse-rb/verse-jsonapi) | Ready | JSON::Api renderer for your API |
 | [verse-jsonrpc](https://github.com/verse-rb/verse-jsonrpc) | Ready | Json RPC renderer for your API |
-| [verse-login](https://github.com/verse-rb/verse-login) | In Progress | JWT authorization implementation |
+| [verse-login](https://github.com/verse-rb/verse-login) | Ready | JWT authorization implementation |
 | [verse-otelemetry](https://github.com/verse-rb/verse-otelemetry) | Planned | open telemetry integration |
 | [verse-periodic](https://github.com/verse-rb/verse-periodic) | Ready | CRON and repeatable tasks |
 | [verse-redis](https://github.com/verse-rb/verse-redis) | Ready | Redis integration to Verse |
 | [verse-saga](https://github.com/verse-rb/verse-saga) | Planned | Job and Saga management |
+| [verse-schema](https://github.com/verse-rb/verse-schema) | Ready | Schema validation for inputs |
 | [verse-sequel](https://github.com/verse-rb/verse-sequel) | Ready | Repositories implementation using the Sequel gem. |
 | [verse-shrine](https://github.com/verse-rb/verse-shrine) | Ready | File storage using the Shrine gem. |
 
@@ -138,17 +143,7 @@ If bundler is not being used to manage dependencies, install the gem by executin
 
 ## Usage
 
-Get access to the CLI by calling:
-
-```
-verse --help
-```
-
-To setup a quick HTTP application:
-
-```
-verse g new --plugins=http,nats,sequel
-```
+To setup a quick HTTP application, you can use the `verse` command-line tool, which is available when you install the `verse-cli` gem.
 
 ## Development
 
@@ -158,7 +153,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/verse-core.
+Bug reports and pull requests are welcome on GitHub at https://github.com/verse-rb/verse-core.
 
 ## License
 

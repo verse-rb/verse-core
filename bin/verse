@@ -1,7 +1,0 @@
-#!/usr/bin/env ruby
-# frozen_string_literal: true
-
-require "verse/core"
-require "verse/cli"
-
-Verse::Cli::App.start

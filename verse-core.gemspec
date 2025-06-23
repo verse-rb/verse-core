@@ -31,17 +31,11 @@ Gem::Specification.new do |spec|
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
   spec.files = Dir.chdir(__dir__) do
     `git ls-files -z`.split("\x0").select do |f|
-      (f == __FILE__) || f.match(/\A(?:lib|bin|sig)/)
+      (f == __FILE__) || f.match(/\A(?:lib|sig)/)
     end
   end
 
-  spec.bindir = "bin"
-  spec.executables   = ["verse"]
   spec.require_paths = ["lib"]
 
   spec.add_dependency "verse-schema", ">= 1"
-
-  spec.add_dependency "thor", "~> 1.2.1"
-
-  spec.add_dependency "i18n", "~> 1.10.0"
 end
