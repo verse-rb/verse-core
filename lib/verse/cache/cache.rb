@@ -96,6 +96,9 @@ module Verse
     # @param selector [String, Array<String>] the selectors to flush.
     # If none is given, all the selectors for the key will be flushed.
     def flush(key, selectors = ["*"])
+      setup!
+      return unless @enabled
+
       selectors = [selectors] unless selectors.is_a?(Array)
       adapter.flush(key, selectors)
     end
