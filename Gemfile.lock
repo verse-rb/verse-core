@@ -10,6 +10,7 @@ PATH
   remote: .
   specs:
     verse-core (2.0.0)
+      logger (>= 1.0)
       verse-schema (>= 1)
 
 GEM
@@ -26,6 +27,7 @@ GEM
     json (2.12.2)
     language_server-protocol (3.17.0.5)
     lint_roller (1.1.0)
+    logger (1.7.0)
     method_source (1.1.0)
     msgpack (1.8.0)
     parallel (1.27.0)

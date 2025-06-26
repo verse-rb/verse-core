@@ -38,4 +38,5 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "verse-schema", ">= 1"
+  spec.add_dependency "logger", ">= 1.0"
 end
