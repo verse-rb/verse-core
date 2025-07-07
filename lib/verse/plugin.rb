@@ -117,6 +117,9 @@ module Verse
       register_plugin(plugin)
 
       logger.debug{ "Plugin `#{name}`: init sequence completed" }
+    rescue NameError => e
+      logger.fatal("Plugin `#{name}`: cannot find class `#{type}`: #{e.message}")
+      exit(-1)
     rescue StandardError => e
       logger.fatal(e)
       exit(-1)

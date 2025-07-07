@@ -18,13 +18,7 @@ require_relative "./distributed/impl/memory_kv_store"
 module Verse
   extend self
 
-  def service_id
-    @service_id
-  end
-
-  def root_path
-    @root_path
-  end
+  attr_reader :service_id, :root_path, :mode
 
   def stop
     return unless @started
@@ -44,6 +38,10 @@ module Verse
     @started = false
   end
 
+  def started?
+    !!@started
+  end
+
   def start(
     mode = :server,
     root_path: ".",
@@ -51,6 +49,7 @@ module Verse
     config_path: "./config"
   )
     @started = true
+    @mode = mode
 
     init(
       root_path:,
@@ -84,6 +83,7 @@ module Verse
       service_name:, service_id:, config: em.config || {}, logger:
     )
   end
+
 
   def on_boot(&block)
     if @started
