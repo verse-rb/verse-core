@@ -31,16 +31,15 @@ module Verse
     Verse::Plugin.finalize
 
     # Allow to switch via config.
-    @kvstore = nil
-    @lock = nil
-    @counter = nil
+    @kvstore  = nil
+    @lock     = nil
+    @counter  = nil
 
     @started = false
   end
 
-  def started?
-    !!@started
-  end
+  def started? = !!@started
+  def config = Verse::Config.config
 
   def start(
     mode = :server,
@@ -84,21 +83,16 @@ module Verse
     )
   end
 
-
   def on_boot(&block)
-    if @started
-      block.call
-    else
-      (@on_boot_callbacks ||= []) << block
-    end
+    return block.call if @started
+
+    (@on_boot_callbacks ||= []) << block
   end
 
   def on_stop(&block)
-    if !@started
-      block.call
-    else
-      (@on_stop_callbacks ||= []) << block
-    end
+    return block.call unless @started
+
+    (@on_stop_callbacks ||= []) << block
   end
 
   # Accessor for DistributedHash utility
@@ -125,14 +119,13 @@ module Verse
     end
   end
 
-  def config = Verse::Config.config
-
   def inflector
     # Inflector is not defined in config because it doesn't require
     # configuration which change between environments.
     @inflector ||= Verse::Util::Inflector.new
   end
 
+  # Authorize resetting of distributed utilities
   attr_writer :counter, :kvstore, :lock, :inflector
 
   protected
