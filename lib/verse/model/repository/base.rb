@@ -214,7 +214,12 @@ module Verse
         end
 
         def chunked_index(filters, scope: scoped(:read), included: [], page: 1, items_per_page: 1_000, sort: nil)
+          break_next_page = false
           Verse::Util::Iterator.chunk_iterator page do |current_page|
+            # PERFORMANCE FIX: stop the iteration if the last page was smaller than items_per_page
+            # Should remove one query on the last page.
+            next nil if break_next_page
+
             result = index(
               filters,
               scope:,
@@ -224,6 +229,8 @@ module Verse
               sort:,
               query_count: false
             )
+
+            break_next_page = result.count < items_per_page
 
             result.count == 0 ? nil : result
           end
