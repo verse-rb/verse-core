@@ -15,14 +15,15 @@ require_relative "./distributed/impl/local_lock"
 require_relative "./distributed/impl/memory_counter"
 require_relative "./distributed/impl/memory_kv_store"
 
-# If Verse is running, call the stop method to
-# clean up resources and faster the shutdown.
-at_exit { Verse.stop }
-
 module Verse
   extend self
 
   attr_reader :service_id, :root_path, :mode
+
+  Kernel.at_exit do
+    Verse.logger&.info { "Verse is shutting down..." }
+    Verse.stop
+  end
 
   def stop
     return unless @started
