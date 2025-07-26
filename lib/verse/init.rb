@@ -15,6 +15,10 @@ require_relative "./distributed/impl/local_lock"
 require_relative "./distributed/impl/memory_counter"
 require_relative "./distributed/impl/memory_kv_store"
 
+# If Verse is running, call the stop method to
+# clean up resources and faster the shutdown.
+at_exit { Verse.stop }
+
 module Verse
   extend self
 
